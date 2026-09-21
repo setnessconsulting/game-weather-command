@@ -40,9 +40,9 @@ Reason: gameplay is primarily evidence inspection, mapping, trends, forecast ent
 
 ## D-04 — TypeScript version
 
-Decision: start on TypeScript 7.0.2.
+Decision: start on TypeScript 6.0.2.
 
-Reason: fresh 2026-09-21 package evidence shows 7.0.2 stable. Earlier Jira planning referenced 6.x, but 6.x is the migration line toward the native 7.x compiler. Starting a new repo on 6.x would create immediate upgrade debt.
+Reason: TypeScript 7.0.2 is stable, but the current typescript-eslint 8.70 support window is `>=4.8.4 <6.1.0` and it warns on TypeScript 7. Weather Command prioritizes a fully supported lint/typecheck toolchain over adopting a newer compiler early. Upgrade to TypeScript 7 only after typescript-eslint officially supports it and the full verification suite passes.
 
 ## D-05 — Runtime network
 
