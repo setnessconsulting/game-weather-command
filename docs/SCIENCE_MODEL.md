@@ -79,6 +79,18 @@ At least three synchronized locations expose time-stamped observations:
 
 A simplified radar-style field may be derived from scenario truth. It is evidence, not independent truth. If rendered densely, presentation may use Canvas, but the underlying precipitation data remains semantic domain state.
 
+## Front motion and station truth must agree
+
+Station observations and front/precipitation geometry are authored separately. That separation is
+useful - it keeps the presentation layer from owning science - but it lets an authored scenario place a
+front far away from a station that is recording a frontal change, which would teach the wrong causal
+lesson from the game's own evidence.
+
+Binding constraint: for every station a boundary-linked effect names, the authored front motion must
+place the boundary at that station inside the authored change window, and `transitionWidth` must equal
+the distance the front travels across that window. The scenario validation layer enforces this and
+fails closed. See `docs/SCENARIO_SCHEMA.md`.
+
 ## Determinism
 
 Binding invariant:

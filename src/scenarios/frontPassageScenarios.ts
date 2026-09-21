@@ -26,13 +26,19 @@ const commonSimplifications = [
     id: "bounded-precipitation",
     description:
       "Precipitation fields are simplified evidence bands and do not simulate cloud microphysics or convection.",
-    learnerFacing: false,
+    learnerFacing: true,
+  },
+  {
+    id: "schematic-front-geometry",
+    description:
+      "Fronts are drawn as straight boundaries translating across a simplified region; real fronts curve, connect to low-pressure centers, and travel in other directions.",
+    learnerFacing: true,
   },
 ] as const;
 
 const guidedColdFront = parseWeatherScenario({
   schemaVersion: "1",
-  contentVersion: "wc04-guided-cold-front-1",
+  contentVersion: "wc04-guided-cold-front-2",
   scenarioId: "guided-cold-front-shift",
   title: "Cold Front Shift",
   missionType: "guided-cold-front",
@@ -95,14 +101,14 @@ const guidedColdFront = parseWeatherScenario({
     {
       id: "cool-dry",
       label: "Cooler, drier air",
-      initialCenter: { x: 0.1, y: 0.5 },
-      movement: { x: 0.06, y: 0 },
+      initialCenter: { x: 0.02, y: 0.5 },
+      movement: { x: 0.12, y: 0 },
       sourceRefIds: ["ngss-ms-ess2-5", "nws-fronts"],
     },
     {
       id: "warm-moist",
       label: "Warmer, moister air",
-      initialCenter: { x: 0.75, y: 0.5 },
+      initialCenter: { x: 0.72, y: 0.5 },
       movement: { x: 0.02, y: 0 },
       sourceRefIds: ["ngss-ms-ess2-5", "nws-fronts"],
     },
@@ -114,19 +120,19 @@ const guidedColdFront = parseWeatherScenario({
       airMassAId: "cool-dry",
       airMassBId: "warm-moist",
       initialPath: [
-        { x: 0.2, y: 0.08 },
-        { x: 0.2, y: 0.92 },
+        { x: 0.09, y: 0.08 },
+        { x: 0.09, y: 0.92 },
       ],
-      movement: { x: 0.08, y: 0 },
-      transitionWidth: 0.1,
+      movement: { x: 0.12, y: 0 },
+      transitionWidth: 0.12,
       sourceRefIds: ["nws-fronts", "noaa-weather-map"],
     },
   ],
   precipitationCells: [
     {
       id: "frontal-band",
-      initialCenter: { x: 0.24, y: 0.5 },
-      movement: { x: 0.08, y: 0 },
+      initialCenter: { x: 0.09, y: 0.5 },
+      movement: { x: 0.12, y: 0 },
       initialIntensityMmh: 4,
       intensityDeltaMmhPerStep: -0.1,
       sourceRefIds: ["nws-fronts"],
@@ -282,7 +288,7 @@ const guidedColdFront = parseWeatherScenario({
 
 const independentColdFront = parseWeatherScenario({
   schemaVersion: "1",
-  contentVersion: "wc04-independent-cold-front-1",
+  contentVersion: "wc04-independent-cold-front-2",
   scenarioId: "independent-cold-front-variant",
   title: "Front Timing Challenge",
   missionType: "independent-cold-front",
@@ -301,7 +307,7 @@ const independentColdFront = parseWeatherScenario({
     {
       id: "west",
       name: "Pine Station",
-      position: { x: 0.2, y: 0.45 },
+      position: { x: 0.32, y: 0.45 },
       initial: {
         temperatureC: 20,
         pressureHpa: 1009,
@@ -315,7 +321,7 @@ const independentColdFront = parseWeatherScenario({
     {
       id: "central",
       name: "Lake Station",
-      position: { x: 0.51, y: 0.54 },
+      position: { x: 0.52, y: 0.54 },
       initial: {
         temperatureC: 22,
         pressureHpa: 1008,
@@ -329,7 +335,7 @@ const independentColdFront = parseWeatherScenario({
     {
       id: "east",
       name: "Ridge Station",
-      position: { x: 0.8, y: 0.48 },
+      position: { x: 0.72, y: 0.48 },
       initial: {
         temperatureC: 23,
         pressureHpa: 1007,
@@ -345,14 +351,14 @@ const independentColdFront = parseWeatherScenario({
     {
       id: "cooler-dry-air",
       label: "Cooler, drier air",
-      initialCenter: { x: 0.08, y: 0.5 },
-      movement: { x: 0.05, y: 0 },
+      initialCenter: { x: 0.02, y: 0.5 },
+      movement: { x: 0.1, y: 0 },
       sourceRefIds: ["ngss-ms-ess2-5", "nws-fronts"],
     },
     {
       id: "mild-moist-air",
       label: "Mild, moister air",
-      initialCenter: { x: 0.72, y: 0.5 },
+      initialCenter: { x: 0.68, y: 0.5 },
       movement: { x: 0.015, y: 0 },
       sourceRefIds: ["ngss-ms-ess2-5", "nws-fronts"],
     },
@@ -364,19 +370,19 @@ const independentColdFront = parseWeatherScenario({
       airMassAId: "cooler-dry-air",
       airMassBId: "mild-moist-air",
       initialPath: [
-        { x: 0.18, y: 0.08 },
-        { x: 0.18, y: 0.92 },
+        { x: 0.08, y: 0.08 },
+        { x: 0.08, y: 0.92 },
       ],
-      movement: { x: 0.065, y: 0 },
-      transitionWidth: 0.12,
+      movement: { x: 0.1, y: 0 },
+      transitionWidth: 0.1,
       sourceRefIds: ["nws-fronts", "noaa-weather-map"],
     },
   ],
   precipitationCells: [
     {
       id: "broken-frontal-showers",
-      initialCenter: { x: 0.22, y: 0.5 },
-      movement: { x: 0.06, y: 0 },
+      initialCenter: { x: 0.08, y: 0.5 },
+      movement: { x: 0.1, y: 0 },
       initialIntensityMmh: 2.5,
       intensityDeltaMmhPerStep: -0.08,
       sourceRefIds: ["nws-fronts"],
@@ -529,7 +535,7 @@ const independentColdFront = parseWeatherScenario({
 
 const warmFront = parseWeatherScenario({
   schemaVersion: "1",
-  contentVersion: "wc04-warm-front-1",
+  contentVersion: "wc04-warm-front-2",
   scenarioId: "warm-front-gradual-change",
   title: "Gradual Change",
   missionType: "warm-front",
@@ -548,7 +554,7 @@ const warmFront = parseWeatherScenario({
     {
       id: "west",
       name: "Meadow Station",
-      position: { x: 0.2, y: 0.52 },
+      position: { x: 0.26, y: 0.52 },
       initial: {
         temperatureC: 16,
         pressureHpa: 1015,
@@ -562,7 +568,7 @@ const warmFront = parseWeatherScenario({
     {
       id: "central",
       name: "Valley Station",
-      position: { x: 0.5, y: 0.5 },
+      position: { x: 0.53, y: 0.5 },
       initial: {
         temperatureC: 15,
         pressureHpa: 1016,
@@ -592,14 +598,14 @@ const warmFront = parseWeatherScenario({
     {
       id: "warm-moist",
       label: "Warmer, moister air",
-      initialCenter: { x: 0.08, y: 0.5 },
-      movement: { x: 0.05, y: 0 },
+      initialCenter: { x: 0.01, y: 0.5 },
+      movement: { x: 0.1, y: 0 },
       sourceRefIds: ["ngss-ms-ess2-5", "nws-fronts"],
     },
     {
       id: "cool-air",
       label: "Cooler air",
-      initialCenter: { x: 0.75, y: 0.5 },
+      initialCenter: { x: 0.74, y: 0.5 },
       movement: { x: 0.01, y: 0 },
       sourceRefIds: ["ngss-ms-ess2-5", "nws-fronts"],
     },
@@ -611,19 +617,19 @@ const warmFront = parseWeatherScenario({
       airMassAId: "warm-moist",
       airMassBId: "cool-air",
       initialPath: [
-        { x: 0.18, y: 0.08 },
-        { x: 0.18, y: 0.92 },
+        { x: 0.06, y: 0.08 },
+        { x: 0.06, y: 0.92 },
       ],
-      movement: { x: 0.055, y: 0 },
-      transitionWidth: 0.2,
+      movement: { x: 0.1, y: 0 },
+      transitionWidth: 0.3,
       sourceRefIds: ["nws-fronts", "noaa-weather-map"],
     },
   ],
   precipitationCells: [
     {
       id: "broad-light-rain",
-      initialCenter: { x: 0.32, y: 0.5 },
-      movement: { x: 0.05, y: 0 },
+      initialCenter: { x: 0.14, y: 0.5 },
+      movement: { x: 0.1, y: 0 },
       initialIntensityMmh: 2.2,
       intensityDeltaMmhPerStep: -0.05,
       sourceRefIds: ["nws-fronts"],
@@ -759,7 +765,7 @@ const warmFront = parseWeatherScenario({
 
 const uncertainBoundary = parseWeatherScenario({
   schemaVersion: "1",
-  contentVersion: "wc04-uncertain-boundary-1",
+  contentVersion: "wc04-uncertain-boundary-2",
   scenarioId: "uncertain-boundary-variant",
   title: "Uncertain Timing",
   missionType: "uncertain-boundary",
@@ -778,7 +784,7 @@ const uncertainBoundary = parseWeatherScenario({
     {
       id: "west",
       name: "Cedar Station",
-      position: { x: 0.2, y: 0.45 },
+      position: { x: 0.38, y: 0.45 },
       initial: {
         temperatureC: 20,
         pressureHpa: 1010,
@@ -792,7 +798,7 @@ const uncertainBoundary = parseWeatherScenario({
     {
       id: "central",
       name: "Harbor Station",
-      position: { x: 0.5, y: 0.53 },
+      position: { x: 0.56, y: 0.53 },
       initial: {
         temperatureC: 21,
         pressureHpa: 1009,
@@ -806,7 +812,7 @@ const uncertainBoundary = parseWeatherScenario({
     {
       id: "east",
       name: "Field Station",
-      position: { x: 0.8, y: 0.48 },
+      position: { x: 0.74, y: 0.48 },
       initial: {
         temperatureC: 22,
         pressureHpa: 1008,
@@ -822,14 +828,14 @@ const uncertainBoundary = parseWeatherScenario({
     {
       id: "cooler-air",
       label: "Cooler air",
-      initialCenter: { x: 0.09, y: 0.5 },
-      movement: { x: 0.04, y: 0 },
+      initialCenter: { x: 0.01, y: 0.5 },
+      movement: { x: 0.1, y: 0 },
       sourceRefIds: ["ngss-ms-ess2-5", "nws-fronts"],
     },
     {
       id: "milder-air",
       label: "Milder, moister air",
-      initialCenter: { x: 0.72, y: 0.5 },
+      initialCenter: { x: 0.68, y: 0.5 },
       movement: { x: 0.015, y: 0 },
       sourceRefIds: ["ngss-ms-ess2-5", "nws-fronts"],
     },
@@ -841,19 +847,19 @@ const uncertainBoundary = parseWeatherScenario({
       airMassAId: "cooler-air",
       airMassBId: "milder-air",
       initialPath: [
-        { x: 0.2, y: 0.08 },
-        { x: 0.2, y: 0.92 },
+        { x: 0.06, y: 0.08 },
+        { x: 0.06, y: 0.92 },
       ],
-      movement: { x: 0.045, y: 0 },
-      transitionWidth: 0.18,
+      movement: { x: 0.1, y: 0 },
+      transitionWidth: 0.2,
       sourceRefIds: ["nws-fronts", "noaa-weather-map"],
     },
   ],
   precipitationCells: [
     {
       id: "patchy-rain",
-      initialCenter: { x: 0.3, y: 0.5 },
-      movement: { x: 0.04, y: 0 },
+      initialCenter: { x: 0.06, y: 0.5 },
+      movement: { x: 0.1, y: 0 },
       initialIntensityMmh: 1.8,
       intensityDeltaMmhPerStep: -0.05,
       sourceRefIds: ["nws-fronts"],

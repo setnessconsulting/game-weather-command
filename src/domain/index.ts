@@ -26,6 +26,7 @@ export {
   assertValidKernelScenario,
   DomainScenarioError
 } from "./weatherValidation";
+export { assertScenarioCoherence } from "./scenarioCoherence";
 export type {
   AirMassDefinition,
   AirMassState,
