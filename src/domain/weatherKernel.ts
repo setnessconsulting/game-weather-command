@@ -202,7 +202,7 @@ export function getAvailableForecastWindows(
   state: ScenarioState
 ): readonly ForecastWindow[] {
   return scenario.forecastWindows.filter(
-    (window) => state.minute >= window.startMinute && state.minute < window.endMinute
+    (forecastWindow) => state.minute >= forecastWindow.startMinute && state.minute < forecastWindow.endMinute
   );
 }
 
