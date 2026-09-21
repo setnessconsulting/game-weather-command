@@ -45,6 +45,7 @@ export type {
   StationDefinition,
   StationEffectRule,
   StationObservation,
+  StationObservationChange,
   StationObservationDelta,
   TimelineDefinition
 } from "./weatherTypes";
