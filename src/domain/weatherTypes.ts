@@ -140,13 +140,24 @@ export interface ScenarioState {
   readonly progress: ScenarioProgress;
 }
 
+export interface StationObservationChange {
+  readonly temperatureC: number;
+  readonly pressureHpa: number;
+  readonly pressureTendencyHpaPer3h: number;
+  readonly relativeHumidityPct: number;
+  readonly windDirectionDeg: number;
+  readonly windSpeedMps: number;
+  readonly precipitationRateMmh: number;
+}
+
 export interface StationChangeFact {
   readonly stationId: string;
   readonly fromMinute: number;
   readonly toMinute: number;
   readonly initial: StationObservation;
   readonly observed: StationObservation;
-  readonly delta: StationObservation;
+  /** Signed changes; windDirectionDeg is the shortest signed angular change in [-180, 180). */
+  readonly delta: StationObservationChange;
 }
 
 export interface ScenarioOutcomeFacts {
