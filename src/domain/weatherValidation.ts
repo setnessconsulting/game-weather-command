@@ -155,6 +155,7 @@ export function assertValidKernelScenario(scenario: KernelScenarioDefinition): v
       cell.intensityDeltaMmhPerStep,
       `precipitation cell ${cell.id}.intensityDeltaMmhPerStep`
     );
+    assertSourceRefs(cell.sourceRefIds, `Precipitation cell ${cell.id}`);
   }
 
   for (const effect of scenario.stationEffects) {
