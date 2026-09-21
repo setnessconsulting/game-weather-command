@@ -11,6 +11,7 @@ export {
 } from "./weatherKernel";
 export {
   parseReplayTrace,
+  recomputeReplayTrace,
   replayScenario,
   serializeReplayTrace
 } from "./replay";
