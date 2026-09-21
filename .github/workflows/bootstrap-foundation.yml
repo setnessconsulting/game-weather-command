@@ -1,0 +1,52 @@
+name: WC-02 Bootstrap Verification
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wc02-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - name: Generate exact lockfile for review
+        run: npm install --package-lock-only --ignore-scripts
+      - name: Install exact resolved graph
+        run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run test:coverage
+      - run: npm run check:architecture
+      - run: npm run build
+      - run: npm run check:privacy
+      - uses: actions/upload-artifact@v4
+        with:
+          name: weather-command-package-lock-${{ github.sha }}
+          path: package-lock.json
+          retention-days: 7
+
+  browser:
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - run: npm install --package-lock-only --ignore-scripts
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - run: npm run test:host
