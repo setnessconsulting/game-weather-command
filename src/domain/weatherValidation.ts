@@ -104,7 +104,7 @@ export function assertValidKernelScenario(scenario: KernelScenarioDefinition): v
   assertUnique(scenario.boundaries.map((boundary) => boundary.id), "boundaries");
   assertUnique(scenario.precipitationCells.map((cell) => cell.id), "precipitationCells");
   assertUnique(scenario.stationEffects.map((effect) => effect.id), "stationEffects");
-  assertUnique(scenario.forecastWindows.map((window) => forecastWindow.id), "forecastWindows");
+  assertUnique(scenario.forecastWindows.map((forecastWindow) => forecastWindow.id), "forecastWindows");
 
   const stationIds = new Set(scenario.stations.map((station) => station.id));
   const airMassIds = new Set(scenario.airMasses.map((airMass) => airMass.id));
