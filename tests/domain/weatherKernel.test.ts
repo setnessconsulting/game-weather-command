@@ -110,6 +110,27 @@ describe("weather kernel", () => {
     expect(facts).not.toHaveProperty("score");
   });
 
+
+  it("reports wind-direction outcome deltas as shortest signed changes", () => {
+    const scenario = {
+      ...frontPassageFixture,
+      stations: frontPassageFixture.stations.map((station) =>
+        station.id === "central"
+          ? { ...station, initial: { ...station.initial, windDirectionDeg: 270 } }
+          : station
+      ),
+      stationEffects: frontPassageFixture.stationEffects.map((effect) =>
+        effect.stationId === "central"
+          ? { ...effect, delta: { ...effect.delta, windDirectionDeg: -90 } }
+          : effect
+      )
+    };
+    const facts = getScenarioOutcomeFacts(scenario, stateAtMinute(scenario, 120));
+    const central = facts.stationChanges.find((fact) => fact.stationId === "central");
+    expect(central?.observed.windDirectionDeg).toBe(180);
+    expect(central?.delta.windDirectionDeg).toBe(-90);
+  });
+
   it("rejects state from a different seed even when scenario id/content match", () => {
     const state = initializeScenario(frontPassageFixture);
     const changedSeed = { ...frontPassageFixture, seed: frontPassageFixture.seed + 1 };
