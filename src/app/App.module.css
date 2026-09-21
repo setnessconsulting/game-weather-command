@@ -1,0 +1,13 @@
+.shell {
+  width: min(72rem, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: var(--space-6) 0 var(--space-8);
+}
+.header { max-width: 54rem; }
+.header h1 { margin: var(--space-2) 0; font-size: clamp(2.4rem, 8vw, 5rem); line-height: .95; }
+.eyebrow { color: var(--text-muted); text-transform: uppercase; letter-spacing: .12em; font-size: .78rem; font-weight: 700; }
+.lede { font-size: clamp(1.05rem, 2.4vw, 1.35rem); color: var(--text-secondary); max-width: 44rem; }
+.notice, .workspace { margin-top: var(--space-6); border: 1px solid var(--border); background: var(--surface); border-radius: var(--radius-lg); padding: var(--space-5); }
+.notice h2, .workspace h2 { margin-top: 0; }
+.workspace { display: grid; gap: var(--space-5); grid-template-columns: minmax(0, .8fr) minmax(20rem, 1.2fr); align-items: start; }
+@media (max-width: 46rem) { .workspace { grid-template-columns: 1fr; } }
