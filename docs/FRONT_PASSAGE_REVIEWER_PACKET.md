@@ -31,18 +31,21 @@ that automated or AI checks may not fabricate that approval.
 
 ## 2. Scope lock
 
-Review exactly this content. If any value below has changed, the packet is stale.
+**The binding scope is the content versions and the three file hashes below.** Those are what you are
+reviewing. Commit SHAs are recorded as provenance only: a documentation-only change moves `main`
+without altering a byte of the reviewed content, so a newer `main` on its own does **not** mean this
+packet is stale. If a content version or one of the hashes has changed, stop and ask for a regenerated
+packet.
 
 | Item | Value |
 | --- | --- |
 | Repository | `setnessconsulting/game-weather-command` |
-| `main` at packet generation | `468d4e182279aa06e79cf50d18a6f0731539d919` |
-| Scenario content | `wc04-guided-cold-front-2`, `wc04-independent-cold-front-2`, `wc04-warm-front-2`, `wc04-uncertain-boundary-2` |
-| `src/scenarios/frontPassageScenarios.ts` | git blob `bb73e96526fb51dbd2afd27f12d46fd22d100e6c`, sha256 `3f25fa5b9b992c8f21da28b5b141764378ee2ac32a5742f0894a4c43acc92950` |
-| `src/scenarios/schema.ts` | sha256 `9ee4729971e1bea06254144c6b256c6f64ac9dabf0749857e87f834d50e8cee5` |
-| `src/scenarios/scienceSources.ts` | sha256 `f2de0e5f5f580f5f95ff89a8f9a1fe2285c3212ce10092c6055e5d89c6c3f35d` |
-| Reviewed PRs | #6 (coherence remediation, reviewed head `747d82f37e007033203abba3da35220ba4938f9d`), #7 (replay conformance, reviewed head `d2e56649927ec78c7bc14f3ad43cdd1f02cc6992`) |
-| CI evidence | run `35665212364` (PR #6) and run `35666860623` (PR #7): verify + browser + nested-host all PASS |
+| **Scenario content (binding)** | `wc04-guided-cold-front-2`, `wc04-independent-cold-front-2`, `wc04-warm-front-2`, `wc04-uncertain-boundary-2` |
+| **`src/scenarios/frontPassageScenarios.ts` (binding)** | git blob `bb73e96526fb51dbd2afd27f12d46fd22d100e6c`, sha256 `3f25fa5b9b992c8f21da28b5b141764378ee2ac32a5742f0894a4c43acc92950` |
+| **`src/scenarios/schema.ts` (binding)** | sha256 `9ee4729971e1bea06254144c6b256c6f64ac9dabf0749857e87f834d50e8cee5` |
+| **`src/scenarios/scienceSources.ts` (binding)** | sha256 `f2de0e5f5f580f5f95ff89a8f9a1fe2285c3212ce10092c6055e5d89c6c3f35d` |
+| Reviewed PRs (provenance) | #6 coherence remediation, head `747d82f37e007033203abba3da35220ba4938f9d`, merged `81a3e1f8f4b13fc6eba09550875fd625f69f2374`; #7 replay conformance, head `d2e56649927ec78c7bc14f3ad43cdd1f02cc6992`, merged `468d4e182279aa06e79cf50d18a6f0731539d919`; #8 this packet |
+| CI evidence | run `35665212364` (PR #6), run `35666860623` (PR #7), run `35667360177` (PR #8): verify + browser + nested-host all PASS |
 
 ### Reproducing every claim
 
