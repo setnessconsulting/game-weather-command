@@ -15,6 +15,10 @@ export default defineConfig(
     }
   },
   {
+    files: ["scripts/**/*.mjs"],
+    languageOptions: { globals: { ...globals.node } }
+  },
+  {
     files: ["src/domain/**/*.ts"],
     rules: {
       "no-restricted-imports": ["error", {
