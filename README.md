@@ -69,3 +69,23 @@ See GAME-336 for the full dependency graph.
 ## Scope boundaries
 
 v1 deliberately excludes live weather APIs, severe-warning authority, learner accounts, remote telemetry, AI/LLM calls, multiplayer, LevelBest coupling, and a general-purpose game engine.
+
+
+## Development
+
+WC-02 establishes the executable foundation. Production weather simulation and canonical missions remain out of scope until WC-03/WC-04.
+
+```bash
+npm ci
+npm run dev
+npm run verify
+npm run test:e2e
+npm run test:host
+```
+
+The production build uses a relative asset base so the exact artifact can run beneath
+`/game-assets/weather-command/<version>/` inside games-site.
+
+Architecture guards keep `src/domain/` free of React, DOM, browser storage, network access,
+wall-clock time, animation timing, and ambient randomness. The learner runtime is limited to
+React, React DOM, and Zod until a later Jira gate explicitly approves another runtime dependency.
