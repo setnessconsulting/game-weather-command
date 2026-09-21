@@ -140,19 +140,26 @@ describe("authored front/station coherence", () => {
     )).toThrow(/outside the authored/);
   });
 
-  it("treats a boundary that never moves as a failed passage claim", () => {
+  it("reports a boundary that never advances eastward", () => {
     expect(() => assertScenarioCoherence(scenarioWith({
       boundary: { movement: { x: 0, y: 0 } },
       precipitationCell: { movement: { x: 0, y: 0 } },
-    }))).toThrow(/never within the timeline/);
+    }))).toThrow(/does not advance eastward/);
   });
 
-  it("treats a front that stalls short of the station as a failed passage claim", () => {
+  it("reports a front that stalls short of the station inside the timeline", () => {
     // 0.01/step from x=0.2 never reaches x=0.4 inside 180 minutes.
     expect(() => assertScenarioCoherence(scenarioWith({
       boundary: { movement: { x: 0.01, y: 0 } },
       precipitationCell: { movement: { x: 0.01, y: 0 } },
-    }))).toThrow(/never within the timeline/);
+    }))).toThrow(/after the scenario ends/);
+  });
+
+  it("reports a front that already passed the station before the scenario starts", () => {
+    // Central moves west of the front's starting position, so the crossing is negative.
+    expect(() => assertScenarioCoherence(scenarioWith({
+      stationOverrides: { central: { position: { x: 0.1, y: 0.5 } } },
+    }))).toThrow(/before the scenario starts/);
   });
 
   it("requires the transition width to match front speed across the change window", () => {

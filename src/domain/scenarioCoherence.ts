@@ -21,6 +21,12 @@ import type {
  * authored-data boundary. They do not change simulation behavior: the kernel
  * still derives every scientific value from `stationEffects`, seed, and time.
  *
+ * Deliberately NOT part of `assertValidKernelScenario`. That contract is
+ * evaluated on every `stateAtMinute` call and governs stored replay traces, so
+ * tightening it here would reject previously authored content and invalidate
+ * historical replays. Front/station coherence is an authoring rule, enforced
+ * where untrusted authored data enters the system.
+ *
  * Scope assumption for v1: a boundary that a station effect references is a
  * zonal front - a path spanning the region that translates along +x
  * (`movement.y === 0`). Boundaries with a non-zero y translation are left
@@ -44,23 +50,40 @@ function referenceXAtY(path: readonly NormalizedPoint[], y: number): number {
   return path[0]!.x;
 }
 
-/**
- * Simulation minute at which the authored boundary reaches a station, or `null`
- * when it never does inside the timeline (it does not advance along +x, or it
- * stops short of the station).
- */
-function crossingMinute(
+type FrontReach =
+  | { readonly kind: "reaches"; readonly minute: number }
+  | { readonly kind: "no-eastward-motion" }
+  | { readonly kind: "already-past"; readonly minute: number }
+  | { readonly kind: "beyond-timeline"; readonly minute: number };
+
+/** Where the authored boundary motion puts the front relative to one station. */
+function frontReach(
   boundary: BoundaryDefinition,
   stationX: number,
   stationY: number,
   stepMinutes: number,
   maxMinute: number
-): number | null {
-  if (!(boundary.movement.x > 0)) return null;
+): FrontReach {
+  if (!(boundary.movement.x > 0)) return { kind: "no-eastward-motion" };
   const referenceX = referenceXAtY(boundary.initialPath, stationY);
   const minute = ((stationX - referenceX) / boundary.movement.x) * stepMinutes;
-  if (minute < 0 || minute > maxMinute) return null;
-  return minute;
+  if (minute < 0) return { kind: "already-past", minute };
+  if (minute > maxMinute) return { kind: "beyond-timeline", minute };
+  return { kind: "reaches", minute };
+}
+
+/** Author-facing description of a failed reach, so the message is actionable. */
+function describeReach(reach: FrontReach): string {
+  switch (reach.kind) {
+    case "no-eastward-motion":
+      return "never, because the authored boundary does not advance eastward";
+    case "already-past":
+      return `at minute ${reach.minute}, before the scenario starts`;
+    case "beyond-timeline":
+      return `at minute ${reach.minute}, after the scenario ends`;
+    default:
+      return `at minute ${reach.minute}`;
+  }
 }
 
 /** Earliest boundary-linked effect per (station, boundary) pair: the passage rule. */
@@ -85,7 +108,7 @@ export function assertScenarioCoherence(scenario: KernelScenarioDefinition): voi
     if (boundary.movement.y !== 0) continue;
     const station = stationById.get(effect.stationId)!;
 
-    const crossing = crossingMinute(
+    const reach = frontReach(
       boundary,
       station.position.x,
       station.position.y,
@@ -94,14 +117,13 @@ export function assertScenarioCoherence(scenario: KernelScenarioDefinition): voi
     );
 
     if (
-      crossing === null ||
-      crossing < effect.startMinute - TOLERANCE ||
-      crossing > effect.endMinute + TOLERANCE
+      reach.kind !== "reaches" ||
+      reach.minute < effect.startMinute - TOLERANCE ||
+      reach.minute > effect.endMinute + TOLERANCE
     ) {
       throw new DomainScenarioError(
         `Effect ${effect.id} claims boundary "${boundary.id}" passage at station "${station.id}", but the ` +
-          `authored boundary motion places the front there ` +
-          `${crossing === null ? "never within the timeline" : `at minute ${crossing}`}, outside the authored ` +
+          `authored boundary motion places the front there ${describeReach(reach)}, outside the authored ` +
           `change interval from minute ${effect.startMinute} to minute ${effect.endMinute}. A station cannot ` +
           `record a frontal change before the front arrives or after it has passed.`
       );
