@@ -37,7 +37,10 @@ export function assertSaneObservation(observation: StationObservation, label: st
     `${label}.pressureTendencyHpaPer3h`
   );
   bounded(observation.relativeHumidityPct, 0, 100, `${label}.relativeHumidityPct`);
-  bounded(observation.windDirectionDeg, 0, 360, `${label}.windDirectionDeg`);
+  finite(observation.windDirectionDeg, `${label}.windDirectionDeg`);
+  if (observation.windDirectionDeg < 0 || observation.windDirectionDeg >= 360) {
+    throw new DomainScenarioError(`${label}.windDirectionDeg must be in [0, 360).`);
+  }
   bounded(observation.windSpeedMps, 0, 150, `${label}.windSpeedMps`);
   bounded(observation.precipitationRateMmh, 0, 500, `${label}.precipitationRateMmh`);
 }
@@ -46,14 +49,24 @@ function assertUnique(values: readonly string[], label: string): void {
   const seen = new Set<string>();
   for (const value of values) {
     if (!value.trim()) throw new DomainScenarioError(`${label} contains an empty identifier.`);
-    if (seen.has(value)) throw new DomainScenarioError(`${label} contains duplicate id "${value}".`);
+    if (seen.has(value)) {
+      throw new DomainScenarioError(`${label} contains duplicate id "${value}".`);
+    }
     seen.add(value);
+  }
+}
+
+function assertSourceRefs(refs: readonly string[], label: string): void {
+  if (refs.length === 0 || refs.some((ref) => !ref.trim())) {
+    throw new DomainScenarioError(`${label} requires at least one non-empty source reference.`);
   }
 }
 
 export function assertValidKernelScenario(scenario: KernelScenarioDefinition): void {
   if (scenario.schemaVersion !== "1") {
-    throw new DomainScenarioError(`Unsupported scenario schema version "${String(scenario.schemaVersion)}".`);
+    throw new DomainScenarioError(
+      `Unsupported scenario schema version "${String(scenario.schemaVersion)}".`
+    );
   }
   if (!scenario.scenarioId.trim()) throw new DomainScenarioError("scenarioId is required.");
   if (!scenario.contentVersion.trim()) throw new DomainScenarioError("contentVersion is required.");
@@ -106,6 +119,7 @@ export function assertValidKernelScenario(scenario: KernelScenarioDefinition): v
     normalizedPoint(airMass.initialCenter, `air mass ${airMass.id}.initialCenter`);
     finite(airMass.movement.x, `air mass ${airMass.id}.movement.x`);
     finite(airMass.movement.y, `air mass ${airMass.id}.movement.y`);
+    assertSourceRefs(airMass.sourceRefIds, `Air mass ${airMass.id}`);
   }
 
   for (const boundary of scenario.boundaries) {
@@ -126,20 +140,33 @@ export function assertValidKernelScenario(scenario: KernelScenarioDefinition): v
     }
     finite(boundary.movement.x, `boundary ${boundary.id}.movement.x`);
     finite(boundary.movement.y, `boundary ${boundary.id}.movement.y`);
+    assertSourceRefs(boundary.sourceRefIds, `Boundary ${boundary.id}`);
   }
 
   for (const cell of scenario.precipitationCells) {
     normalizedPoint(cell.initialCenter, `precipitation cell ${cell.id}.initialCenter`);
-    bounded(cell.initialIntensityMmh, 0, 500, `precipitation cell ${cell.id}.initialIntensityMmh`);
-    finite(cell.intensityDeltaMmhPerStep, `precipitation cell ${cell.id}.intensityDeltaMmhPerStep`);
+    bounded(
+      cell.initialIntensityMmh,
+      0,
+      500,
+      `precipitation cell ${cell.id}.initialIntensityMmh`
+    );
+    finite(
+      cell.intensityDeltaMmhPerStep,
+      `precipitation cell ${cell.id}.intensityDeltaMmhPerStep`
+    );
   }
 
   for (const effect of scenario.stationEffects) {
     if (!stationIds.has(effect.stationId)) {
-      throw new DomainScenarioError(`Effect ${effect.id} references unknown station "${effect.stationId}".`);
+      throw new DomainScenarioError(
+        `Effect ${effect.id} references unknown station "${effect.stationId}".`
+      );
     }
     if (effect.boundaryId && !boundaryIds.has(effect.boundaryId)) {
-      throw new DomainScenarioError(`Effect ${effect.id} references unknown boundary "${effect.boundaryId}".`);
+      throw new DomainScenarioError(
+        `Effect ${effect.id} references unknown boundary "${effect.boundaryId}".`
+      );
     }
     if (
       !Number.isSafeInteger(effect.startMinute) ||
@@ -156,16 +183,21 @@ export function assertValidKernelScenario(scenario: KernelScenarioDefinition): v
     ) {
       throw new DomainScenarioError(`Effect ${effect.id} must align to simulation steps.`);
     }
-    if (effect.sourceRefIds.length === 0) {
-      throw new DomainScenarioError(`Effect ${effect.id} requires at least one source reference.`);
+    if (Object.values(effect.delta).every((value) => value === undefined)) {
+      throw new DomainScenarioError(`Effect ${effect.id} must change at least one observation.`);
     }
+    assertSourceRefs(effect.sourceRefIds, `Effect ${effect.id}`);
     for (const [dimension, rule] of Object.entries(effect.noise ?? {})) {
       if (!rule) continue;
       if (!Number.isFinite(rule.amplitude) || rule.amplitude < 0) {
-        throw new DomainScenarioError(`Effect ${effect.id} noise ${dimension} amplitude is invalid.`);
+        throw new DomainScenarioError(
+          `Effect ${effect.id} noise ${dimension} amplitude is invalid.`
+        );
       }
       if (!rule.key.trim()) {
-        throw new DomainScenarioError(`Effect ${effect.id} noise ${dimension} requires a stable key.`);
+        throw new DomainScenarioError(
+          `Effect ${effect.id} noise ${dimension} requires a stable key.`
+        );
       }
     }
   }
@@ -180,12 +212,21 @@ export function assertValidKernelScenario(scenario: KernelScenarioDefinition): v
     ) {
       throw new DomainScenarioError(`Forecast window ${window.id} has an invalid time interval.`);
     }
+    if (
+      window.startMinute % timeline.stepMinutes !== 0 ||
+      window.endMinute % timeline.stepMinutes !== 0
+    ) {
+      throw new DomainScenarioError(`Forecast window ${window.id} must align to simulation steps.`);
+    }
     if (window.targetStationIds.length === 0) {
       throw new DomainScenarioError(`Forecast window ${window.id} requires at least one station.`);
     }
+    assertUnique(window.targetStationIds, `forecast window ${window.id} targetStationIds`);
     for (const stationId of window.targetStationIds) {
       if (!stationIds.has(stationId)) {
-        throw new DomainScenarioError(`Forecast window ${window.id} references unknown station "${stationId}".`);
+        throw new DomainScenarioError(
+          `Forecast window ${window.id} references unknown station "${stationId}".`
+        );
       }
     }
   }
