@@ -48,9 +48,9 @@ describe("WC-04 canonical Front Passage science content", () => {
     ]).toEqual([
       { temperatureC: 23, pressureHpa: 1006, pressureTendencyHpaPer3h: -2, relativeHumidityPct: 78, windDirectionDeg: 190, windSpeedMps: 4, precipitationRateMmh: 0 },
       { temperatureC: 23, pressureHpa: 1006, pressureTendencyHpaPer3h: -2, relativeHumidityPct: 78, windDirectionDeg: 190, windSpeedMps: 4, precipitationRateMmh: 0 },
-      { temperatureC: 16, pressureHpa: 1012, pressureTendencyHpaPer3h: 3, relativeHumidityPct: 60, windDirectionDeg: 265, windSpeedMps: 7, precipitationRateMmh: 4 },
-      { temperatureC: 16, pressureHpa: 1012, pressureTendencyHpaPer3h: 3, relativeHumidityPct: 56, windDirectionDeg: 265, windSpeedMps: 7, precipitationRateMmh: 2 },
-      { temperatureC: 16, pressureHpa: 1012, pressureTendencyHpaPer3h: 3, relativeHumidityPct: 52, windDirectionDeg: 265, windSpeedMps: 7, precipitationRateMmh: 0 },
+      { temperatureC: 16, pressureHpa: 1010, pressureTendencyHpaPer3h: 2, relativeHumidityPct: 60, windDirectionDeg: 265, windSpeedMps: 7, precipitationRateMmh: 4 },
+      { temperatureC: 16, pressureHpa: 1010, pressureTendencyHpaPer3h: 2, relativeHumidityPct: 56, windDirectionDeg: 265, windSpeedMps: 7, precipitationRateMmh: 2 },
+      { temperatureC: 16, pressureHpa: 1010, pressureTendencyHpaPer3h: 2, relativeHumidityPct: 52, windDirectionDeg: 265, windSpeedMps: 7, precipitationRateMmh: 0 },
     ]);
   });
 
@@ -64,9 +64,9 @@ describe("WC-04 canonical Front Passage science content", () => {
     ]).toEqual([
       { temperatureC: 22, pressureHpa: 1008, pressureTendencyHpaPer3h: -1.5, relativeHumidityPct: 69, windDirectionDeg: 185, windSpeedMps: 5, precipitationRateMmh: 0 },
       { temperatureC: 22, pressureHpa: 1008, pressureTendencyHpaPer3h: -1.5, relativeHumidityPct: 69, windDirectionDeg: 185, windSpeedMps: 5, precipitationRateMmh: 0 },
-      { temperatureC: 16, pressureHpa: 1013, pressureTendencyHpaPer3h: 2, relativeHumidityPct: 55, windDirectionDeg: 270, windSpeedMps: 7.5, precipitationRateMmh: 2 },
-      { temperatureC: 16, pressureHpa: 1013, pressureTendencyHpaPer3h: 2, relativeHumidityPct: 49, windDirectionDeg: 270, windSpeedMps: 7.5, precipitationRateMmh: 0 },
-      { temperatureC: 16, pressureHpa: 1013, pressureTendencyHpaPer3h: 2, relativeHumidityPct: 49, windDirectionDeg: 270, windSpeedMps: 7.5, precipitationRateMmh: 0 },
+      { temperatureC: 16, pressureHpa: 1012, pressureTendencyHpaPer3h: 1.5, relativeHumidityPct: 55, windDirectionDeg: 270, windSpeedMps: 7.5, precipitationRateMmh: 2 },
+      { temperatureC: 16, pressureHpa: 1012, pressureTendencyHpaPer3h: 1.5, relativeHumidityPct: 49, windDirectionDeg: 270, windSpeedMps: 7.5, precipitationRateMmh: 0 },
+      { temperatureC: 16, pressureHpa: 1012, pressureTendencyHpaPer3h: 1.5, relativeHumidityPct: 49, windDirectionDeg: 270, windSpeedMps: 7.5, precipitationRateMmh: 0 },
     ]);
   });
 
@@ -78,9 +78,9 @@ describe("WC-04 canonical Front Passage science content", () => {
       centralAt(warmFront as typeof guidedColdFront, 300),
     ]).toEqual([
       { temperatureC: 15, pressureHpa: 1016, pressureTendencyHpaPer3h: -1, relativeHumidityPct: 62, windDirectionDeg: 110, windSpeedMps: 3, precipitationRateMmh: 0 },
-      { temperatureC: 16.666666666667, pressureHpa: 1015, pressureTendencyHpaPer3h: -0.5, relativeHumidityPct: 66, windDirectionDeg: 126.666666666667, windSpeedMps: 3.666666666667, precipitationRateMmh: 0.666666666667 },
-      { temperatureC: 20, pressureHpa: 1013, pressureTendencyHpaPer3h: 0.5, relativeHumidityPct: 74, windDirectionDeg: 160, windSpeedMps: 5, precipitationRateMmh: 2 },
-      { temperatureC: 20, pressureHpa: 1013, pressureTendencyHpaPer3h: 0.5, relativeHumidityPct: 74, windDirectionDeg: 160, windSpeedMps: 5, precipitationRateMmh: 0 },
+      { temperatureC: 16.666666666667, pressureHpa: 1015.333333333333, pressureTendencyHpaPer3h: -0.5, relativeHumidityPct: 66, windDirectionDeg: 126.666666666667, windSpeedMps: 3.666666666667, precipitationRateMmh: 0.666666666667 },
+      { temperatureC: 20, pressureHpa: 1014, pressureTendencyHpaPer3h: 0.5, relativeHumidityPct: 74, windDirectionDeg: 160, windSpeedMps: 5, precipitationRateMmh: 2 },
+      { temperatureC: 20, pressureHpa: 1014, pressureTendencyHpaPer3h: 0.5, relativeHumidityPct: 74, windDirectionDeg: 160, windSpeedMps: 5, precipitationRateMmh: 0 },
     ]);
   });
 
@@ -92,8 +92,8 @@ describe("WC-04 canonical Front Passage science content", () => {
     expect(at180).toEqual(repeated);
     expect(at180).toEqual({
       temperatureC: 16.020475686295,
-      pressureHpa: 1012.739967634715,
-      pressureTendencyHpaPer3h: 1.2,
+      pressureHpa: 1011.739967634715,
+      pressureTendencyHpaPer3h: 0.7,
       relativeHumidityPct: 62,
       windDirectionDeg: 217.798989269882,
       windSpeedMps: 6.5,
