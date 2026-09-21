@@ -2,7 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
 test("foundation build boots with bounded runtime behavior", async ({ page }) => {
-  const unexpected = [];
+  const unexpected: string[] = [];
   page.on("request", (request) => {
     const url = new URL(request.url());
     if (url.origin !== "http://127.0.0.1:4173") unexpected.push(request.url());
