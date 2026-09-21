@@ -21,7 +21,7 @@ export function App() {
 
       <section className={styles.notice} aria-labelledby="simulation-heading">
         <h2 id="simulation-heading">Simulation, not live weather</h2>
-        <p>This build contains no live forecast, location, account, analytics, or remote learner data.</p>
+        <p>This build contains no live forecast, location, account, remote tracking, or remote learner data.</p>
       </section>
 
       <section className={styles.workspace} aria-labelledby="workspace-heading">
