@@ -15,6 +15,7 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       include: ["src/domain/**/*.ts", "src/scenarios/**/*.ts"],
+      exclude: ["src/domain/weatherTypes.ts"],
       reporter: ["text", "json-summary", "lcov"],
       thresholds: {
         lines: 90,
