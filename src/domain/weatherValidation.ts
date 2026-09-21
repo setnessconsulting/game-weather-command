@@ -104,7 +104,7 @@ export function assertValidKernelScenario(scenario: KernelScenarioDefinition): v
   assertUnique(scenario.boundaries.map((boundary) => boundary.id), "boundaries");
   assertUnique(scenario.precipitationCells.map((cell) => cell.id), "precipitationCells");
   assertUnique(scenario.stationEffects.map((effect) => effect.id), "stationEffects");
-  assertUnique(scenario.forecastWindows.map((window) => window.id), "forecastWindows");
+  assertUnique(scenario.forecastWindows.map((window) => forecastWindow.id), "forecastWindows");
 
   const stationIds = new Set(scenario.stations.map((station) => station.id));
   const airMassIds = new Set(scenario.airMasses.map((airMass) => airMass.id));
@@ -203,30 +203,30 @@ export function assertValidKernelScenario(scenario: KernelScenarioDefinition): v
     }
   }
 
-  for (const window of scenario.forecastWindows) {
+  for (const forecastWindow of scenario.forecastWindows) {
     if (
-      !Number.isSafeInteger(window.startMinute) ||
-      !Number.isSafeInteger(window.endMinute) ||
-      window.startMinute < 0 ||
-      window.endMinute <= window.startMinute ||
-      window.endMinute > timeline.maxMinute
+      !Number.isSafeInteger(forecastWindow.startMinute) ||
+      !Number.isSafeInteger(forecastWindow.endMinute) ||
+      forecastWindow.startMinute < 0 ||
+      forecastWindow.endMinute <= forecastWindow.startMinute ||
+      forecastWindow.endMinute > timeline.maxMinute
     ) {
-      throw new DomainScenarioError(`Forecast window ${window.id} has an invalid time interval.`);
+      throw new DomainScenarioError(`Forecast window ${forecastWindow.id} has an invalid time interval.`);
     }
     if (
-      window.startMinute % timeline.stepMinutes !== 0 ||
-      window.endMinute % timeline.stepMinutes !== 0
+      forecastWindow.startMinute % timeline.stepMinutes !== 0 ||
+      forecastWindow.endMinute % timeline.stepMinutes !== 0
     ) {
-      throw new DomainScenarioError(`Forecast window ${window.id} must align to simulation steps.`);
+      throw new DomainScenarioError(`Forecast window ${forecastWindow.id} must align to simulation steps.`);
     }
-    if (window.targetStationIds.length === 0) {
-      throw new DomainScenarioError(`Forecast window ${window.id} requires at least one station.`);
+    if (forecastWindow.targetStationIds.length === 0) {
+      throw new DomainScenarioError(`Forecast window ${forecastWindow.id} requires at least one station.`);
     }
-    assertUnique(window.targetStationIds, `forecast window ${window.id} targetStationIds`);
-    for (const stationId of window.targetStationIds) {
+    assertUnique(forecastWindow.targetStationIds, `forecast window ${forecastWindow.id} targetStationIds`);
+    for (const stationId of forecastWindow.targetStationIds) {
       if (!stationIds.has(stationId)) {
         throw new DomainScenarioError(
-          `Forecast window ${window.id} references unknown station "${stationId}".`
+          `Forecast window ${forecastWindow.id} references unknown station "${stationId}".`
         );
       }
     }
