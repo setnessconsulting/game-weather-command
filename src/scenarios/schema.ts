@@ -145,16 +145,18 @@ const numericRangeSchema = z.object({
   max: z.number(),
 }).refine((range) => range.min <= range.max, "range min must be <= max");
 
+const percentageRangeSchema = z.object({
+  min: z.number().min(0).max(100),
+  max: z.number().min(0).max(100),
+}).refine((range) => range.min <= range.max, "percentage range min must be <= max");
+
 export const acceptedRangeSchema = z.object({
   id: nonEmptyId,
   forecastWindowId: nonEmptyId,
   targetStationId: nonEmptyId,
   transitionArrivalMinute: numericRangeSchema,
   temperatureChangeC: numericRangeSchema,
-  precipitationProbabilityPct: numericRangeSchema.extend({
-    min: z.number().min(0).max(100),
-    max: z.number().min(0).max(100),
-  }).refine((range) => range.min <= range.max, "range min must be <= max"),
+  precipitationProbabilityPct: percentageRangeSchema,
   windDirectionSectorsDeg: z.array(z.object({
     min: z.number().min(0).lt(360),
     max: z.number().gt(0).max(360),
