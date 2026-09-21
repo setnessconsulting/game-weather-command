@@ -1,5 +1,9 @@
 import { deterministicSignedNoise } from "./deterministicNoise";
-import { assertSaneObservation, assertValidKernelScenario, DomainScenarioError } from "./weatherValidation";
+import {
+  assertSaneObservation,
+  assertValidKernelScenario,
+  DomainScenarioError
+} from "./weatherValidation";
 import type {
   ForecastWindow,
   KernelScenarioDefinition,
@@ -11,6 +15,9 @@ import type {
   StationObservationDelta
 } from "./weatherTypes";
 
+const DOMAIN_DECIMAL_PLACES = 12;
+const DOMAIN_SCALE = 10 ** DOMAIN_DECIMAL_PLACES;
+
 const observationDimensions: readonly ObservationDimension[] = [
   "temperatureC",
   "pressureHpa",
@@ -21,11 +28,19 @@ const observationDimensions: readonly ObservationDimension[] = [
   "precipitationRateMmh"
 ];
 
-const normalizeDirection = (degrees: number): number => ((degrees % 360) + 360) % 360;
+const canonicalNumber = (value: number): number =>
+  Math.round(value * DOMAIN_SCALE) / DOMAIN_SCALE;
 
-const translate = (point: NormalizedPoint, movement: NormalizedPoint, steps: number): NormalizedPoint => ({
-  x: point.x + movement.x * steps,
-  y: point.y + movement.y * steps
+const normalizeDirection = (degrees: number): number =>
+  canonicalNumber(((degrees % 360) + 360) % 360);
+
+const translate = (
+  point: NormalizedPoint,
+  movement: NormalizedPoint,
+  steps: number
+): NormalizedPoint => ({
+  x: canonicalNumber(point.x + movement.x * steps),
+  y: canonicalNumber(point.y + movement.y * steps)
 });
 
 function progressAt(minute: number, startMinute: number, endMinute: number): number {
@@ -40,7 +55,7 @@ function applyDelta(
   progress: number
 ): StationObservation {
   const value = <K extends ObservationDimension>(dimension: K): number =>
-    base[dimension] + (delta[dimension] ?? 0) * progress;
+    canonicalNumber(base[dimension] + (delta[dimension] ?? 0) * progress);
 
   return {
     temperatureC: value("temperatureC"),
@@ -82,7 +97,9 @@ function observationAt(
           rule.key,
           minute
         ].join(":");
-        noisy[dimension] += deterministicSignedNoise(scenario.seed, key, rule.amplitude);
+        noisy[dimension] = canonicalNumber(
+          noisy[dimension] + deterministicSignedNoise(scenario.seed, key, rule.amplitude)
+        );
       }
       observation = {
         ...noisy,
@@ -112,7 +129,7 @@ export function stateAtMinute(
   }
 
   const stepIndex = minute / timeline.stepMinutes;
-  const stations = Object.fromEntries(
+  const stations: Record<string, StationObservation> = Object.fromEntries(
     scenario.stations.map((station) => [station.id, observationAt(scenario, station.id, minute)])
   );
 
@@ -135,12 +152,16 @@ export function stateAtMinute(
     })),
     boundaries: scenario.boundaries.map((boundary) => ({
       id: boundary.id,
-      path: boundary.initialPath.map((point) => translate(point, boundary.movement, stepIndex))
+      path: boundary.initialPath.map((point) =>
+        translate(point, boundary.movement, stepIndex)
+      )
     })),
     precipitationCells: scenario.precipitationCells.map((cell) => ({
       id: cell.id,
       center: translate(cell.initialCenter, cell.movement, stepIndex),
-      intensityMmh: Math.max(0, cell.initialIntensityMmh + cell.intensityDeltaMmhPerStep * stepIndex)
+      intensityMmh: canonicalNumber(
+        Math.max(0, cell.initialIntensityMmh + cell.intensityDeltaMmhPerStep * stepIndex)
+      )
     })),
     progress
   };
@@ -155,8 +176,15 @@ export function advanceScenario(
   state: ScenarioState,
   steps = 1
 ): ScenarioState {
-  if (state.scenarioId !== scenario.scenarioId || state.contentVersion !== scenario.contentVersion) {
-    throw new DomainScenarioError("State does not belong to the supplied scenario/content version.");
+  if (
+    state.scenarioId !== scenario.scenarioId ||
+    state.schemaVersion !== scenario.schemaVersion ||
+    state.contentVersion !== scenario.contentVersion ||
+    state.seed !== scenario.seed
+  ) {
+    throw new DomainScenarioError(
+      "State does not belong to the supplied scenario identity/version/seed."
+    );
   }
   if (!Number.isSafeInteger(steps) || steps <= 0) {
     throw new DomainScenarioError("advanceScenario steps must be a positive integer.");
@@ -183,14 +211,19 @@ function subtractObservation(
   initial: StationObservation
 ): StationObservation {
   return {
-    temperatureC: observed.temperatureC - initial.temperatureC,
-    pressureHpa: observed.pressureHpa - initial.pressureHpa,
-    pressureTendencyHpaPer3h:
-      observed.pressureTendencyHpaPer3h - initial.pressureTendencyHpaPer3h,
-    relativeHumidityPct: observed.relativeHumidityPct - initial.relativeHumidityPct,
+    temperatureC: canonicalNumber(observed.temperatureC - initial.temperatureC),
+    pressureHpa: canonicalNumber(observed.pressureHpa - initial.pressureHpa),
+    pressureTendencyHpaPer3h: canonicalNumber(
+      observed.pressureTendencyHpaPer3h - initial.pressureTendencyHpaPer3h
+    ),
+    relativeHumidityPct: canonicalNumber(
+      observed.relativeHumidityPct - initial.relativeHumidityPct
+    ),
     windDirectionDeg: normalizeDirection(observed.windDirectionDeg - initial.windDirectionDeg),
-    windSpeedMps: observed.windSpeedMps - initial.windSpeedMps,
-    precipitationRateMmh: observed.precipitationRateMmh - initial.precipitationRateMmh
+    windSpeedMps: canonicalNumber(observed.windSpeedMps - initial.windSpeedMps),
+    precipitationRateMmh: canonicalNumber(
+      observed.precipitationRateMmh - initial.precipitationRateMmh
+    )
   };
 }
 
@@ -198,6 +231,17 @@ export function getScenarioOutcomeFacts(
   scenario: KernelScenarioDefinition,
   state: ScenarioState
 ): ScenarioOutcomeFacts {
+  if (
+    state.scenarioId !== scenario.scenarioId ||
+    state.schemaVersion !== scenario.schemaVersion ||
+    state.contentVersion !== scenario.contentVersion ||
+    state.seed !== scenario.seed
+  ) {
+    throw new DomainScenarioError(
+      "Outcome facts require state from the supplied scenario identity/version/seed."
+    );
+  }
+
   return {
     scenarioId: scenario.scenarioId,
     contentVersion: scenario.contentVersion,
