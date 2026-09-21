@@ -236,6 +236,32 @@ interface ModelBoundary {
 }
 ```
 
+## Front motion / station change coherence
+
+Front motion and station change windows are authored independently, so the schema must prove they
+agree rather than trusting the author to keep them aligned. `assertScenarioCoherence` enforces this at
+the authored-data boundary and fails closed.
+
+Rules for a zonal front (a boundary spanning the region that translates along `+x`):
+
+1. **Passage timing.** For every station a boundary-linked effect names, the front line must cross
+   that station's position inside the earliest boundary-linked effect window for that station/boundary
+   pair. A station cannot record a frontal change before the front arrives or after it has passed.
+   Later boundary-linked effects on the same station (for example post-frontal clearing) are follow-ups,
+   not passages, and are not constrained by this rule.
+2. **Transition width.** `transitionWidth` must equal the distance the front travels during that
+   station's change window - `movement.x * (endMinute - startMinute) / stepMinutes`. The station then
+   traverses the authored transition zone exactly across the window over which its observation ramps.
+   This is also what makes "abrupt" versus "gradual" a quantitative property of the content rather
+   than a label: warm fronts carry a materially larger transition width than cold fronts.
+3. **Precipitation bands ride fronts.** Every precipitation cell must share a movement vector with a
+   modeled boundary, so the precipitation layer and the front layer cannot disagree about where the
+   frontal band is.
+
+Boundaries with a non-zero `movement.y` are outside the current v1 front model and are skipped rather
+than guessed at. Station positions are therefore load-bearing authored data, not decoration: moving a
+station changes whether its authored change window is reachable by the authored front.
+
 ## Validation invariants
 
 At minimum:
@@ -247,6 +273,7 @@ At minimum:
 - forecast windows fit timeline;
 - every effect/source relationship has a source or explicit pedagogical simplification;
 - uncertain accepted ranges are internally coherent;
+- front motion, station change windows, and precipitation bands agree (see above);
 - golden trace can run from initial state to completion.
 
 ## Golden trace identity

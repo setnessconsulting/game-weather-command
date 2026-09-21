@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import {
+  assertScenarioCoherence,
   assertValidKernelScenario,
   type KernelScenarioDefinition,
   type StationEffectRule,
@@ -341,6 +342,10 @@ export function parseWeatherScenario(input: unknown): WeatherScenarioV1 {
     }
   }
 
-  assertValidKernelScenario(toKernelScenario(scenario));
+  const kernelScenario = toKernelScenario(scenario);
+  assertValidKernelScenario(kernelScenario);
+  // Front motion and station change windows are authored independently; fail closed
+  // rather than shipping a map that disagrees with the station truth.
+  assertScenarioCoherence(kernelScenario);
   return scenario;
 }
