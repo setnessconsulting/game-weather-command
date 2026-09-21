@@ -246,13 +246,17 @@ export function getScenarioOutcomeFacts(
     );
   }
 
+  // Recompute the canonical scientific snapshot from scenario + simulation time.
+  // Callers may hold presentation copies of state; those copies are never scientific authority.
+  const canonicalState = stateAtMinute(scenario, state.minute);
+
   return {
     scenarioId: scenario.scenarioId,
     contentVersion: scenario.contentVersion,
-    minute: state.minute,
+    minute: canonicalState.minute,
     stationChanges: scenario.stations.map((station) => {
-      const observed = state.stations[station.id];
-      if (!observed) throw new DomainScenarioError(`State is missing station "${station.id}".`);
+      const observed = canonicalState.stations[station.id];
+      if (!observed) throw new DomainScenarioError(`Canonical state is missing station "${station.id}".`);
       return {
         stationId: station.id,
         fromMinute: 0,
