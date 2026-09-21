@@ -200,6 +200,30 @@ which is the distinction the mission is teaching. Reviewed and accepted against:
 | 11 | No implication of live or operational forecasting | Pass - fictional region, synthetic stations, no live feeds; objectives are scenario-bounded |
 | 12 | Exact deterministic golden traces | **Found F3/F4, remediated** - all four missions lock exact traces |
 
+## Canonical replay conformance
+
+GAME-341's acceptance criterion requires that a reviewer can "replay every scenario deterministically".
+Before this review that claim was unproven for the canonical content: `replayScenario` and the replay
+contract were only exercised against a synthetic kernel fixture in `tests/domain/`, never against the
+four shipping scenarios.
+
+`tests/scenarios/canonicalReplay.test.ts` now proves, for every canonical scenario, that:
+
+- a full mission replays to the authored maximum minute, visiting every simulation step exactly once,
+  and each replayed checkpoint equals the canonical `stateAtMinute` snapshot;
+- identical scenario + seed + action logs produce identical traces;
+- the result is invariant to how advance actions are chunked (uneven chunking lands on the same state);
+- a serialized trace round-trips, and authoritative state is recomputed from the action log rather than
+  trusted from the payload;
+- a tampered serialized checkpoint is ignored by `recomputeReplayTrace`;
+- replay identity is bound to `contentVersion`, so a trace from superseded science (`-1`) is rejected
+  against current science (`-2`) instead of being silently replayed as current;
+- outcome facts are reproducible from replay state.
+
+Deterministic uncertainty is also now checked as a property rather than a statement: changing only the
+seed leaves the guided, independent, and warm-front observations bit-identical (they declare no
+observational noise), and moves the uncertain-boundary observations (which do).
+
 ## Golden-trace review
 
 The committed tests lock the Central Station trace for all four missions and now additionally assert
