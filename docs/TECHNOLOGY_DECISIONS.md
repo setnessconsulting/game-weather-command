@@ -3,7 +3,7 @@
 Status: binding WC-01 decision record  
 Decision date: 2026-09-21
 
-This document supersedes earlier planning references to TypeScript 6.x. A fresh package/release check found TypeScript 7.0.2 stable, so a new repository should not intentionally begin on the 6.x migration line.
+A fresh package/release review found TypeScript 7.0.2 stable, but the current typescript-eslint 8.70 support range is `>=4.8.4 <6.1.0` and it explicitly warns on TypeScript 7. For a fully supported lint/typecheck stack, Weather Command intentionally begins on TypeScript 6.0.2. TypeScript 7 is a planned future upgrade only after the lint toolchain officially supports it.
 
 ## Runtime baseline
 
@@ -19,7 +19,7 @@ This document supersedes earlier planning references to TypeScript 6.x. A fresh 
 | Technology | Pinned baseline | Role |
 |---|---:|---|
 | Node.js | 24.x | repo/CI runtime; aligns with current Setness standalone-game repos |
-| TypeScript | 7.0.2 | strict type checking |
+| TypeScript | 6.0.2 | strict type checking; highest supported TypeScript line for current typescript-eslint |
 | Vite | 8.3.0 | dev/build |
 | @vitejs/plugin-react | 6.1.1 | React/Vite integration |
 | Vitest | 5.0.1 | unit/contract tests |
@@ -35,7 +35,7 @@ Where a package has required peer packages (for example React Testing Library's 
 
 - React latest version page: https://react.dev/versions
 - React 19.3 announcement: https://react.dev/blog/2026/09/09/react-19-3
-- TypeScript npm: https://www.npmjs.com/package/typescript
+- TypeScript 6 announcement: https://devblogs.microsoft.com/typescript/announcing-typescript-6-0/\n- TypeScript 6 compatibility package: https://www.npmjs.com/package/@typescript/typescript6\n- typescript-eslint support window: https://typescript-eslint.io/users/dependency-versions/
 - Vite npm: https://www.npmjs.com/package/vite
 - Vitest 5 announcement: https://vitest.dev/blog/vitest-5
 - Vitest npm: https://www.npmjs.com/package/vitest
@@ -184,3 +184,14 @@ After the production vertical slice, dependency upgrades require a dedicated cha
 - regenerated exact-SHA evidence when applicable.
 
 “Latest exists” is not sufficient justification.
+
+
+## TypeScript 7 upgrade gate
+
+Do not upgrade to TypeScript 7 while the active typescript-eslint support range excludes it.
+
+The future upgrade requires:
+- official typescript-eslint support for TypeScript 7;
+- clean lint/typecheck on the full repository;
+- no suppression of unsupported-version warnings;
+- full WC-02/WC-12 verification.
