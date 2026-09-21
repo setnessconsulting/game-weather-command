@@ -12,6 +12,7 @@ import type {
   ScenarioOutcomeFacts,
   ScenarioState,
   StationObservation,
+  StationObservationChange,
   StationObservationDelta
 } from "./weatherTypes";
 
@@ -206,10 +207,13 @@ export function getAvailableForecastWindows(
   );
 }
 
+const signedDirectionChange = (observedDegrees: number, initialDegrees: number): number =>
+  canonicalNumber(((observedDegrees - initialDegrees + 540) % 360) - 180);
+
 function subtractObservation(
   observed: StationObservation,
   initial: StationObservation
-): StationObservation {
+): StationObservationChange {
   return {
     temperatureC: canonicalNumber(observed.temperatureC - initial.temperatureC),
     pressureHpa: canonicalNumber(observed.pressureHpa - initial.pressureHpa),
@@ -219,7 +223,7 @@ function subtractObservation(
     relativeHumidityPct: canonicalNumber(
       observed.relativeHumidityPct - initial.relativeHumidityPct
     ),
-    windDirectionDeg: normalizeDirection(observed.windDirectionDeg - initial.windDirectionDeg),
+    windDirectionDeg: signedDirectionChange(observed.windDirectionDeg, initial.windDirectionDeg),
     windSpeedMps: canonicalNumber(observed.windSpeedMps - initial.windSpeedMps),
     precipitationRateMmh: canonicalNumber(
       observed.precipitationRateMmh - initial.precipitationRateMmh
