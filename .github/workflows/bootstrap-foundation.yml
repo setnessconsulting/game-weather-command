@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: wc02-${{ github.ref }}
@@ -17,24 +17,11 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
-      - name: Generate exact lockfile for repository bootstrap
-        run: npm install --package-lock-only --ignore-scripts
-      - name: Persist exact lockfile on the implementation branch
-        if: github.event_name == 'pull_request'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add package-lock.json
-          if ! git diff --cached --quiet; then
-            git commit -m "GAME-338: commit exact dependency lockfile"
-            git push origin HEAD:${{ github.event.pull_request.head.ref }}
-          fi
-      - name: Install exact resolved graph
+          cache: npm
+      - name: Install exact committed dependency graph
         run: npm ci
       - run: npm run typecheck
       - run: npm run lint
@@ -49,13 +36,12 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
-      - run: npm install --package-lock-only --ignore-scripts
-      - run: npm ci
+          cache: npm
+      - name: Install exact committed dependency graph
+        run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
       - run: npm run test:host
