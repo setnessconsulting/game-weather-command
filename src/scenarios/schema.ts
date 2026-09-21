@@ -3,6 +3,7 @@ import { z } from "zod";
 import {
   assertValidKernelScenario,
   type KernelScenarioDefinition,
+  type StationEffectRule,
 } from "@/domain";
 
 const normalizedCoordinate = z.number().min(0).max(1);
@@ -228,7 +229,26 @@ function assertUniqueIds(values: readonly string[], label: string): void {
   }
 }
 
+function compactDefined<T extends Record<string, unknown>>(value: T): Record<string, unknown> {
+  return Object.fromEntries(Object.entries(value).filter(([, entry]) => entry !== undefined));
+}
+
 export function toKernelScenario(scenario: WeatherScenarioV1): KernelScenarioDefinition {
+  const stationEffects: StationEffectRule[] = scenario.stationEffects.map((effect) => ({
+    id: effect.id,
+    stationId: effect.stationId,
+    startMinute: effect.startMinute,
+    endMinute: effect.endMinute,
+    delta: compactDefined(effect.delta) as StationEffectRule["delta"],
+    sourceRefIds: effect.sourceRefIds,
+    ...(effect.boundaryId !== undefined ? { boundaryId: effect.boundaryId } : {}),
+    ...(effect.noise !== undefined
+      ? {
+          noise: compactDefined(effect.noise) as NonNullable<StationEffectRule["noise"]>,
+        }
+      : {}),
+  }));
+
   return {
     schemaVersion: scenario.schemaVersion,
     contentVersion: scenario.contentVersion,
@@ -239,7 +259,7 @@ export function toKernelScenario(scenario: WeatherScenarioV1): KernelScenarioDef
     airMasses: scenario.airMasses,
     boundaries: scenario.boundaries,
     precipitationCells: scenario.precipitationCells,
-    stationEffects: scenario.stationEffects,
+    stationEffects,
     forecastWindows: scenario.forecastWindows,
   };
 }
