@@ -47,6 +47,7 @@ export interface PrecipitationCellDefinition {
   readonly movement: NormalizedPoint;
   readonly initialIntensityMmh: number;
   readonly intensityDeltaMmhPerStep: number;
+  readonly sourceRefIds: readonly string[];
 }
 
 export type ObservationDimension = keyof StationObservation;
