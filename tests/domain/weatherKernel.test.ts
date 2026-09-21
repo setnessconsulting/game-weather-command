@@ -7,6 +7,7 @@ import {
   getScenarioOutcomeFacts,
   initializeScenario,
   parseReplayTrace,
+  recomputeReplayTrace,
   replayScenario,
   serializeReplayTrace,
   stateAtMinute
@@ -188,6 +189,33 @@ describe("replay contract", () => {
     const parsed = parseReplayTrace(serializeReplayTrace(trace));
     expect(parsed).toEqual(trace);
     expect(parsed.checkpoints.at(-1)?.state.progress.status).toBe("complete");
+  });
+
+  it("recomputes authoritative replay state instead of trusting serialized checkpoints", () => {
+    const trace = replayScenario(frontPassageFixture, [{ type: "advance", steps: 2 }]);
+    const tampered = {
+      ...trace,
+      checkpoints: trace.checkpoints.map((checkpoint, index) =>
+        index === 1
+          ? {
+              ...checkpoint,
+              state: {
+                ...checkpoint.state,
+                stations: {
+                  ...checkpoint.state.stations,
+                  central: { ...checkpoint.state.stations.central!, temperatureC: 69 }
+                }
+              }
+            }
+          : checkpoint
+      )
+    };
+    const parsed = parseReplayTrace(JSON.stringify(tampered));
+    expect(parsed.checkpoints[1]?.state.stations.central?.temperatureC).toBe(69);
+
+    const authoritative = recomputeReplayTrace(frontPassageFixture, parsed);
+    expect(authoritative.checkpoints[1]?.state.stations.central?.temperatureC).not.toBe(69);
+    expect(authoritative).toEqual(replayScenario(frontPassageFixture, parsed.actions));
   });
 
   it("rejects malformed replay versions", () => {
