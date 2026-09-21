@@ -40,6 +40,7 @@ Scientific state never depends on rendering frame rate, SVG coordinates, animati
 
 - [Product requirements](docs/PRD.md)
 - [Science model](docs/SCIENCE_MODEL.md)
+- [Scenario schema](docs/SCENARIO_SCHEMA.md)
 - [Technical design](docs/TECHNICAL_DESIGN.md)
 - [Technology decisions](docs/TECHNOLOGY_DECISIONS.md)
 - [UX and user flow](docs/UX_USER_FLOW.md)
@@ -47,6 +48,7 @@ Scientific state never depends on rendering frame rate, SVG coordinates, animati
 - [Comparator benchmark rubric](docs/BENCHMARK_RUBRIC.md)
 - [Performance and device budgets](docs/PERFORMANCE_AND_DEVICE_BUDGETS.md)
 - [Privacy and persistence](docs/PRIVACY_AND_PERSISTENCE.md)
+- [Asset/audio provenance](docs/ASSET_PROVENANCE.md)
 - [games-site release contract](docs/RELEASE_CONTRACT.md)
 - [Acceptance/evidence matrix](docs/ACCEPTANCE_EVIDENCE_MATRIX.md)
 - [Decisions](docs/DECISIONS.md)
