@@ -88,6 +88,10 @@ export function serializeReplayTrace(trace: ReplayTrace): string {
   return JSON.stringify(trace);
 }
 
+/**
+ * Parses transport/storage shape only. Parsed checkpoints are not scientific authority;
+ * consumers that need authoritative state must call recomputeReplayTrace.
+ */
 export function parseReplayTrace(serialized: string): ReplayTrace {
   let candidate: unknown;
   try {
@@ -150,4 +154,26 @@ export function parseReplayTrace(serialized: string): ReplayTrace {
   }
 
   return candidate as unknown as ReplayTrace;
+}
+
+
+/**
+ * Recomputes authoritative checkpoints from the canonical scenario and parsed action log.
+ * Serialized checkpoint payloads are deliberately ignored.
+ */
+export function recomputeReplayTrace(
+  scenario: KernelScenarioDefinition,
+  trace: ReplayTrace
+): ReplayTrace {
+  if (
+    trace.scenarioId !== scenario.scenarioId ||
+    trace.schemaVersion !== scenario.schemaVersion ||
+    trace.contentVersion !== scenario.contentVersion ||
+    trace.seed !== scenario.seed
+  ) {
+    throw new DomainScenarioError(
+      "Replay trace does not belong to the supplied scenario identity/version/seed."
+    );
+  }
+  return replayScenario(scenario, trace.actions);
 }
