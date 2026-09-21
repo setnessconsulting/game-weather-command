@@ -161,6 +161,35 @@ begin changing until minute 90. The uncertainty framing therefore relies on the 
 and the wide transition zone rather than on pre-frontal observation scatter. Whether to add authored
 pre-frontal variability is a design decision for WC-05/WC-06; it is recorded, not silently changed.
 
+### F9 - MEDIUM - The uncertain mission never clears after the front passes (OPEN - human disposition)
+
+The guided, independent, and warm-front missions all model post-passage clearing. The uncertain mission
+has no follow-up effects at all, so every station reaches +2.5 mm/h and holds it to the end of the
+simulation. Cedar Station is fully changed by minute 150 but still reports 2.5 mm/h steady rain at minute
+300, 150 minutes after the front crossed it at minute 96. That contradicts the cold-front relationship
+the mission cites, where rain is a band associated with passage rather than a permanent state.
+
+Recommended remediation: add `west-clearing` (150-210) and `central-clearing` (180-240) mirroring the
+other missions (precip -2.5, RH -5) and re-lock the uncertain golden trace at `contentVersion` `-3`.
+Recorded rather than applied because the deliberately vague character of this mission makes sustained
+broad rain a plausible design intent, which is a science-authoring judgment for the human reviewer.
+
+### F10 - MEDIUM - `transitionArrivalMinute` is undefined and the four missions disagree (OPEN - human disposition)
+
+`transitionArrivalMinute` is a load-bearing forecast-verification input, but the term is defined nowhere
+in `docs/`, and the four canonical accepted ranges are not consistent with any single reading:
+
+| Mission | Canonical change window | Accepted arrival range | Onset in range? | Completion in range? |
+| --- | --- | --- | --- | --- |
+| guided | 90-120 | 90-120 | yes | yes |
+| independent | 120-150 | 120-150 | yes | yes |
+| warm | 90-180 | 120-180 | no (90 < 120) | yes |
+| uncertain | 120-180 | 120-210 | yes | no (180 < 210) |
+
+Without a definition, WC-06's verification could judge a defensible forecast wrong (or right) depending
+on an undocumented convention. Recommended: WC-06 owns an explicit definition and the four ranges are
+aligned to it as part of the forecast-verification story.
+
 ### F7 - LOW - Accepted ranges ship to the learner runtime (FORWARDED to WC-06)
 
 `acceptedRanges` are part of the scenario payload and therefore reach the browser. They are envelopes,
@@ -192,10 +221,10 @@ which is the distinction the mission is teaching. Reviewed and accepted against:
 | 3 | Timing relationships | **Found F1, remediated** - front, band, and station timing now agree by construction and by test |
 | 4 | Cold-front vs warm-front distinction | Pass - cold-front temperature change is 6-7 C in 30 min; the warm front moves 5 C across 90 min with a 0.30 transition width against 0.10-0.12 for the cold fronts |
 | 5 | Precipitation language does not imply universality | Pass - debrief text uses "band", "broken showers", "broader light-rain signal"; the bounded-precipitation boundary is now learner-facing |
-| 6 | Forecast ranges | Pass - every accepted range brackets the canonical outcome and fits its forecast window |
+| 6 | Forecast ranges | Pass with note - every accepted range brackets the canonical outcome and fits its forecast window; **found F10**, `transitionArrivalMinute` is undefined |
 | 7 | Confidence calibration | Pass - defensible confidence widens from `[medium, high]` on the guided mission to `[low, medium]` on the uncertain mission |
 | 8 | Deterministic uncertainty | Pass - seeded PRNG in the domain layer; replays reproduce identical observations; the noise key includes `contentVersion`, so a content revision re-draws the stream by design |
-| 9 | Debrief explanations | Pass - each debrief links evidence IDs to outcome dimensions; debrief text was checked against the corrected front timing |
+| 9 | Debrief explanations | Pass with note - each debrief links evidence IDs to outcome dimensions and was checked against the corrected front timing; **found F9**, the uncertain mission never clears |
 | 10 | Model boundaries/simplifications | **Found F2, remediated** |
 | 11 | No implication of live or operational forecasting | Pass - fictional region, synthetic stations, no live feeds; objectives are scenario-bounded |
 | 12 | Exact deterministic golden traces | **Found F3/F4, remediated** - all four missions lock exact traces |
@@ -239,6 +268,13 @@ and after remediation:
 
 Model boundaries now always output values inside their documented ranges, and `assertSaneObservation`
 still rejects out-of-range simulated weather rather than clamping it.
+
+## Reviewer packet
+
+`docs/FRONT_PASSAGE_REVIEWER_PACKET.md` is the decision companion to this dossier. It scope-locks the
+exact content versions and file hashes, reproduces the per-scenario facts from the shipped content
+(rather than transcribing prose), quotes the source basis, maps each of the twelve review criteria to the
+test that backs it, and carries a fill-in decision worksheet covering F5, F6, F9, and F10.
 
 ## Independent review gate
 
