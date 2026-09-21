@@ -76,7 +76,8 @@ export const frontPassageFixture: KernelScenarioDefinition = {
       initialCenter: { x: 0.4, y: 0.5 },
       movement: { x: 0.04, y: 0 },
       initialIntensityMmh: 2,
-      intensityDeltaMmhPerStep: 1
+      intensityDeltaMmhPerStep: 1,
+      sourceRefIds: ["source-fronts"]
     }
   ],
   stationEffects: [
