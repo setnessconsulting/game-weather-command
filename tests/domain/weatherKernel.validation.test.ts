@@ -236,18 +236,22 @@ describe("WC-03 validation hardening", () => {
       .toThrow(/positive integer/);
   });
 
-  it("rejects state mismatches when deriving outcome facts", () => {
+  it("rejects identity mismatches and ignores mutated presentation state for outcome facts", () => {
     const state = initializeScenario(frontPassageFixture);
     expect(() =>
       getScenarioOutcomeFacts({ ...frontPassageFixture, seed: 99 }, state)
     ).toThrow(/identity\/version\/seed/);
 
-    const missingStation = {
+    const mutatedPresentationState = {
       ...state,
-      stations: { ...state.stations, central: undefined }
-    } as unknown as typeof state;
-    expect(() => getScenarioOutcomeFacts(frontPassageFixture, missingStation))
-      .toThrow(/missing station/);
+      stations: {
+        ...state.stations,
+        central: { ...state.stations.central!, temperatureC: 69 }
+      }
+    };
+    const facts = getScenarioOutcomeFacts(frontPassageFixture, mutatedPresentationState);
+    const central = facts.stationChanges.find((fact) => fact.stationId === "central");
+    expect(central?.observed.temperatureC).toBe(23);
   });
 
   it("keeps zero-amplitude deterministic noise exactly zero", () => {
