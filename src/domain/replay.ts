@@ -25,6 +25,39 @@ export interface ReplayTrace {
   readonly checkpoints: readonly ReplayCheckpoint[];
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function isReplayAction(value: unknown): value is ReplayAction {
+  if (!isRecord(value)) return false;
+  return (
+    value.type === "advance" &&
+    Number.isSafeInteger(value.steps) &&
+    typeof value.steps === "number" &&
+    value.steps > 0
+  );
+}
+
+function isScenarioStateIdentity(
+  value: unknown,
+  trace: Pick<ReplayTrace, "scenarioId" | "schemaVersion" | "contentVersion" | "seed">
+): value is ScenarioState {
+  if (!isRecord(value)) return false;
+  return (
+    value.scenarioId === trace.scenarioId &&
+    value.schemaVersion === trace.schemaVersion &&
+    value.contentVersion === trace.contentVersion &&
+    value.seed === trace.seed &&
+    typeof value.minute === "number" &&
+    Number.isSafeInteger(value.minute) &&
+    value.minute >= 0 &&
+    typeof value.stepIndex === "number" &&
+    Number.isSafeInteger(value.stepIndex) &&
+    value.stepIndex >= 0
+  );
+}
+
 export function replayScenario(
   scenario: KernelScenarioDefinition,
   actions: readonly ReplayAction[]
@@ -33,8 +66,8 @@ export function replayScenario(
   const checkpoints: ReplayCheckpoint[] = [{ actionIndex: -1, action: null, state }];
 
   actions.forEach((action, actionIndex) => {
-    if (action.type !== "advance") {
-      throw new DomainScenarioError("Unsupported replay action.");
+    if (!isReplayAction(action)) {
+      throw new DomainScenarioError("Unsupported or malformed replay action.");
     }
     state = advanceScenario(scenario, state, action.steps);
     checkpoints.push({ actionIndex, action, state });
@@ -56,22 +89,65 @@ export function serializeReplayTrace(trace: ReplayTrace): string {
 }
 
 export function parseReplayTrace(serialized: string): ReplayTrace {
-  const candidate: unknown = JSON.parse(serialized);
-  if (!candidate || typeof candidate !== "object") {
+  let candidate: unknown;
+  try {
+    candidate = JSON.parse(serialized);
+  } catch {
+    throw new DomainScenarioError("Replay trace is not valid JSON.");
+  }
+
+  if (!isRecord(candidate)) {
     throw new DomainScenarioError("Replay trace must be an object.");
   }
 
-  const trace = candidate as Partial<ReplayTrace>;
+  const identity = {
+    scenarioId: candidate.scenarioId,
+    schemaVersion: candidate.schemaVersion,
+    contentVersion: candidate.contentVersion,
+    seed: candidate.seed
+  };
+
   if (
-    trace.formatVersion !== "1" ||
-    trace.schemaVersion !== "1" ||
-    typeof trace.scenarioId !== "string" ||
-    typeof trace.contentVersion !== "string" ||
-    !Number.isSafeInteger(trace.seed) ||
-    !Array.isArray(trace.actions) ||
-    !Array.isArray(trace.checkpoints)
+    candidate.formatVersion !== "1" ||
+    identity.schemaVersion !== "1" ||
+    typeof identity.scenarioId !== "string" ||
+    !identity.scenarioId ||
+    typeof identity.contentVersion !== "string" ||
+    !identity.contentVersion ||
+    !Number.isSafeInteger(identity.seed) ||
+    !Array.isArray(candidate.actions) ||
+    !candidate.actions.every(isReplayAction) ||
+    !Array.isArray(candidate.checkpoints) ||
+    candidate.checkpoints.length !== candidate.actions.length + 1
   ) {
     throw new DomainScenarioError("Unsupported or malformed replay trace.");
   }
-  return trace as ReplayTrace;
+
+  const typedIdentity = identity as Pick<
+    ReplayTrace,
+    "scenarioId" | "schemaVersion" | "contentVersion" | "seed"
+  >;
+
+  for (let index = 0; index < candidate.checkpoints.length; index += 1) {
+    const checkpoint = candidate.checkpoints[index];
+    if (!isRecord(checkpoint) || !isScenarioStateIdentity(checkpoint.state, typedIdentity)) {
+      throw new DomainScenarioError("Replay trace contains a malformed checkpoint.");
+    }
+    const expectedActionIndex = index - 1;
+    if (checkpoint.actionIndex !== expectedActionIndex) {
+      throw new DomainScenarioError("Replay checkpoint action index is inconsistent.");
+    }
+    if (index === 0) {
+      if (checkpoint.action !== null) {
+        throw new DomainScenarioError("Initial replay checkpoint must not contain an action.");
+      }
+    } else if (
+      !isReplayAction(checkpoint.action) ||
+      JSON.stringify(checkpoint.action) !== JSON.stringify(candidate.actions[index - 1])
+    ) {
+      throw new DomainScenarioError("Replay checkpoint action does not match the action log.");
+    }
+  }
+
+  return candidate as unknown as ReplayTrace;
 }
