@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  DomainScenarioError,
   advanceScenario,
   deterministicSignedNoise,
   getScenarioOutcomeFacts,
@@ -134,6 +133,15 @@ describe("WC-03 validation hardening", () => {
         }]
       }))
     ).toThrow(/initialIntensityMmh/);
+
+    expect(() =>
+      initializeScenario(malformed({
+        precipitationCells: [{
+          ...frontPassageFixture.precipitationCells[0]!,
+          sourceRefIds: []
+        }]
+      }))
+    ).toThrow(/source reference/);
   });
 
   it("rejects malformed station effects", () => {
