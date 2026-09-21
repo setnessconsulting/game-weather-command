@@ -4,7 +4,7 @@ test("same production build works beneath the games-site versioned prefix", asyn
   await page.goto("./");
   await expect(page.getByRole("heading", { level: 1, name: "Weather Command" })).toBeVisible();
 
-  const assetFailures = [];
+  const assetFailures: string[] = [];
   page.on("response", (response) => {
     if (response.status() >= 400) assetFailures.push(response.url());
   });
