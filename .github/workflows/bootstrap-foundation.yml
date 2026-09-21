@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: wc02-${{ github.ref }}
@@ -17,11 +17,23 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
-      - name: Generate exact lockfile for review
+      - name: Generate exact lockfile for repository bootstrap
         run: npm install --package-lock-only --ignore-scripts
+      - name: Persist exact lockfile on the implementation branch
+        if: github.event_name == 'pull_request'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json
+          if ! git diff --cached --quiet; then
+            git commit -m "GAME-338: commit exact dependency lockfile"
+            git push origin HEAD:${{ github.event.pull_request.head.ref }}
+          fi
       - name: Install exact resolved graph
         run: npm ci
       - run: npm run typecheck
@@ -30,11 +42,6 @@ jobs:
       - run: npm run check:architecture
       - run: npm run build
       - run: npm run check:privacy
-      - uses: actions/upload-artifact@v4
-        with:
-          name: weather-command-package-lock-${{ github.sha }}
-          path: package-lock.json
-          retention-days: 7
 
   browser:
     needs: verify
@@ -42,6 +49,8 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
