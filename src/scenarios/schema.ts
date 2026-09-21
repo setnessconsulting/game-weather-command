@@ -160,7 +160,7 @@ export const acceptedRangeSchema = z.object({
   windDirectionSectorsDeg: z.array(z.object({
     min: z.number().min(0).lt(360),
     max: z.number().gt(0).max(360),
-  })).min(1),
+  }).refine((sector) => sector.min < sector.max, "wind sector min must be < max")).min(1),
   defensibleConfidence: z.array(z.enum(["low", "medium", "high"])).min(1),
 });
 
@@ -255,7 +255,9 @@ export function parseWeatherScenario(input: unknown): WeatherScenarioV1 {
   const sourceIds = new Set(scenario.sources.map((source) => source.id));
   const evidenceIds = new Set(scenario.evidence.map((evidence) => evidence.id));
   const stationIds = new Set(scenario.stations.map((station) => station.id));
-  const forecastWindowIds = new Set(scenario.forecastWindows.map((window) => window.id));
+  const boundaryIds = new Set(scenario.boundaries.map((boundary) => boundary.id));
+  const precipitationCellIds = new Set(scenario.precipitationCells.map((cell) => cell.id));
+  const forecastWindows = new Map(scenario.forecastWindows.map((window) => [window.id, window]));
 
   const sourceRefGroups = [
     ...scenario.airMasses.map((item) => item.sourceRefIds),
@@ -270,12 +272,44 @@ export function parseWeatherScenario(input: unknown): WeatherScenarioV1 {
     }
   }
 
+  for (const evidence of scenario.evidence) {
+    if (
+      evidence.availableAtMinute > scenario.timeline.maxMinute ||
+      evidence.availableAtMinute % scenario.timeline.stepMinutes !== 0
+    ) {
+      throw new Error(`Evidence ${evidence.id} must be available on an in-range simulation step.`);
+    }
+    const targetSet =
+      evidence.type === "boundary"
+        ? boundaryIds
+        : evidence.type === "precipitation"
+          ? precipitationCellIds
+          : evidence.type === "station" || evidence.type === "trend"
+            ? stationIds
+            : new Set([...stationIds, ...boundaryIds, ...precipitationCellIds]);
+    for (const targetId of evidence.targetIds) {
+      if (!targetSet.has(targetId)) {
+        throw new Error(`Evidence ${evidence.id} references unknown target "${targetId}".`);
+      }
+    }
+  }
+
   for (const range of scenario.acceptedRanges) {
-    if (!forecastWindowIds.has(range.forecastWindowId)) {
+    const forecastWindow = forecastWindows.get(range.forecastWindowId);
+    if (!forecastWindow) {
       throw new Error(`Accepted range ${range.id} references an unknown forecast window.`);
     }
     if (!stationIds.has(range.targetStationId)) {
       throw new Error(`Accepted range ${range.id} references an unknown station.`);
+    }
+    if (!forecastWindow.targetStationIds.includes(range.targetStationId)) {
+      throw new Error(`Accepted range ${range.id} targets a station outside its forecast window.`);
+    }
+    if (
+      range.transitionArrivalMinute.min < forecastWindow.startMinute ||
+      range.transitionArrivalMinute.max > forecastWindow.endMinute
+    ) {
+      throw new Error(`Accepted range ${range.id} timing must fit its forecast window.`);
     }
   }
 
