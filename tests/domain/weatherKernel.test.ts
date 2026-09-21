@@ -110,6 +110,12 @@ describe("weather kernel", () => {
     expect(facts).not.toHaveProperty("score");
   });
 
+  it("rejects state from a different seed even when scenario id/content match", () => {
+    const state = initializeScenario(frontPassageFixture);
+    const changedSeed = { ...frontPassageFixture, seed: frontPassageFixture.seed + 1 };
+    expect(() => advanceScenario(changedSeed, state)).toThrow(/identity\/version\/seed/);
+  });
+
   it("marks completion only at the authored maximum minute and clamps over-advance", () => {
     const initial = initializeScenario(frontPassageFixture);
     const complete = advanceScenario(frontPassageFixture, initial, 99);
@@ -166,6 +172,27 @@ describe("replay contract", () => {
   it("rejects malformed replay versions", () => {
     expect(() => parseReplayTrace('{"formatVersion":"99"}')).toThrow(
       /Unsupported or malformed replay trace/
+    );
+  });
+
+  it("rejects malformed action payloads and inconsistent checkpoints", () => {
+    const trace = replayScenario(frontPassageFixture, [{ type: "advance", steps: 1 }]);
+    const malformedAction = {
+      ...trace,
+      actions: [{ type: "advance", steps: 0 }]
+    };
+    expect(() => parseReplayTrace(JSON.stringify(malformedAction))).toThrow(
+      /Unsupported or malformed replay trace/
+    );
+
+    const malformedCheckpoint = {
+      ...trace,
+      checkpoints: trace.checkpoints.map((checkpoint, index) =>
+        index === 1 ? { ...checkpoint, actionIndex: 99 } : checkpoint
+      )
+    };
+    expect(() => parseReplayTrace(JSON.stringify(malformedCheckpoint))).toThrow(
+      /action index is inconsistent/
     );
   });
 });
