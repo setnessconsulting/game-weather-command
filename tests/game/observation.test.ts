@@ -80,6 +80,145 @@ describe("observed transition derivation", () => {
   });
 });
 
+describe("transition window boundary detection", () => {
+  /** Minimal kernel whose target station changes by exactly `totalDeltaC` across 60–120. */
+  function detectionKernel(totalDeltaC: number): KernelScenarioDefinition {
+    const initial = {
+      temperatureC: 20,
+      pressureHpa: 1010,
+      pressureTendencyHpaPer3h: -1,
+      relativeHumidityPct: 60,
+      windDirectionDeg: 180,
+      windSpeedMps: 5,
+      precipitationRateMmh: 0
+    } as const;
+    const station = (id: string, x: number) => ({
+      id,
+      name: id,
+      position: { x, y: 0.5 },
+      initial: { ...initial }
+    });
+    return {
+      schemaVersion: "1",
+      contentVersion: "detection-test-1",
+      scenarioId: "detection-test",
+      seed: 1,
+      timeline: { startMinute: 0, stepMinutes: 30, maxMinute: 180, checkpoints: [0, 90, 180] },
+      stations: [station("a", 0.2), station("b", 0.5), station("c", 0.8)],
+      airMasses: [
+        {
+          id: "one",
+          label: "One",
+          initialCenter: { x: 0.2, y: 0.5 },
+          movement: { x: 0, y: 0 },
+          sourceRefIds: ["s"]
+        },
+        {
+          id: "two",
+          label: "Two",
+          initialCenter: { x: 0.8, y: 0.5 },
+          movement: { x: 0, y: 0 },
+          sourceRefIds: ["s"]
+        }
+      ],
+      boundaries: [
+        {
+          id: "edge",
+          kind: "other-bounded-transition",
+          airMassAId: "one",
+          airMassBId: "two",
+          initialPath: [
+            { x: 0.4, y: 0 },
+            { x: 0.4, y: 1 }
+          ],
+          movement: { x: 0, y: 0 },
+          transitionWidth: 0.1,
+          sourceRefIds: ["s"]
+        }
+      ],
+      precipitationCells: [],
+      stationEffects: [
+        {
+          id: "a-change",
+          stationId: "a",
+          startMinute: 60,
+          endMinute: 120,
+          delta: { temperatureC: totalDeltaC },
+          sourceRefIds: ["s"]
+        }
+      ],
+      forecastWindows: []
+    };
+  }
+
+  it("detects a change of exactly 0.5 °C and nothing smaller", () => {
+    const exact = deriveObservedTransitionWindow(buildStationSeries(detectionKernel(0.5), "a", 180));
+    expect(exact).toEqual({ startMinute: 60, endMinute: 120 });
+
+    const below = deriveObservedTransitionWindow(buildStationSeries(detectionKernel(0.4), "a", 180));
+    expect(below).toBeUndefined();
+  });
+
+  it("never detects a transition in a station record that does not change", () => {
+    const series = buildStationSeries(detectionKernel(0), "a", 180);
+    expect(series.points.length).toBeGreaterThan(1);
+    expect(deriveObservedTransitionWindow(series)).toBeUndefined();
+  });
+
+  it("includes a step exactly at the half-maximum rate and excludes the first step below it", () => {
+    const kernel = detectionKernel(0);
+    const rates = [
+      { id: "fast", startMinute: 60, endMinute: 90, temperatureC: 5 },
+      { id: "exactly-half", startMinute: 90, endMinute: 120, temperatureC: 2.5 },
+      { id: "just-under-half", startMinute: 120, endMinute: 150, temperatureC: 2.4999 }
+    ];
+    const withRates = {
+      ...kernel,
+      stationEffects: rates.map((rule) => ({
+        id: rule.id,
+        stationId: "a",
+        startMinute: rule.startMinute,
+        endMinute: rule.endMinute,
+        delta: { temperatureC: rule.temperatureC },
+        sourceRefIds: ["s"]
+      }))
+    };
+    expect(deriveObservedTransitionWindow(buildStationSeries(withRates, "a", 180))).toEqual({
+      startMinute: 60,
+      endMinute: 120
+    });
+  });
+
+  it("encloses a slow step between two qualifying steps instead of splitting the window", () => {
+    const kernel = detectionKernel(0);
+    const rates = [
+      { id: "fast", startMinute: 60, endMinute: 90, temperatureC: 5 },
+      { id: "just-under-half", startMinute: 90, endMinute: 120, temperatureC: 2.4999 },
+      { id: "exactly-half", startMinute: 120, endMinute: 150, temperatureC: 2.5 }
+    ];
+    const withRates = {
+      ...kernel,
+      stationEffects: rates.map((rule) => ({
+        id: rule.id,
+        stationId: "a",
+        startMinute: rule.startMinute,
+        endMinute: rule.endMinute,
+        delta: { temperatureC: rule.temperatureC },
+        sourceRefIds: ["s"]
+      }))
+    };
+    expect(deriveObservedTransitionWindow(buildStationSeries(withRates, "a", 180))).toEqual({
+      startMinute: 60,
+      endMinute: 150
+    });
+  });
+
+  it("reproduces the same window from the same record on every call", () => {
+    const series = buildStationSeries(detectionKernel(3), "a", 180);
+    expect(deriveObservedTransitionWindow(series)).toEqual(deriveObservedTransitionWindow(series));
+  });
+});
+
 describe("station series", () => {
   it("extends one reading per step and matches canonical state at each step", () => {
     const scenario = canonicalFrontPassageScenarios[0]!;
@@ -89,6 +228,12 @@ describe("station series", () => {
     for (const point of series.points) {
       expect(point.observation).toEqual(stateAtMinute(machine.kernel, point.minute).stations.central);
     }
+  });
+
+  it("refuses to build a series for a station the scenario does not define", () => {
+    const scenario = canonicalFrontPassageScenarios[0]!;
+    const machine = createSessionMachine(scenario);
+    expect(() => buildStationSeries(machine.kernel, "not-a-station", 60)).toThrow(/Unknown station/);
   });
 
   it("clamps beyond the scenario end instead of throwing", () => {

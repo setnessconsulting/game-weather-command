@@ -258,7 +258,121 @@ describe("WC-03 validation hardening", () => {
     expect(deterministicSignedNoise(42, "anything", 0)).toBe(0);
   });
 
-  it("rejects malformed replay JSON and checkpoint payloads", () => {
+  it("accepts every observation field at its exact bound and rejects one step outside", () => {
+    // [dimension, at-bound value, just-outside value] — the pairs the failure messages name.
+    const bounds: readonly [
+      keyof KernelScenarioDefinition["stations"][number]["initial"],
+      number,
+      number
+    ][] = [
+      ["temperatureC", -100, -100.001],
+      ["temperatureC", 70, 70.001],
+      ["pressureHpa", 800, 799.999],
+      ["pressureHpa", 1100, 1100.001],
+      ["pressureTendencyHpaPer3h", -50, -50.001],
+      ["pressureTendencyHpaPer3h", 50, 50.001],
+      ["relativeHumidityPct", 0, -0.001],
+      ["relativeHumidityPct", 100, 100.001],
+      ["windDirectionDeg", 0, 360],
+      ["windSpeedMps", 0, -0.001],
+      ["windSpeedMps", 150, 150.001],
+      ["precipitationRateMmh", 0, -0.001],
+      ["precipitationRateMmh", 500, 500.001]
+    ];
+    for (const [dimension, atBound, outside] of bounds) {
+      const accepted = malformed({
+        stations: frontPassageFixture.stations.map((station, index) =>
+          index === 0
+            ? { ...station, initial: { ...station.initial, [dimension]: atBound } }
+            : station
+        )
+      });
+      expect(() => initializeScenario(accepted), `${dimension}=${atBound}`).not.toThrow();
+
+      const rejected = malformed({
+        stations: frontPassageFixture.stations.map((station, index) =>
+          index === 0
+            ? { ...station, initial: { ...station.initial, [dimension]: outside } }
+            : station
+        )
+      });
+      expect(() => initializeScenario(rejected), `${dimension}=${outside}`).toThrow(
+        new RegExp(String(dimension).replace(/([A-Z])/g, "\\$1"))
+      );
+    }
+  });
+
+  it("winds direction back into [0, 360) at every state instead of rejecting large authored shifts", () => {
+    const wrapped = {
+      ...frontPassageFixture,
+      stationEffects: frontPassageFixture.stationEffects.map((effect) =>
+        effect.stationId === "central"
+          ? { ...effect, delta: { ...effect.delta, windDirectionDeg: 360 } }
+          : effect
+      )
+    };
+    expect(() => stateAtMinute(wrapped, 120)).not.toThrow();
+    // 180° + 360° must wind back to the same compass direction.
+    expect(stateAtMinute(wrapped, 120).stations.central?.windDirectionDeg).toBe(180);
+  });
+
+  it("rejects NaN and infinity in scenario geometry and observation data", () => {
+    expect(() =>
+      initializeScenario(malformed({
+        stations: frontPassageFixture.stations.map((station, index) =>
+          index === 0
+            ? { ...station, initial: { ...station.initial, temperatureC: Number.NaN } }
+            : station
+        )
+      }))
+    ).toThrow(/temperatureC/);
+
+    expect(() =>
+      initializeScenario(malformed({
+        boundaries: [
+          { ...frontPassageFixture.boundaries[0]!, movement: { x: Number.POSITIVE_INFINITY, y: 0 } }
+        ]
+      }))
+    ).toThrow(/movement.x/);
+
+    expect(() =>
+      initializeScenario(malformed({
+        precipitationCells: [
+          { ...frontPassageFixture.precipitationCells[0]!, intensityDeltaMmhPerStep: Number.NaN }
+        ]
+      }))
+    ).toThrow(/intensityDeltaMmhPerStep/);
+  });
+
+  it("fails closed when an authored change carries a station out of physical range mid-simulation", () => {
+    // Humidity 70 % + an authored +40 % shift leaves the [0, 100] % range by minute 120.
+    // The parse-time validator cannot see this (it only checks initial readings), so the
+    // guard must live in the per-step science and reject the state when it is derived.
+    const invalidMidScenario = malformed({
+      stationEffects: [
+        { ...frontPassageFixture.stationEffects[0]!, delta: { relativeHumidityPct: 40 } }
+      ]
+    });
+    expect(() => initializeScenario(invalidMidScenario)).not.toThrow();
+    expect(() => stateAtMinute(invalidMidScenario, 90)).not.toThrow();
+    expect(() => stateAtMinute(invalidMidScenario, 120)).toThrow(/relativeHumidityPct/);
+  });
+
+  it("treats a zero-amplitude noise rule as exactly no noise", () => {
+    const zeroNoise = {
+      ...frontPassageFixture,
+      scenarioId: "front-passage-zero-noise",
+      stationEffects: frontPassageFixture.stationEffects.map((effect) => ({
+        ...effect,
+        noise: { temperatureC: { amplitude: 0, key: "sensor-temp" } }
+      }))
+    };
+    expect(stateAtMinute(zeroNoise, 90).stations.central).toEqual(
+      stateAtMinute(frontPassageFixture, 90).stations.central
+    );
+  });
+
+  it("rejects invalid requested time and advance operations", () => {
     expect(() => parseReplayTrace("{")).toThrow(/not valid JSON/);
     expect(() => parseReplayTrace("[]")).toThrow(/must be an object/);
 

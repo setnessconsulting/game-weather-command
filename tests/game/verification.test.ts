@@ -209,6 +209,153 @@ describe("confidence calibration", () => {
   });
 });
 
+describe("verification boundary conditions", () => {
+  const observed = observedTransition(machine.kernel, "central")!;
+
+  it("treats a zero-width window touching the observed change at one instant as a near miss", () => {
+    // Only strictly positive overlap counts as "supported": a point prediction that merely
+    // touches the window boundary yields overlapMinutes 0 and is graded as a one-step miss.
+    // (Documented ambiguity: a case could be made for counting boundary contact as support.)
+    const report = verifyForecast(
+      input({ forecast: { ...reasonableDraft, transitionWindow: { min: observed.startMinute, max: observed.startMinute } } })
+    );
+    expect(report.timing.overlapMinutes).toBe(0);
+    expect(report.timing.level).toBe("partially-supported");
+
+    const oneMinuteInside = verifyForecast(
+      input({ forecast: { ...reasonableDraft, transitionWindow: { min: observed.startMinute, max: observed.startMinute + 1 } } })
+    );
+    expect(oneMinuteInside.timing.level).toBe("supported");
+  });
+
+  it("treats a miss of exactly one simulation step as a near miss, and anything further as unsupported", () => {
+    // Observed change runs 90-120; the guided forecast window closes at 150, step is 30 min.
+    const oneStepEarly = verifyForecast(
+      input({ forecast: { ...reasonableDraft, transitionWindow: { min: 0, max: 60 } } })
+    );
+    expect(oneStepEarly.timing.overlapMinutes).toBe(0);
+    expect(oneStepEarly.timing.level).toBe("partially-supported");
+
+    const barelyLate = verifyForecast(
+      input({ forecast: { ...reasonableDraft, transitionWindow: { min: 150, max: 180 } } })
+    );
+    expect(barelyLate.timing.level).toBe("partially-supported");
+
+    const far = verifyForecast(
+      input({ forecast: { ...reasonableDraft, transitionWindow: { min: 151, max: 180 } } })
+    );
+    expect(far.timing.level).toBe("unsupported");
+  });
+
+  it("supports a temperature range that names the measured change exactly, and degrades by degrees", () => {
+    const exact = verifyForecast(
+      input({
+        forecast: {
+          ...reasonableDraft,
+          temperatureChangeC: { min: observed.temperatureChangeC, max: observed.temperatureChangeC }
+        }
+      })
+    );
+    expect(exact.ranges.find((range) => range.dimension === "temperature")!.level).toBe("supported");
+
+    const oneDegreeOff = verifyForecast(
+      input({
+        forecast: {
+          ...reasonableDraft,
+          temperatureChangeC: {
+            min: observed.temperatureChangeC + 1,
+            max: observed.temperatureChangeC + 1
+          }
+        }
+      })
+    );
+    expect(oneDegreeOff.ranges.find((range) => range.dimension === "temperature")!.level).toBe(
+      "partially-supported"
+    );
+
+    const beyondOneDegree = verifyForecast(
+      input({
+        forecast: {
+          ...reasonableDraft,
+          temperatureChangeC: {
+            min: observed.temperatureChangeC + 1.1,
+            max: observed.temperatureChangeC + 1.1
+          }
+        }
+      })
+    );
+    expect(beyondOneDegree.ranges.find((range) => range.dimension === "temperature")!.level).toBe(
+      "unsupported"
+    );
+  });
+
+  it("treats a wind sector exactly 15° from the measurement as partially supported and 16° as unsupported", () => {
+    const observedDeg = Math.round(observed.finalWindDirectionDeg);
+    const near = verifyForecast(
+      input({ forecast: { ...reasonableDraft, windDirectionDeg: { min: observedDeg + 15, max: observedDeg + 40 } } })
+    );
+    const far = verifyForecast(
+      input({ forecast: { ...reasonableDraft, windDirectionDeg: { min: observedDeg + 16, max: observedDeg + 40 } } })
+    );
+    expect(near.ranges.find((range) => range.dimension === "wind")!.level).toBe("partially-supported");
+    expect(far.ranges.find((range) => range.dimension === "wind")!.level).toBe("unsupported");
+  });
+
+  it("checks precipitation probability against the authored defensible range, not the single outcome", () => {
+    // Authored defensible range for the guided mission is 60-90 %.
+    const halfOverlap = verifyForecast(
+      input({ forecast: { ...reasonableDraft, precipitationProbabilityPct: { min: 30, max: 90 } } })
+    );
+    expect(halfOverlap.ranges.find((range) => range.dimension === "precipitation")!.level).toBe(
+      "partially-supported"
+    );
+
+    const justUnderHalf = verifyForecast(
+      input({ forecast: { ...reasonableDraft, precipitationProbabilityPct: { min: 30, max: 89.9 } } })
+    );
+    expect(justUnderHalf.ranges.find((range) => range.dimension === "precipitation")!.level).toBe(
+      "unsupported"
+    );
+  });
+
+  it("grades every confidence level the scenario defends as well-calibrated, and treats a missing one as low", () => {
+    for (const confidence of ["medium", "high"] as const) {
+      const report = verifyForecast(input({ forecast: { ...reasonableDraft, confidence } }));
+      expect(report.calibration.level, confidence).toBe("well-calibrated");
+    }
+
+    const underconfident = verifyForecast(input({ forecast: { ...reasonableDraft, confidence: "low" } }));
+    expect(underconfident.calibration.level).toBe("underconfident");
+
+    const unstated = verifyForecast(input({ forecast: { ...reasonableDraft, confidence: null } }));
+    expect(unstated.calibration.level).toBe("underconfident");
+    expect(unstated.calibration.stated).toBe("low");
+  });
+
+  it("omits unforecast dimensions from the report instead of scoring empty entries", () => {
+    const report = verifyForecast(
+      input({
+        forecast: {
+          ...reasonableDraft,
+          temperatureChangeC: null,
+          windDirectionDeg: null,
+          precipitationProbabilityPct: null
+        }
+      })
+    );
+    expect(report.ranges).toEqual([]);
+    expect(report.timing.level).toBe("supported");
+  });
+
+  it("treats a forecast committed one minute before the change as a prediction and at the change as a nowcast", () => {
+    const before = verifyForecast(input({ committedAtMinute: observed.startMinute - 1 }));
+    expect(before.mode).toBe("forecast");
+
+    const atStart = verifyForecast(input({ committedAtMinute: observed.startMinute }));
+    expect(atStart.mode).toBe("nowcast");
+  });
+});
+
 describe("verification inputs", () => {
   it("refuses to verify when the target station never changes", () => {
     const kernel = {
