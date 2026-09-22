@@ -20,7 +20,10 @@
     "serve:nested-host": "node scripts/nested-host-server.mjs",
     "check:architecture": "node scripts/check-architecture.mjs",
     "check:privacy": "node scripts/check-privacy-surface.mjs",
-    "verify": "npm run typecheck && npm run lint && npm run test:coverage && npm run check:architecture && npm run build && npm run check:privacy"
+    "verify": "npm run typecheck && npm run lint && npm run test:coverage && npm run check:architecture && npm run build && npm run check:privacy",
+    "release:build": "npm run build && npm run release:manifest",
+    "release:manifest": "node scripts/create-release-manifest.mjs dist",
+    "release:check": "node scripts/create-release-manifest.mjs dist --check"
   },
   "dependencies": {
     "react": "19.3.0",

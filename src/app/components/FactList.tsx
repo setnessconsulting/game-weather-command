@@ -17,19 +17,21 @@ export interface FactListProps {
 export function FactList({ caption, facts, compact = false }: FactListProps) {
   if (facts.length === 0) return null;
   return (
-    <table className={compact ? `${styles.facts} ${styles.factsCompact}` : styles.facts}>
-      <caption>{caption}</caption>
-      <tbody>
-        {facts.map((fact, index) => (
-          <tr key={`${fact.label}-${index}`}>
-            <th scope="row">{fact.label}</th>
-            <td>
-              {fact.value}
-              {fact.note ? <span className={styles.factNote}>{fact.note}</span> : null}
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+    <div className={styles.tableScroll}>
+      <table className={compact ? `${styles.facts} ${styles.factsCompact}` : styles.facts}>
+        <caption>{caption}</caption>
+        <tbody>
+          {facts.map((fact, index) => (
+            <tr key={`${fact.label}-${index}`}>
+              <th scope="row">{fact.label}</th>
+              <td>
+                {fact.value}
+                {fact.note ? <span className={styles.factNote}>{fact.note}</span> : null}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }

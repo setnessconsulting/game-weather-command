@@ -1,6 +1,8 @@
 .mission {
   display: grid;
   gap: var(--space-5);
+  min-width: 0;
+  max-width: 100%;
 }
 
 .skipLink {
@@ -91,6 +93,15 @@
   box-shadow: var(--shadow-panel);
   display: grid;
   gap: var(--space-4);
+  min-width: 0;
+  max-width: 100%;
+}
+
+.tableScroll {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .panel h2 {
@@ -287,12 +298,16 @@
 .workspaceWrapper {
   display: grid;
   gap: var(--space-5);
+  min-width: 0;
+  max-width: 100%;
 }
 
 .workspace {
   display: grid;
   gap: var(--space-5);
   grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+  max-width: 100%;
 }
 
 .workspaceMain,
@@ -323,6 +338,13 @@
 
 .facts {
   font-size: 0.9rem;
+  table-layout: fixed;
+}
+
+.facts th,
+.facts td {
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .facts caption {

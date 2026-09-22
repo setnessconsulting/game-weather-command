@@ -130,6 +130,43 @@ Scenario files are untrusted authored data at runtime boundaries and must be val
 
 Verification must not compare the learner with one hidden scalar answer.
 
+### Observed transition window
+
+The **observed transition window** is the grading truth for timing. It is derived only from the
+target station's own reported observations — never from authoring metadata or map geometry.
+
+Definition (implemented by `deriveObservedTransitionWindow` in the game layer):
+
+1. For every consecutive pair of observation steps, compute the absolute temperature-change rate
+   (°C per scenario minute).
+2. Find that station's maximum rate over the full scenario.
+3. The window is the enclosing span of every consecutive pair whose rate is at least **half of that
+   maximum** (the half-maximum threshold).
+4. If the station's total temperature change is negligible (< 0.5 °C) or no rate meets the
+   threshold, there is no detectable transition and the scenario cannot verify a timing forecast.
+
+A front passage is the fastest sustained temperature change in a station record. This recovery rule
+reproduces the authored passage window from public evidence alone, so learners and the verifier
+share the same observable definition.
+
+The learner's forecast `transitionWindow` is graded by overlap against this observed window (not
+against a single scalar arrival minute). See also `transitionArrivalMinute` in
+`docs/SCENARIO_SCHEMA.md` (F10).
+
+### Forecast / nowcast / hindcast commit classification
+
+Every committed forecast is classified by *when* it was committed relative to the observed
+transition and the published forecast window:
+
+| Mode | When the learner commits | Pedagogical meaning |
+| --- | --- | --- |
+| **forecast** | before the observed transition starts | a genuine prediction of a change that has not yet begun |
+| **nowcast** | at or after the observed transition start, but before the published window ends | describing a change already under way rather than predicting one |
+| **hindcast** | at or after the published forecast window's `endMinute` | recording after the window closed; still graded, never a dead end |
+
+Classification is recorded on the verification report (`mode` / `modeDetail`) and in session status
+copy. It does not replace evidence-quality, causal, timing-overlap, or calibration scoring.
+
 ### Evidence quality
 
 Did the learner inspect/cite evidence that is relevant to the forecast?

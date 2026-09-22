@@ -1,5 +1,8 @@
 .shell {
+  box-sizing: border-box;
   width: min(84rem, calc(100% - 1.5rem));
+  max-width: 100%;
+  min-width: 0;
   margin: 0 auto;
   padding: var(--space-4) 0 var(--space-8);
   display: grid;

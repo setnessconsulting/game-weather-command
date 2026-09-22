@@ -166,6 +166,10 @@ interface ForecastWindow {
 }
 ```
 
+The published window bounds when a commit counts as a **forecast** versus a **hindcast**. Commits
+at or after `endMinute` are hindcasts. Commits that fall inside the observed transition at the
+target station (see SCIENCE_MODEL) are **nowcasts** even when still inside the published window.
+
 ## Evidence
 
 Evidence is addressable by stable ID so the learner can cite it without free text.
@@ -194,6 +198,28 @@ Examples:
 - confidence calibration expectation.
 
 The verifier must preserve raw error/difference facts for debrief.
+
+### `transitionArrivalMinute` (F10)
+
+**Resolved convention (WC-06):** `transitionArrivalMinute` is the authored accepted envelope for
+the **observed transition window** at the target station — the half-maximum sustained temperature-
+change span defined in `docs/SCIENCE_MODEL.md`.
+
+Binding rules:
+
+1. Timing grading compares the learner's `transitionWindow` to the *observed* transition window
+   recovered from station observations, not to a single scalar "arrival" minute.
+2. The accepted `transitionArrivalMinute` range must contain that observed window
+   (`accepted.min ≤ observed.start` and `accepted.max ≥ observed.end`) and must itself lie inside
+   the linked forecast window.
+3. Authors may widen the envelope for uncertain missions; they may not leave the observed onset or
+   completion outside the envelope unless a human science disposition explicitly accepts that gap.
+
+Review finding **F10** (undefined / inconsistent `transitionArrivalMinute` across the four Front
+Passage missions) is therefore closed for *definition*: the half-maximum observed window is the
+canonical meaning, and accepted ranges are envelopes around it. Remaining per-mission envelope
+alignment (for example warm-front onset vs accepted range) stays under GAME-341 / WC-04 human
+science disposition and must not be silently rewritten without a `contentVersion` bump.
 
 ## Uncertain Boundary rule
 

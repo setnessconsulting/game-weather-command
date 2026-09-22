@@ -123,29 +123,31 @@ export function ObservationPanel({
               <div key={boundary.boundaryId} className={styles.boundaryBlockInner}>
                 <p>{boundary.positionSummary}</p>
                 <p>{boundary.motionSummary}</p>
-                <table className={styles.facts}>
-                  <caption>Extrapolated arrival at each station, assuming the current motion continues</caption>
-                  <thead>
-                    <tr>
-                      <th scope="col">Station</th>
-                      <th scope="col">Extrapolated arrival</th>
-                      <th scope="col">Basis</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {boundary.proximity.map((proximity) => (
-                      <tr key={proximity.stationId}>
-                        <th scope="row">{proximity.stationName}</th>
-                        <td>
-                          {proximity.etaMinutes !== undefined
-                            ? formatSimulatedTimestamp(proximity.etaMinutes)
-                            : "not extrapolated"}
-                        </td>
-                        <td>{proximity.note}</td>
+                <div className={styles.tableScroll}>
+                  <table className={styles.facts}>
+                    <caption>Extrapolated arrival at each station, assuming the current motion continues</caption>
+                    <thead>
+                      <tr>
+                        <th scope="col">Station</th>
+                        <th scope="col">Extrapolated arrival</th>
+                        <th scope="col">Basis</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {boundary.proximity.map((proximity) => (
+                        <tr key={proximity.stationId}>
+                          <th scope="row">{proximity.stationName}</th>
+                          <td>
+                            {proximity.etaMinutes !== undefined
+                              ? formatSimulatedTimestamp(proximity.etaMinutes)
+                              : "not extrapolated"}
+                          </td>
+                          <td>{proximity.note}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             ))}
           </div>
@@ -172,39 +174,41 @@ export function ObservationPanel({
             ))}
           </div>
 
-          <table className={styles.facts}>
-            <caption>All stations at {evidence.timestamp}</caption>
-            <thead>
-              <tr>
-                <th scope="col">Station</th>
-                <th scope="col">Temp</th>
-                <th scope="col">Pressure</th>
-                <th scope="col">Tendency</th>
-                <th scope="col">Humidity</th>
-                <th scope="col">Wind</th>
-                <th scope="col">Precipitation</th>
-              </tr>
-            </thead>
-            <tbody>
-              {scenario.stations.map((station) => {
-                const observation = canonicalState.stations[station.id]!;
-                return (
-                  <tr key={station.id} data-selected={station.id === state.selectedStationId}>
-                    <th scope="row">
-                      {station.name}
-                      {station.id === state.selectedStationId ? " (selected)" : ""}
-                    </th>
-                    <td>{formatTemperature(observation.temperatureC)}</td>
-                    <td>{formatPressure(observation.pressureHpa)}</td>
-                    <td>{formatPressureTendency(observation.pressureTendencyHpaPer3h)}</td>
-                    <td>{formatHumidity(observation.relativeHumidityPct)}</td>
-                    <td>{formatWind(observation.windDirectionDeg, observation.windSpeedMps)}</td>
-                    <td>{formatPrecipitationRate(observation.precipitationRateMmh)}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          <div className={styles.tableScroll}>
+            <table className={styles.facts}>
+              <caption>All stations at {evidence.timestamp}</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Station</th>
+                  <th scope="col">Temp</th>
+                  <th scope="col">Pressure</th>
+                  <th scope="col">Tendency</th>
+                  <th scope="col">Humidity</th>
+                  <th scope="col">Wind</th>
+                  <th scope="col">Precipitation</th>
+                </tr>
+              </thead>
+              <tbody>
+                {scenario.stations.map((station) => {
+                  const observation = canonicalState.stations[station.id]!;
+                  return (
+                    <tr key={station.id} data-selected={station.id === state.selectedStationId}>
+                      <th scope="row">
+                        {station.name}
+                        {station.id === state.selectedStationId ? " (selected)" : ""}
+                      </th>
+                      <td>{formatTemperature(observation.temperatureC)}</td>
+                      <td>{formatPressure(observation.pressureHpa)}</td>
+                      <td>{formatPressureTendency(observation.pressureTendencyHpaPer3h)}</td>
+                      <td>{formatHumidity(observation.relativeHumidityPct)}</td>
+                      <td>{formatWind(observation.windDirectionDeg, observation.windSpeedMps)}</td>
+                      <td>{formatPrecipitationRate(observation.precipitationRateMmh)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
 
           <h3>
             {selectedStation.name} in detail
