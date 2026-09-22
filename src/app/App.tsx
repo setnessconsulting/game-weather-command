@@ -1,39 +1,38 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
-import { foundationScenario } from "@/scenarios/foundationScenario";
-import { parseFoundationScenario } from "@/scenarios/schema";
-import { WeatherMapShell } from "@/viz/WeatherMapShell";
+import { missionByMissionType, scenarioByMissionType, type MissionType } from "@/game";
 
 import styles from "./App.module.css";
+import { MissionScreen } from "./MissionScreen";
+import { MissionSelect } from "./MissionSelect";
 
 export function App() {
-  const scenario = useMemo(() => parseFoundationScenario(foundationScenario), []);
+  const [openMissionType, setOpenMissionType] = useState<MissionType | null>(null);
+
+  const opened = useMemo(() => {
+    if (!openMissionType) return undefined;
+    const mission = missionByMissionType(openMissionType);
+    const scenario = scenarioByMissionType(openMissionType);
+    if (!mission || !scenario) return undefined;
+    return { mission, scenario };
+  }, [openMissionType]);
 
   return (
     <main className={styles.shell}>
-      <header className={styles.header}>
-        <p className={styles.eyebrow}>Forecast desk · foundation build</p>
-        <h1>Weather Command</h1>
-        <p className={styles.lede}>
-          Read changing atmospheric evidence, make a forecast, then compare it with what the simulated system does.
-        </p>
-      </header>
-
-      <section className={styles.notice} aria-labelledby="simulation-heading">
-        <h2 id="simulation-heading">Simulation, not live weather</h2>
-        <p>This build contains no live forecast, location, account, remote tracking, or remote learner data.</p>
-      </section>
-
-      <section className={styles.workspace} aria-labelledby="workspace-heading">
-        <div>
-          <p className={styles.eyebrow}>WC-02 architecture smoke</p>
-          <h2 id="workspace-heading">{scenario.title}</h2>
-          <p>
-            This is the accessible rendering seam only. Scientific transition rules and production missions begin in later Jira gates.
-          </p>
-        </div>
-        <WeatherMapShell scenario={scenario} />
-      </section>
+      <div className={styles.shellHeader}>
+        <p className={styles.brand}>Weather Command</p>
+        <p className={styles.brandNote}>Deterministic forecast training · simulation only</p>
+      </div>
+      {opened ? (
+        <MissionScreen
+          key={opened.mission.scenarioId}
+          scenario={opened.scenario}
+          mission={opened.mission}
+          onExit={() => setOpenMissionType(null)}
+        />
+      ) : (
+        <MissionSelect onOpenMission={setOpenMissionType} />
+      )}
     </main>
   );
 }

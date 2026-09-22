@@ -1,0 +1,122 @@
+.figure {
+  margin: 0;
+  display: grid;
+  gap: var(--space-3);
+}
+
+.caption {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.mapFrame {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--surface-sunken);
+}
+
+.map {
+  width: 100%;
+  height: clamp(14rem, 42vw, 22rem);
+  transition: opacity var(--transition-calm);
+}
+
+.still {
+  transition: none;
+}
+
+.grid {
+  stroke: rgb(148 185 214 / 12%);
+  stroke-width: 0.25;
+}
+
+.compassLine {
+  stroke: var(--text-muted);
+  stroke-width: 0.7;
+}
+
+.compassHead {
+  fill: var(--text-muted);
+}
+
+.compassLabel {
+  fill: var(--text-muted);
+  font-size: 3.2px;
+  font-weight: 700;
+}
+
+.airMassLabel {
+  fill: var(--text-muted);
+  font-size: 3.1px;
+  letter-spacing: 0.04em;
+}
+
+.precipitation {
+  opacity: 0.55;
+}
+
+.cellLabel {
+  fill: var(--text);
+  font-size: 3.1px;
+  font-weight: 700;
+  paint-order: stroke;
+  stroke: rgb(8 19 31 / 85%);
+  stroke-width: 0.8;
+}
+
+.boundaryLabel {
+  fill: var(--text);
+  font-size: 3.1px;
+  font-weight: 700;
+  paint-order: stroke;
+  stroke: rgb(8 19 31 / 85%);
+  stroke-width: 0.8;
+}
+
+.stationGroup {
+  cursor: pointer;
+}
+
+.stationDot {
+  fill: var(--station);
+  stroke: #08131f;
+  stroke-width: 0.5;
+}
+
+.stationTick {
+  stroke: #08131f;
+  stroke-width: 0.4;
+}
+
+.stationSelectedRing {
+  fill: none;
+  stroke: var(--station-selected);
+  stroke-width: 0.7;
+  stroke-dasharray: 1.6 1.2;
+}
+
+.stationName {
+  fill: var(--text);
+  font-size: 3.3px;
+  font-weight: 600;
+  paint-order: stroke;
+  stroke: rgb(8 19 31 / 88%);
+  stroke-width: 0.9;
+}
+
+.legend {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--space-1);
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+.legendText {
+  display: inline-block;
+}

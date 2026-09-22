@@ -1,0 +1,834 @@
+.mission {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.skipLink {
+  position: absolute;
+  left: -9999px;
+  top: var(--space-2);
+  background: var(--surface-raised);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+}
+
+.skipLink:focus {
+  left: var(--space-2);
+  z-index: 5;
+}
+
+.missionHeader {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.missionHeaderSide {
+  display: grid;
+  gap: var(--space-2);
+  justify-items: end;
+}
+
+.phaseTag {
+  margin: 0;
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.phaseHeading {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.statusRegion {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-left: 4px solid var(--info);
+  background: var(--surface-sunken);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  min-height: var(--tap-target);
+}
+
+.statusRegion[data-tone="success"] {
+  border-left-color: var(--success);
+}
+
+.statusRegion[data-tone="attention"] {
+  border-left-color: var(--attention);
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.lede {
+  font-size: clamp(1.02rem, 2.2vw, 1.22rem);
+  color: var(--text-secondary);
+  max-width: 60rem;
+  margin: var(--space-2) 0 0;
+}
+
+.panel {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-panel);
+  display: grid;
+  gap: var(--space-4);
+}
+
+.panel h2 {
+  margin: 0;
+}
+
+.panelHeader {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.twoUp {
+  display: grid;
+  gap: var(--space-5);
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+}
+
+.note {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.bulletList {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: var(--space-1);
+  color: var(--text-secondary);
+}
+
+.definitionList {
+  display: grid;
+  grid-template-columns: minmax(9rem, auto) 1fr;
+  gap: var(--space-1) var(--space-4);
+  margin: 0 0 var(--space-3);
+}
+
+.definitionList dt {
+  color: var(--text-muted);
+  font-size: 0.86rem;
+}
+
+.definitionList dd {
+  margin: 0;
+  color: var(--text);
+}
+
+.actionRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.primaryAction {
+  background: var(--focus);
+  color: #10202f;
+  border: 1px solid var(--focus);
+  font-weight: 700;
+}
+
+.actionRow button,
+.timeButtons button,
+.timeToggles button,
+.evidenceActions button,
+.stationTab,
+.pill,
+.option,
+.coachingStep button {
+  min-height: var(--tap-target);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
+  color: var(--text);
+  padding: var(--space-2) var(--space-4);
+  transition: background var(--transition-quick), border-color var(--transition-quick);
+}
+
+.actionRow button:hover,
+.timeButtons button:hover,
+.timeToggles button:hover,
+.evidenceActions button:hover,
+.stationTab:hover,
+.pill:hover,
+.option:hover,
+.coachingStep button:hover {
+  border-color: var(--focus);
+}
+
+.actionRow button:disabled,
+.timeButtons button:disabled,
+.timeToggles button:disabled,
+.evidenceActions button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.inlineStatus {
+  margin: 0;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--surface-sunken);
+  border-left: 4px solid var(--info);
+  color: var(--text-secondary);
+}
+
+.inlineStatus[data-tone="attention"] {
+  border-left-color: var(--attention);
+}
+
+.inlineStatus[data-tone="success"] {
+  border-left-color: var(--success);
+}
+
+/* ------------------------------- coaching ------------------------------- */
+
+.coaching {
+  border: 1px solid var(--border-soft);
+  background: var(--surface-sunken);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-5);
+  display: grid;
+  gap: var(--space-3);
+}
+
+.coachingHeader {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.coachingHeader h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.assistanceControl {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--text-muted);
+  font-size: 0.86rem;
+}
+
+.pillGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.pill[aria-checked="true"],
+.option[aria-checked="true"],
+.stationTab[aria-pressed="true"],
+.evidenceActions button[aria-pressed="true"] {
+  background: var(--focus);
+  color: #10202f;
+  border-color: var(--focus);
+  font-weight: 700;
+}
+
+.coachingStep {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.coachingStep h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.hintList {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: var(--text-secondary);
+  display: grid;
+  gap: var(--space-1);
+}
+
+.coachingIdle {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.progress {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.86rem;
+}
+
+/* ------------------------------ workspace ------------------------------- */
+
+.workspaceWrapper {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.workspace {
+  display: grid;
+  gap: var(--space-5);
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.workspaceMain,
+.workspaceSide {
+  display: grid;
+  gap: var(--space-5);
+  align-content: start;
+  min-width: 0;
+}
+
+@media (min-width: 60rem) {
+  .workspace {
+    grid-template-columns: minmax(0, 1.55fr) minmax(18rem, 0.95fr);
+  }
+}
+
+.boundaryBlock {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.boundaryBlockInner {
+  display: grid;
+  gap: var(--space-2);
+  border-left: 3px solid var(--cold-front);
+  padding-left: var(--space-3);
+}
+
+.facts {
+  font-size: 0.9rem;
+}
+
+.facts caption {
+  font-size: 0.86rem;
+  color: var(--text-muted);
+}
+
+.facts th[scope="row"] {
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.9rem;
+  width: 42%;
+}
+
+.factsCompact th[scope="row"] {
+  font-size: 0.84rem;
+}
+
+.facts tbody tr[data-selected="true"] {
+  background: rgb(247 201 72 / 12%);
+}
+
+.factNote {
+  display: block;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  margin-top: var(--space-1);
+}
+
+.stationTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* ------------------------------- timing --------------------------------- */
+
+.timePanel {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: grid;
+  gap: var(--space-3);
+}
+
+.timeHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.timeHeader h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.timeNow {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.timeClock {
+  font-family: var(--font-mono);
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.timeOffset {
+  color: var(--text-muted);
+  font-size: 0.86rem;
+}
+
+.timeNote {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.86rem;
+}
+
+.timeButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.slider {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.slider label {
+  color: var(--text-muted);
+  font-size: 0.86rem;
+}
+
+.slider input[type="range"] {
+  width: 100%;
+  min-height: var(--tap-target);
+  accent-color: var(--focus);
+}
+
+.timeToggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.timeToggles button[aria-pressed="true"] {
+  background: var(--focus);
+  color: #10202f;
+  border-color: var(--focus);
+  font-weight: 700;
+}
+
+/* ------------------------------- evidence ------------------------------- */
+
+.evidenceList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-4);
+}
+
+.evidenceItem {
+  display: grid;
+  gap: var(--space-2);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  background: var(--surface-sunken);
+}
+
+.evidenceHeader h3 {
+  margin: 0;
+  font-size: 0.98rem;
+}
+
+.evidenceMeta {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.evidenceActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.lockedEvidence {
+  border-top: 1px dashed var(--border-soft);
+  padding-top: var(--space-3);
+}
+
+.lockedEvidence h3 {
+  margin: 0 0 var(--space-2);
+  font-size: 0.95rem;
+}
+
+.lockedEvidence ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+}
+
+/* ------------------------------- forecast ------------------------------- */
+
+.fieldGroup {
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  margin: 0;
+  display: grid;
+  gap: var(--space-4);
+}
+
+.fieldGroupLegend {
+  padding: 0 var(--space-2);
+  font-weight: 700;
+  color: var(--text);
+}
+
+.field {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.fieldLegend {
+  font-weight: 700;
+  padding: 0;
+}
+
+.fieldUnit {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.fieldHint {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.86rem;
+}
+
+.rangeInputs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.rangeInput {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 9rem;
+  flex: 1 1 9rem;
+}
+
+.rangeInput label {
+  color: var(--text-secondary);
+  font-size: 0.84rem;
+}
+
+.rangeInput input {
+  min-height: var(--tap-target);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface-sunken);
+  color: var(--text);
+  font-family: var(--font-mono);
+}
+
+.fieldIssues {
+  margin: 0;
+  display: grid;
+  gap: var(--space-1);
+}
+
+.issueBlocking {
+  color: var(--attention);
+  font-size: 0.88rem;
+}
+
+.advisories {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: var(--text-muted);
+  font-size: 0.84rem;
+}
+
+.optionList {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.option {
+  text-align: left;
+}
+
+.reasoning {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.reasoning h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.blockingSummary {
+  border-left: 4px solid var(--attention);
+  background: var(--surface-sunken);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+}
+
+.blockingSummary h3 {
+  margin: 0 0 var(--space-2);
+  font-size: 0.98rem;
+}
+
+.blockingSummary ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: var(--text-secondary);
+}
+
+.readyNote {
+  margin: 0;
+  color: var(--success);
+}
+
+/* ----------------------------- verification ----------------------------- */
+
+.dimensionGroup {
+  display: grid;
+  gap: var(--space-2);
+  border-top: 1px solid var(--border-soft);
+  padding-top: var(--space-4);
+}
+
+.dimensionGroup h3,
+.dimensionGroup h4 {
+  margin: 0;
+}
+
+.level {
+  margin: 0;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.level[data-level="supported"],
+.level[data-level="well-calibrated"] {
+  color: var(--success);
+}
+
+.level[data-level="partially-supported"] {
+  color: var(--attention);
+}
+
+.level[data-level="unsupported"],
+.level[data-level="overconfident"],
+.level[data-level="underconfident"] {
+  color: var(--warm-front);
+}
+
+.level::before {
+  display: inline-block;
+  margin-right: var(--space-2);
+  font-family: var(--font-mono);
+}
+
+.level[data-level="supported"]::before,
+.level[data-level="well-calibrated"]::before {
+  content: "[supported]";
+}
+
+.level[data-level="partially-supported"]::before {
+  content: "[partial]";
+}
+
+.level[data-level="unsupported"]::before,
+.level[data-level="overconfident"]::before,
+.level[data-level="underconfident"]::before {
+  content: "[check]";
+}
+
+.dimensionList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-4);
+}
+
+.dimensionItem {
+  display: grid;
+  gap: var(--space-1);
+  border-left: 3px solid var(--border);
+  padding-left: var(--space-3);
+}
+
+.reference summary {
+  cursor: pointer;
+  color: var(--info);
+  padding: var(--space-2) 0;
+  min-height: var(--tap-target);
+}
+
+/* -------------------------------- debrief ------------------------------- */
+
+.attachedTag,
+.missingTag {
+  font-size: 0.8rem;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+  margin-left: var(--space-2);
+}
+
+.attachedTag {
+  color: var(--success);
+  border-color: var(--success);
+}
+
+.missingTag {
+  color: var(--text-muted);
+}
+
+.sourceRefs ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+}
+
+/* ------------------------------- selection ------------------------------ */
+
+.sectionHeading {
+  margin: 0 0 var(--space-3);
+  font-size: clamp(1.3rem, 3vw, 1.7rem);
+}
+
+.noticeRow {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+}
+
+.notice {
+  margin: 0;
+  background: var(--surface-sunken);
+  border-left: 4px solid var(--info);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4);
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+}
+
+.missionList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr));
+}
+
+.missionCard {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+}
+
+.missionCardHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.missionCardHeader h3 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.difficultyTag {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  padding: 0 var(--space-3);
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.missionObjective {
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.cardSubheading {
+  margin: var(--space-2) 0 0;
+  font-size: 0.92rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+@media (max-width: 34rem) {
+  .panel,
+  .missionCard {
+    padding: var(--space-4);
+  }
+
+  .definitionList {
+    grid-template-columns: 1fr;
+  }
+
+  .missionHeaderSide {
+    justify-items: start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .actionRow button,
+  .timeButtons button,
+  .timeToggles button,
+  .evidenceActions button,
+  .stationTab,
+  .pill,
+  .option,
+  .coachingStep button {
+    transition: none;
+  }
+}

@@ -2,18 +2,51 @@
   --bg: #08131f;
   --surface: #102235;
   --surface-raised: #173149;
+  --surface-sunken: #0b1926;
   --text: #f5f8fb;
   --text-secondary: #c8d4df;
   --text-muted: #93a9bc;
   --border: #35536c;
+  --border-soft: #22384c;
   --focus: #ffd166;
+
+  /* System colours. Never the only encoding: every one is paired with a
+     line style, shape, pattern or label. */
+  --cold-front: #7fc4ff;
+  --warm-front: #ff9f7a;
+  --other-front: #b6a6ff;
+  --precipitation: #6fd6c4;
+  --precipitation-weak: #2b6b64;
   --station: #f7c948;
-  --space-1: .25rem;
-  --space-2: .5rem;
-  --space-3: .75rem;
+  --station-selected: #ffffff;
+  --success: #8fe3a4;
+  --attention: #ffcf7a;
+  --info: #9ec9f2;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
   --space-4: 1rem;
   --space-5: 1.5rem;
   --space-6: 2rem;
+  --space-7: 2.5rem;
   --space-8: 3rem;
+
+  --radius-sm: 0.35rem;
+  --radius-md: 0.6rem;
   --radius-lg: 1rem;
+  --radius-pill: 999px;
+
+  --shadow-panel: 0 1rem 2.5rem rgb(2 10 20 / 45%);
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --tap-target: 2.75rem;
+  --transition-quick: 140ms ease-out;
+  --transition-calm: 260ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transition-quick: 0ms;
+    --transition-calm: 0ms;
+  }
 }
