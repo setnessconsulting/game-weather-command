@@ -120,6 +120,24 @@ function verifyOnce(): ForecastSessionState {
   return machine.reduce(state, { type: "verify" });
 }
 
+describe("session guards", () => {
+  it("treats verify before any commit as a no-op with attention status", () => {
+    const started = run([{ type: "start" }]);
+    const state = machine.reduce(started, { type: "verify" });
+    expect(state.phase).toBe("observing");
+    expect(state.attempts).toHaveLength(0);
+    expect(state.activeAttemptIndex).toBeNull();
+    expect(state.status?.tone).toBe("attention");
+    expect(state.status?.message).toBe("Commit a forecast before comparing it with the record.");
+  });
+
+  it("clamps a negative setMinute to the timeline start", () => {
+    const started = run([{ type: "start" }]);
+    const state = machine.reduce(started, { type: "setMinute", minute: -1 });
+    expect(state.minute).toBe(0);
+  });
+});
+
 describe("session input handling", () => {
   it("ignores locked evidence and unknown identifiers", () => {
     let state = run([{ type: "start" }]);
