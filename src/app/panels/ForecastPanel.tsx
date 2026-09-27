@@ -184,18 +184,23 @@ export function ForecastPanel({
             ))}
           </ul>
         </div>
-      ) : (
-        <p className={styles.readyNote}>
-          All fields are filled and internally consistent. Committing at {formatSimulatedTimestamp(state.minute)}{" "}
-          will be recorded as a{" "}
-          {state.minute >= machine.window.endMinute
-            ? "hindcast, because the published window has closed"
-            : "forecast"}
-          .
-        </p>
-      )}
+      ) : null}
 
-      <div className={styles.actionRow}>
+      {/*
+        Sticky commit bar (GAME-407 F1): the commit action and the timing/classification
+        state stay pinned to the bottom of the viewport while the form scrolls, so the
+        learner never has to hunt for the next consequential action.
+      */}
+      <div className={styles.commitBar}>
+        <p className={styles.commitStatus}>
+          {blocking.length > 0
+            ? "Finish the highlighted fields above to commit."
+            : `Committing at ${formatSimulatedTimestamp(state.minute)} will be recorded as a ${
+                state.minute >= machine.window.endMinute
+                  ? "hindcast, because the published window has closed"
+                  : "forecast"
+              }.`}
+        </p>
         <button type="button" className={styles.primaryAction} onClick={onCommit} disabled={locked}>
           Commit forecast
         </button>
