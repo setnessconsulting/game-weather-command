@@ -38,7 +38,7 @@ const commonSimplifications = [
 
 const guidedColdFront = parseWeatherScenario({
   schemaVersion: "1",
-  contentVersion: "wc04-guided-cold-front-2",
+  contentVersion: "wc04-guided-cold-front-3",
   scenarioId: "guided-cold-front-shift",
   title: "Cold Front Shift",
   missionType: "guided-cold-front",
@@ -61,7 +61,6 @@ const guidedColdFront = parseWeatherScenario({
       initial: {
         temperatureC: 22,
         pressureHpa: 1007,
-        pressureTendencyHpaPer3h: -2,
         relativeHumidityPct: 76,
         windDirectionDeg: 185,
         windSpeedMps: 4,
@@ -75,7 +74,6 @@ const guidedColdFront = parseWeatherScenario({
       initial: {
         temperatureC: 23,
         pressureHpa: 1006,
-        pressureTendencyHpaPer3h: -2,
         relativeHumidityPct: 78,
         windDirectionDeg: 190,
         windSpeedMps: 4,
@@ -89,7 +87,6 @@ const guidedColdFront = parseWeatherScenario({
       initial: {
         temperatureC: 24,
         pressureHpa: 1005,
-        pressureTendencyHpaPer3h: -2,
         relativeHumidityPct: 80,
         windDirectionDeg: 195,
         windSpeedMps: 5,
@@ -135,6 +132,7 @@ const guidedColdFront = parseWeatherScenario({
       movement: { x: 0.12, y: 0 },
       initialIntensityMmh: 4,
       intensityDeltaMmhPerStep: -0.1,
+      footprintRadius: 0.13,
       sourceRefIds: ["nws-fronts"],
     },
   ],
@@ -148,11 +146,9 @@ const guidedColdFront = parseWeatherScenario({
       delta: {
         temperatureC: -7,
         pressureHpa: 4,
-        pressureTendencyHpaPer3h: 4,
         relativeHumidityPct: -18,
         windDirectionDeg: 75,
         windSpeedMps: 3,
-        precipitationRateMmh: 4,
       },
       sourceRefIds: ["nws-fronts", "ngss-ms-ess2-5"],
     },
@@ -162,7 +158,7 @@ const guidedColdFront = parseWeatherScenario({
       boundaryId: "cold-front",
       startMinute: 90,
       endMinute: 150,
-      delta: { relativeHumidityPct: -8, precipitationRateMmh: -4 },
+      delta: { relativeHumidityPct: -8 },
       sourceRefIds: ["nws-fronts"],
     },
     {
@@ -174,11 +170,9 @@ const guidedColdFront = parseWeatherScenario({
       delta: {
         temperatureC: -7,
         pressureHpa: 4,
-        pressureTendencyHpaPer3h: 4,
         relativeHumidityPct: -18,
         windDirectionDeg: 75,
         windSpeedMps: 3,
-        precipitationRateMmh: 4,
       },
       sourceRefIds: ["nws-fronts", "ngss-ms-ess2-5"],
     },
@@ -188,7 +182,7 @@ const guidedColdFront = parseWeatherScenario({
       boundaryId: "cold-front",
       startMinute: 150,
       endMinute: 210,
-      delta: { relativeHumidityPct: -8, precipitationRateMmh: -4 },
+      delta: { relativeHumidityPct: -8 },
       sourceRefIds: ["nws-fronts"],
     },
     {
@@ -200,11 +194,9 @@ const guidedColdFront = parseWeatherScenario({
       delta: {
         temperatureC: -7,
         pressureHpa: 4,
-        pressureTendencyHpaPer3h: 4,
         relativeHumidityPct: -18,
         windDirectionDeg: 75,
         windSpeedMps: 3,
-        precipitationRateMmh: 4,
       },
       sourceRefIds: ["nws-fronts", "ngss-ms-ess2-5"],
     },
@@ -214,7 +206,7 @@ const guidedColdFront = parseWeatherScenario({
       boundaryId: "cold-front",
       startMinute: 210,
       endMinute: 240,
-      delta: { relativeHumidityPct: -8, precipitationRateMmh: -4 },
+      delta: { relativeHumidityPct: -8 },
       sourceRefIds: ["nws-fronts"],
     },
   ],
@@ -288,7 +280,7 @@ const guidedColdFront = parseWeatherScenario({
 
 const independentColdFront = parseWeatherScenario({
   schemaVersion: "1",
-  contentVersion: "wc04-independent-cold-front-2",
+  contentVersion: "wc04-independent-cold-front-3",
   scenarioId: "independent-cold-front-variant",
   title: "Front Timing Challenge",
   missionType: "independent-cold-front",
@@ -311,7 +303,6 @@ const independentColdFront = parseWeatherScenario({
       initial: {
         temperatureC: 20,
         pressureHpa: 1009,
-        pressureTendencyHpaPer3h: -1.5,
         relativeHumidityPct: 66,
         windDirectionDeg: 175,
         windSpeedMps: 5,
@@ -325,7 +316,6 @@ const independentColdFront = parseWeatherScenario({
       initial: {
         temperatureC: 22,
         pressureHpa: 1008,
-        pressureTendencyHpaPer3h: -1.5,
         relativeHumidityPct: 69,
         windDirectionDeg: 185,
         windSpeedMps: 5,
@@ -339,7 +329,6 @@ const independentColdFront = parseWeatherScenario({
       initial: {
         temperatureC: 23,
         pressureHpa: 1007,
-        pressureTendencyHpaPer3h: -1.5,
         relativeHumidityPct: 72,
         windDirectionDeg: 190,
         windSpeedMps: 6,
@@ -385,6 +374,7 @@ const independentColdFront = parseWeatherScenario({
       movement: { x: 0.1, y: 0 },
       initialIntensityMmh: 2.5,
       intensityDeltaMmhPerStep: -0.08,
+      footprintRadius: 0.13,
       sourceRefIds: ["nws-fronts"],
     },
   ],
@@ -398,11 +388,9 @@ const independentColdFront = parseWeatherScenario({
       delta: {
         temperatureC: -6,
         pressureHpa: 4,
-        pressureTendencyHpaPer3h: 3,
         relativeHumidityPct: -14,
         windDirectionDeg: 85,
         windSpeedMps: 2.5,
-        precipitationRateMmh: 2,
       },
       sourceRefIds: ["nws-fronts", "ngss-ms-ess2-5"],
     },
@@ -415,11 +403,9 @@ const independentColdFront = parseWeatherScenario({
       delta: {
         temperatureC: -6,
         pressureHpa: 4,
-        pressureTendencyHpaPer3h: 3,
         relativeHumidityPct: -14,
         windDirectionDeg: 85,
         windSpeedMps: 2.5,
-        precipitationRateMmh: 2,
       },
       sourceRefIds: ["nws-fronts", "ngss-ms-ess2-5"],
     },
@@ -432,11 +418,9 @@ const independentColdFront = parseWeatherScenario({
       delta: {
         temperatureC: -6,
         pressureHpa: 4,
-        pressureTendencyHpaPer3h: 3,
         relativeHumidityPct: -14,
         windDirectionDeg: 85,
         windSpeedMps: 2.5,
-        precipitationRateMmh: 2,
       },
       sourceRefIds: ["nws-fronts", "ngss-ms-ess2-5"],
     },
@@ -446,7 +430,7 @@ const independentColdFront = parseWeatherScenario({
       boundaryId: "cold-front",
       startMinute: 120,
       endMinute: 180,
-      delta: { relativeHumidityPct: -6, precipitationRateMmh: -2 },
+      delta: { relativeHumidityPct: -6 },
       sourceRefIds: ["nws-fronts"],
     },
     {
@@ -455,7 +439,7 @@ const independentColdFront = parseWeatherScenario({
       boundaryId: "cold-front",
       startMinute: 180,
       endMinute: 240,
-      delta: { relativeHumidityPct: -6, precipitationRateMmh: -2 },
+      delta: { relativeHumidityPct: -6 },
       sourceRefIds: ["nws-fronts"],
     },
     {
@@ -464,7 +448,7 @@ const independentColdFront = parseWeatherScenario({
       boundaryId: "cold-front",
       startMinute: 240,
       endMinute: 300,
-      delta: { relativeHumidityPct: -6, precipitationRateMmh: -2 },
+      delta: { relativeHumidityPct: -6 },
       sourceRefIds: ["nws-fronts"],
     },
   ],
@@ -535,7 +519,7 @@ const independentColdFront = parseWeatherScenario({
 
 const warmFront = parseWeatherScenario({
   schemaVersion: "1",
-  contentVersion: "wc04-warm-front-2",
+  contentVersion: "wc04-warm-front-4",
   scenarioId: "warm-front-gradual-change",
   title: "Gradual Change",
   missionType: "warm-front",
@@ -558,7 +542,6 @@ const warmFront = parseWeatherScenario({
       initial: {
         temperatureC: 16,
         pressureHpa: 1015,
-        pressureTendencyHpaPer3h: -1,
         relativeHumidityPct: 65,
         windDirectionDeg: 105,
         windSpeedMps: 3,
@@ -572,7 +555,6 @@ const warmFront = parseWeatherScenario({
       initial: {
         temperatureC: 15,
         pressureHpa: 1016,
-        pressureTendencyHpaPer3h: -1,
         relativeHumidityPct: 62,
         windDirectionDeg: 110,
         windSpeedMps: 3,
@@ -586,7 +568,6 @@ const warmFront = parseWeatherScenario({
       initial: {
         temperatureC: 14,
         pressureHpa: 1017,
-        pressureTendencyHpaPer3h: -1,
         relativeHumidityPct: 60,
         windDirectionDeg: 115,
         windSpeedMps: 3,
@@ -628,10 +609,11 @@ const warmFront = parseWeatherScenario({
   precipitationCells: [
     {
       id: "broad-light-rain",
-      initialCenter: { x: 0.14, y: 0.5 },
+      initialCenter: { x: 0.1, y: 0.5 },
       movement: { x: 0.1, y: 0 },
       initialIntensityMmh: 2.2,
       intensityDeltaMmhPerStep: -0.05,
+      footprintRadius: 0.13,
       sourceRefIds: ["nws-fronts"],
     },
   ],
@@ -645,11 +627,9 @@ const warmFront = parseWeatherScenario({
       delta: {
         temperatureC: 5,
         pressureHpa: -2,
-        pressureTendencyHpaPer3h: 1.5,
         relativeHumidityPct: 12,
         windDirectionDeg: 50,
         windSpeedMps: 2,
-        precipitationRateMmh: 2,
       },
       sourceRefIds: ["nws-fronts", "ngss-ms-ess2-5"],
     },
@@ -662,11 +642,9 @@ const warmFront = parseWeatherScenario({
       delta: {
         temperatureC: 5,
         pressureHpa: -2,
-        pressureTendencyHpaPer3h: 1.5,
         relativeHumidityPct: 12,
         windDirectionDeg: 50,
         windSpeedMps: 2,
-        precipitationRateMmh: 2,
       },
       sourceRefIds: ["nws-fronts", "ngss-ms-ess2-5"],
     },
@@ -679,31 +657,11 @@ const warmFront = parseWeatherScenario({
       delta: {
         temperatureC: 5,
         pressureHpa: -2,
-        pressureTendencyHpaPer3h: 1.5,
         relativeHumidityPct: 12,
         windDirectionDeg: 50,
         windSpeedMps: 2,
-        precipitationRateMmh: 2,
       },
       sourceRefIds: ["nws-fronts", "ngss-ms-ess2-5"],
-    },
-    {
-      id: "west-rain-eases",
-      stationId: "west",
-      boundaryId: "warm-front",
-      startMinute: 180,
-      endMinute: 240,
-      delta: { precipitationRateMmh: -2 },
-      sourceRefIds: ["nws-fronts"],
-    },
-    {
-      id: "central-rain-eases",
-      stationId: "central",
-      boundaryId: "warm-front",
-      startMinute: 240,
-      endMinute: 300,
-      delta: { precipitationRateMmh: -2 },
-      sourceRefIds: ["nws-fronts"],
     },
   ],
   forecastWindows: [
@@ -742,7 +700,7 @@ const warmFront = parseWeatherScenario({
       id: "warm-central-forecast",
       forecastWindowId: "valley-next-four-hours",
       targetStationId: "central",
-      transitionArrivalMinute: { min: 120, max: 180 },
+      transitionArrivalMinute: { min: 90, max: 180 },
       temperatureChangeC: { min: 3, max: 7 },
       precipitationProbabilityPct: { min: 60, max: 85 },
       windDirectionSectorsDeg: [{ min: 130, max: 190 }],
@@ -765,7 +723,7 @@ const warmFront = parseWeatherScenario({
 
 const uncertainBoundary = parseWeatherScenario({
   schemaVersion: "1",
-  contentVersion: "wc04-uncertain-boundary-2",
+  contentVersion: "wc04-uncertain-boundary-3",
   scenarioId: "uncertain-boundary-variant",
   title: "Uncertain Timing",
   missionType: "uncertain-boundary",
@@ -788,7 +746,6 @@ const uncertainBoundary = parseWeatherScenario({
       initial: {
         temperatureC: 20,
         pressureHpa: 1010,
-        pressureTendencyHpaPer3h: -0.8,
         relativeHumidityPct: 70,
         windDirectionDeg: 165,
         windSpeedMps: 4,
@@ -802,7 +759,6 @@ const uncertainBoundary = parseWeatherScenario({
       initial: {
         temperatureC: 21,
         pressureHpa: 1009,
-        pressureTendencyHpaPer3h: -0.8,
         relativeHumidityPct: 72,
         windDirectionDeg: 170,
         windSpeedMps: 4.5,
@@ -816,7 +772,6 @@ const uncertainBoundary = parseWeatherScenario({
       initial: {
         temperatureC: 22,
         pressureHpa: 1008,
-        pressureTendencyHpaPer3h: -0.8,
         relativeHumidityPct: 74,
         windDirectionDeg: 175,
         windSpeedMps: 5,
@@ -862,6 +817,7 @@ const uncertainBoundary = parseWeatherScenario({
       movement: { x: 0.1, y: 0 },
       initialIntensityMmh: 1.8,
       intensityDeltaMmhPerStep: -0.05,
+      footprintRadius: 0.13,
       sourceRefIds: ["nws-fronts"],
     },
   ],
@@ -875,11 +831,9 @@ const uncertainBoundary = parseWeatherScenario({
       delta: {
         temperatureC: -4.5,
         pressureHpa: 2.5,
-        pressureTendencyHpaPer3h: 1.5,
         relativeHumidityPct: -10,
         windDirectionDeg: 55,
         windSpeedMps: 2,
-        precipitationRateMmh: 2.5,
       },
       noise: {
         temperatureC: { amplitude: 0.5, key: "west-temperature" },
@@ -897,11 +851,9 @@ const uncertainBoundary = parseWeatherScenario({
       delta: {
         temperatureC: -4.5,
         pressureHpa: 2.5,
-        pressureTendencyHpaPer3h: 1.5,
         relativeHumidityPct: -10,
         windDirectionDeg: 55,
         windSpeedMps: 2,
-        precipitationRateMmh: 2.5,
       },
       noise: {
         temperatureC: { amplitude: 0.5, key: "central-temperature" },
@@ -919,11 +871,9 @@ const uncertainBoundary = parseWeatherScenario({
       delta: {
         temperatureC: -4.5,
         pressureHpa: 2.5,
-        pressureTendencyHpaPer3h: 1.5,
         relativeHumidityPct: -10,
         windDirectionDeg: 55,
         windSpeedMps: 2,
-        precipitationRateMmh: 2.5,
       },
       noise: {
         temperatureC: { amplitude: 0.5, key: "east-temperature" },

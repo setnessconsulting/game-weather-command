@@ -65,7 +65,7 @@ export function buildGuidedTutorial(machine: SessionMachine): readonly TutorialS
         "Open the station trends evidence. Trends show how each station has changed since the mission began, and which part of the record changed fastest.",
       hints: [
         "If a trend looks flat, advance the simulated clock and read it again.",
-        "Pressure tendency matters as much as pressure: a level that stops falling is a signal in its own right."
+        "Pressure tendency matters as much as pressure: a tendency that turns upward as the front passes is a signal in its own right."
       ],
       isComplete: (state) => hasEvidenceOfType(machine, state, "trend")
     });
@@ -76,10 +76,10 @@ export function buildGuidedTutorial(machine: SessionMachine): readonly TutorialS
       id: "follow-front",
       title: "Follow the front",
       instruction:
-        "Open the front position and motion evidence to see where the boundary is, which way it is heading, and roughly when it reaches each station.",
+        "Open the front position and motion evidence to see where the boundary is, which way it is heading, and how far it is from each station.",
       hints: [
-        "The extrapolated arrival times ignore the fact that real fronts change speed. Use them as a starting point, then sanity-check them against the station records.",
-        "Compare the extrapolated arrival with the stations that have already changed. The two should tell the same story."
+        "Distance and speed are evidence. Estimate arrival yourself from the map and the clock; this model moves the front at a constant speed, and real fronts change speed and direction.",
+        "Compare your arrival estimate with the stations that have already changed. The two should tell the same story.",
       ],
       isComplete: (state) => hasEvidenceOfType(machine, state, "boundary")
     });

@@ -3,6 +3,7 @@ import { z } from "zod";
 import {
   assertScenarioCoherence,
   assertValidKernelScenario,
+  deriveStationTransitionWindow,
   type KernelScenarioDefinition,
   type StationEffectRule,
 } from "@/domain";
@@ -40,7 +41,10 @@ const normalizedPointSchema = z.object({
 const stationObservationSchema = z.object({
   temperatureC: z.number().min(-100).max(70),
   pressureHpa: z.number().min(800).max(1100),
-  pressureTendencyHpaPer3h: z.number().min(-50).max(50),
+  // Tendency is derived from the pressure trajectory, so it is not authored here.
+  // When omitted it is treated as 0, which is exactly the kernel's computed value at
+  // the scenario start (no time has elapsed, so no pressure change has occurred).
+  pressureTendencyHpaPer3h: z.number().min(-50).max(50).optional(),
   relativeHumidityPct: z.number().min(0).max(100),
   windDirectionDeg: z.number().min(0).lt(360),
   windSpeedMps: z.number().min(0).max(150),
@@ -79,6 +83,7 @@ const precipitationCellDefinitionSchema = z.object({
   movement: z.object({ x: z.number().finite(), y: z.number().finite() }),
   initialIntensityMmh: z.number().min(0).max(500),
   intensityDeltaMmhPerStep: z.number().finite(),
+  footprintRadius: z.number().gt(0).max(1),
   sourceRefIds: sourceRefIdsSchema,
 });
 
@@ -90,10 +95,17 @@ const stationObservationDeltaSchema = z.object({
   windDirectionDeg: z.number().optional(),
   windSpeedMps: z.number().optional(),
   precipitationRateMmh: z.number().optional(),
-}).refine(
-  (value) => Object.values(value).some((dimension) => dimension !== undefined),
-  "station effect must change at least one observation",
-);
+})
+  .refine(
+    (value) => Object.values(value).some((dimension) => dimension !== undefined),
+    "station effect must change at least one observation",
+  )
+  .refine(
+    (value) => value.precipitationRateMmh === undefined && value.pressureTendencyHpaPer3h === undefined,
+    "station effects must not author precipitationRateMmh or pressureTendencyHpaPer3h: precipitation is " +
+      "derived from the precipitation-band geometry and pressure tendency from the produced pressure " +
+      "trajectory, so an authored value would be silently ignored and would contradict the derived surfaces",
+  );
 
 const noiseRuleSchema = z.object({
   amplitude: z.number().min(0),
@@ -132,6 +144,8 @@ export const scienceSourceSchema = z.object({
   relationship: z.string().trim().min(1),
   usage: z.string().trim().min(1),
   reviewed: z.boolean(),
+  accessedOn: z.string().optional(),
+  reviewedBy: z.string().optional(),
 });
 
 export const evidenceDefinitionSchema = z.object({
@@ -256,7 +270,13 @@ export function toKernelScenario(scenario: WeatherScenarioV1): KernelScenarioDef
     scenarioId: scenario.scenarioId,
     seed: scenario.seed,
     timeline: scenario.timeline,
-    stations: scenario.stations,
+    stations: scenario.stations.map((station) => ({
+      ...station,
+      initial: {
+        ...station.initial,
+        pressureTendencyHpaPer3h: station.initial.pressureTendencyHpaPer3h ?? 0
+      }
+    })),
     airMasses: scenario.airMasses,
     boundaries: scenario.boundaries,
     precipitationCells: scenario.precipitationCells,
@@ -347,5 +367,30 @@ export function parseWeatherScenario(input: unknown): WeatherScenarioV1 {
   // Front motion and station change windows are authored independently; fail closed
   // rather than shipping a map that disagrees with the station truth.
   assertScenarioCoherence(kernelScenario);
+
+  // The accepted timing envelope is learner-visible reference truth after verification.
+  // It must contain the station's observed transition window, so a defensible forecast
+  // can never be displayed beside an authored envelope that excludes it.
+  for (const range of scenario.acceptedRanges) {
+    const observed = deriveStationTransitionWindow(kernelScenario, range.targetStationId);
+    if (!observed) {
+      throw new Error(
+        `Accepted range ${range.id} targets station "${range.targetStationId}", whose record shows no ` +
+          "derivable temperature transition. Align the scenario before accepting a timing envelope."
+      );
+    }
+    if (
+      range.transitionArrivalMinute.min > observed.startMinute ||
+      range.transitionArrivalMinute.max < observed.endMinute
+    ) {
+      throw new Error(
+        `Accepted range ${range.id} envelope ${range.transitionArrivalMinute.min}-${range.transitionArrivalMinute.max} ` +
+          `does not contain the observed transition window ${observed.startMinute}-${observed.endMinute} of ` +
+          `station "${range.targetStationId}". A learner forecast that matches the observed change must be ` +
+          "able to sit inside the authored envelope."
+      );
+    }
+  }
+
   return scenario;
 }

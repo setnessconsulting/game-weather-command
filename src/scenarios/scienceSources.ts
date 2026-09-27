@@ -11,15 +11,19 @@ export const scienceSources = {
     usage:
       "Defines the learning scope, required weather variables, probabilistic forecast framing, and the boundary against symbol/cloud-name memorization.",
     reviewed: true,
+    accessedOn: "2026-09-21",
+    reviewedBy: "AI-assisted technical review (not the required human science sign-off)",
   },
   nwsFronts: {
     id: "nws-fronts",
-    url: "https://www.weather.gov/jkl/education",
+    url: "https://www.weather.gov/lmk/basic-fronts",
     relationship:
       "Cold-front passage commonly brings colder/drier air, a wind shift, pressure-tendency change, and sometimes a precipitation band; warm fronts produce more gradual ascent and often broader precipitation.",
     usage:
       "Grounds cold-front and warm-front causal direction, wind/pressure changes, and relative abruptness of canonical scenarios.",
     reviewed: true,
+    accessedOn: "2026-09-21",
+    reviewedBy: "AI-assisted technical review (not the required human science sign-off)",
   },
   noaaWeatherMap: {
     id: "noaa-weather-map",
@@ -29,6 +33,8 @@ export const scienceSources = {
     usage:
       "Grounds age-appropriate weather-map evidence and reinforces high-to-low pressure reasoning without requiring symbol recall for success.",
     reviewed: true,
+    accessedOn: "2026-09-21",
+    reviewedBy: "AI-assisted technical review (not the required human science sign-off)",
   },
 } as const satisfies Record<string, ScienceSource>;
 

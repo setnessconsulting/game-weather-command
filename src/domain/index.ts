@@ -4,11 +4,15 @@ export type { SeededRng } from "./seededRng";
 export { deterministicSignedNoise } from "./deterministicNoise";
 export {
   advanceScenario,
+  deriveStationTransitionWindow,
+  deriveTransitionWindow,
   getAvailableForecastWindows,
   getScenarioOutcomeFacts,
   initializeScenario,
+  precipitationAt,
   stateAtMinute
 } from "./weatherKernel";
+export type { SeriesPoint, StationTransitionWindow } from "./weatherKernel";
 export {
   parseReplayTrace,
   recomputeReplayTrace,

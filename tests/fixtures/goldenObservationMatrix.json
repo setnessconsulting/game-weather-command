@@ -1,0 +1,1191 @@
+{
+  "schemaVersion": "1",
+  "scenarios": {
+    "guided-cold-front-shift": {
+      "contentVersion": "wc04-guided-cold-front-3",
+      "seed": 2026092101,
+      "stepMinutes": 30,
+      "stations": {
+        "west": {
+          "0": {
+            "temperatureC": 22,
+            "pressureHpa": 1007,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 76,
+            "windDirectionDeg": 185,
+            "windSpeedMps": 4,
+            "precipitationRateMmh": 0
+          },
+          "30": {
+            "temperatureC": 22,
+            "pressureHpa": 1007,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 76,
+            "windDirectionDeg": 185,
+            "windSpeedMps": 4,
+            "precipitationRateMmh": 3.22917960675
+          },
+          "60": {
+            "temperatureC": 15,
+            "pressureHpa": 1011,
+            "pressureTendencyHpaPer3h": 4,
+            "relativeHumidityPct": 58,
+            "windDirectionDeg": 260,
+            "windSpeedMps": 7,
+            "precipitationRateMmh": 0.53190064827
+          },
+          "90": {
+            "temperatureC": 15,
+            "pressureHpa": 1011,
+            "pressureTendencyHpaPer3h": 4,
+            "relativeHumidityPct": 58,
+            "windDirectionDeg": 260,
+            "windSpeedMps": 7,
+            "precipitationRateMmh": 0
+          },
+          "120": {
+            "temperatureC": 15,
+            "pressureHpa": 1011,
+            "pressureTendencyHpaPer3h": 4,
+            "relativeHumidityPct": 54,
+            "windDirectionDeg": 260,
+            "windSpeedMps": 7,
+            "precipitationRateMmh": 0
+          },
+          "150": {
+            "temperatureC": 15,
+            "pressureHpa": 1011,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 50,
+            "windDirectionDeg": 260,
+            "windSpeedMps": 7,
+            "precipitationRateMmh": 0
+          },
+          "180": {
+            "temperatureC": 15,
+            "pressureHpa": 1011,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 50,
+            "windDirectionDeg": 260,
+            "windSpeedMps": 7,
+            "precipitationRateMmh": 0
+          },
+          "210": {
+            "temperatureC": 15,
+            "pressureHpa": 1011,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 50,
+            "windDirectionDeg": 260,
+            "windSpeedMps": 7,
+            "precipitationRateMmh": 0
+          },
+          "240": {
+            "temperatureC": 15,
+            "pressureHpa": 1011,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 50,
+            "windDirectionDeg": 260,
+            "windSpeedMps": 7,
+            "precipitationRateMmh": 0
+          }
+        },
+        "central": {
+          "0": {
+            "temperatureC": 23,
+            "pressureHpa": 1006,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 78,
+            "windDirectionDeg": 190,
+            "windSpeedMps": 4,
+            "precipitationRateMmh": 0
+          },
+          "30": {
+            "temperatureC": 23,
+            "pressureHpa": 1006,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 78,
+            "windDirectionDeg": 190,
+            "windSpeedMps": 4,
+            "precipitationRateMmh": 0
+          },
+          "60": {
+            "temperatureC": 23,
+            "pressureHpa": 1006,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 78,
+            "windDirectionDeg": 190,
+            "windSpeedMps": 4,
+            "precipitationRateMmh": 0
+          },
+          "90": {
+            "temperatureC": 23,
+            "pressureHpa": 1006,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 78,
+            "windDirectionDeg": 190,
+            "windSpeedMps": 4,
+            "precipitationRateMmh": 2.276923076923
+          },
+          "120": {
+            "temperatureC": 16,
+            "pressureHpa": 1010,
+            "pressureTendencyHpaPer3h": 4,
+            "relativeHumidityPct": 60,
+            "windDirectionDeg": 265,
+            "windSpeedMps": 7,
+            "precipitationRateMmh": 1.661538461538
+          },
+          "150": {
+            "temperatureC": 16,
+            "pressureHpa": 1010,
+            "pressureTendencyHpaPer3h": 4,
+            "relativeHumidityPct": 60,
+            "windDirectionDeg": 265,
+            "windSpeedMps": 7,
+            "precipitationRateMmh": 0
+          },
+          "180": {
+            "temperatureC": 16,
+            "pressureHpa": 1010,
+            "pressureTendencyHpaPer3h": 4,
+            "relativeHumidityPct": 56,
+            "windDirectionDeg": 265,
+            "windSpeedMps": 7,
+            "precipitationRateMmh": 0
+          },
+          "210": {
+            "temperatureC": 16,
+            "pressureHpa": 1010,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 52,
+            "windDirectionDeg": 265,
+            "windSpeedMps": 7,
+            "precipitationRateMmh": 0
+          },
+          "240": {
+            "temperatureC": 16,
+            "pressureHpa": 1010,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 52,
+            "windDirectionDeg": 265,
+            "windSpeedMps": 7,
+            "precipitationRateMmh": 0
+          }
+        },
+        "east": {
+          "0": {
+            "temperatureC": 24,
+            "pressureHpa": 1005,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 80,
+            "windDirectionDeg": 195,
+            "windSpeedMps": 5,
+            "precipitationRateMmh": 0
+          },
+          "30": {
+            "temperatureC": 24,
+            "pressureHpa": 1005,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 80,
+            "windDirectionDeg": 195,
+            "windSpeedMps": 5,
+            "precipitationRateMmh": 0
+          },
+          "60": {
+            "temperatureC": 24,
+            "pressureHpa": 1005,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 80,
+            "windDirectionDeg": 195,
+            "windSpeedMps": 5,
+            "precipitationRateMmh": 0
+          },
+          "90": {
+            "temperatureC": 24,
+            "pressureHpa": 1005,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 80,
+            "windDirectionDeg": 195,
+            "windSpeedMps": 5,
+            "precipitationRateMmh": 0
+          },
+          "120": {
+            "temperatureC": 24,
+            "pressureHpa": 1005,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 80,
+            "windDirectionDeg": 195,
+            "windSpeedMps": 5,
+            "precipitationRateMmh": 0
+          },
+          "150": {
+            "temperatureC": 24,
+            "pressureHpa": 1005,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 80,
+            "windDirectionDeg": 195,
+            "windSpeedMps": 5,
+            "precipitationRateMmh": 1.017814953806
+          },
+          "180": {
+            "temperatureC": 17,
+            "pressureHpa": 1009,
+            "pressureTendencyHpaPer3h": 4,
+            "relativeHumidityPct": 62,
+            "windDirectionDeg": 270,
+            "windSpeedMps": 8,
+            "precipitationRateMmh": 2.457009666417
+          },
+          "210": {
+            "temperatureC": 17,
+            "pressureHpa": 1009,
+            "pressureTendencyHpaPer3h": 4,
+            "relativeHumidityPct": 62,
+            "windDirectionDeg": 270,
+            "windSpeedMps": 8,
+            "precipitationRateMmh": 0
+          },
+          "240": {
+            "temperatureC": 17,
+            "pressureHpa": 1009,
+            "pressureTendencyHpaPer3h": 4,
+            "relativeHumidityPct": 54,
+            "windDirectionDeg": 270,
+            "windSpeedMps": 8,
+            "precipitationRateMmh": 0
+          }
+        }
+      }
+    },
+    "independent-cold-front-variant": {
+      "contentVersion": "wc04-independent-cold-front-3",
+      "seed": 2026092102,
+      "stepMinutes": 30,
+      "stations": {
+        "west": {
+          "0": {
+            "temperatureC": 20,
+            "pressureHpa": 1009,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 66,
+            "windDirectionDeg": 175,
+            "windSpeedMps": 5,
+            "precipitationRateMmh": 0
+          },
+          "30": {
+            "temperatureC": 20,
+            "pressureHpa": 1009,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 66,
+            "windDirectionDeg": 175,
+            "windSpeedMps": 5,
+            "precipitationRateMmh": 0
+          },
+          "60": {
+            "temperatureC": 20,
+            "pressureHpa": 1009,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 66,
+            "windDirectionDeg": 175,
+            "windSpeedMps": 5,
+            "precipitationRateMmh": 1.187437637262
+          },
+          "90": {
+            "temperatureC": 14,
+            "pressureHpa": 1013,
+            "pressureTendencyHpaPer3h": 4,
+            "relativeHumidityPct": 52,
+            "windDirectionDeg": 260,
+            "windSpeedMps": 7.5,
+            "precipitationRateMmh": 0.902218133265
+          },
+          "120": {
+            "temperatureC": 14,
+            "pressureHpa": 1013,
+            "pressureTendencyHpaPer3h": 4,
+            "relativeHumidityPct": 52,
+            "windDirectionDeg": 260,
+            "windSpeedMps": 7.5,
+            "precipitationRateMmh": 0
+          },
+          "150": {
+            "temperatureC": 14,
+            "pressureHpa": 1013,
+            "pressureTendencyHpaPer3h": 4,
+            "relativeHumidityPct": 49,
+            "windDirectionDeg": 260,
+            "windSpeedMps": 7.5,
+            "precipitationRateMmh": 0
+          },
+          "180": {
+            "temperatureC": 14,
+            "pressureHpa": 1013,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 46,
+            "windDirectionDeg": 260,
+            "windSpeedMps": 7.5,
+            "precipitationRateMmh": 0
+          },
+          "210": {
+            "temperatureC": 14,
+            "pressureHpa": 1013,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 46,
+            "windDirectionDeg": 260,
+            "windSpeedMps": 7.5,
+            "precipitationRateMmh": 0
+          },
+          "240": {
+            "temperatureC": 14,
+            "pressureHpa": 1013,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 46,
+            "windDirectionDeg": 260,
+            "windSpeedMps": 7.5,
+            "precipitationRateMmh": 0
+          },
+          "270": {
+            "temperatureC": 14,
+            "pressureHpa": 1013,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 46,
+            "windDirectionDeg": 260,
+            "windSpeedMps": 7.5,
+            "precipitationRateMmh": 0
+          },
+          "300": {
+            "temperatureC": 14,
+            "pressureHpa": 1013,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 46,
+            "windDirectionDeg": 260,
+            "windSpeedMps": 7.5,
+            "precipitationRateMmh": 0
+          }
+        },
+        "central": {
+          "0": {
+            "temperatureC": 22,
+            "pressureHpa": 1008,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 69,
+            "windDirectionDeg": 185,
+            "windSpeedMps": 5,
+            "precipitationRateMmh": 0
+          },
+          "30": {
+            "temperatureC": 22,
+            "pressureHpa": 1008,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 69,
+            "windDirectionDeg": 185,
+            "windSpeedMps": 5,
+            "precipitationRateMmh": 0
+          },
+          "60": {
+            "temperatureC": 22,
+            "pressureHpa": 1008,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 69,
+            "windDirectionDeg": 185,
+            "windSpeedMps": 5,
+            "precipitationRateMmh": 0
+          },
+          "90": {
+            "temperatureC": 22,
+            "pressureHpa": 1008,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 69,
+            "windDirectionDeg": 185,
+            "windSpeedMps": 5,
+            "precipitationRateMmh": 0
+          },
+          "120": {
+            "temperatureC": 22,
+            "pressureHpa": 1008,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 69,
+            "windDirectionDeg": 185,
+            "windSpeedMps": 5,
+            "precipitationRateMmh": 1.231389056624
+          },
+          "150": {
+            "temperatureC": 16,
+            "pressureHpa": 1012,
+            "pressureTendencyHpaPer3h": 4,
+            "relativeHumidityPct": 55,
+            "windDirectionDeg": 270,
+            "windSpeedMps": 7.5,
+            "precipitationRateMmh": 0.935129587927
+          },
+          "180": {
+            "temperatureC": 16,
+            "pressureHpa": 1012,
+            "pressureTendencyHpaPer3h": 4,
+            "relativeHumidityPct": 55,
+            "windDirectionDeg": 270,
+            "windSpeedMps": 7.5,
+            "precipitationRateMmh": 0
+          },
+          "210": {
+            "temperatureC": 16,
+            "pressureHpa": 1012,
+            "pressureTendencyHpaPer3h": 4,
+            "relativeHumidityPct": 52,
+            "windDirectionDeg": 270,
+            "windSpeedMps": 7.5,
+            "precipitationRateMmh": 0
+          },
+          "240": {
+            "temperatureC": 16,
+            "pressureHpa": 1012,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 49,
+            "windDirectionDeg": 270,
+            "windSpeedMps": 7.5,
+            "precipitationRateMmh": 0
+          },
+          "270": {
+            "temperatureC": 16,
+            "pressureHpa": 1012,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 49,
+            "windDirectionDeg": 270,
+            "windSpeedMps": 7.5,
+            "precipitationRateMmh": 0
+          },
+          "300": {
+            "temperatureC": 16,
+            "pressureHpa": 1012,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 49,
+            "windDirectionDeg": 270,
+            "windSpeedMps": 7.5,
+            "precipitationRateMmh": 0
+          }
+        },
+        "east": {
+          "0": {
+            "temperatureC": 23,
+            "pressureHpa": 1007,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 72,
+            "windDirectionDeg": 190,
+            "windSpeedMps": 6,
+            "precipitationRateMmh": 0
+          },
+          "30": {
+            "temperatureC": 23,
+            "pressureHpa": 1007,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 72,
+            "windDirectionDeg": 190,
+            "windSpeedMps": 6,
+            "precipitationRateMmh": 0
+          },
+          "60": {
+            "temperatureC": 23,
+            "pressureHpa": 1007,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 72,
+            "windDirectionDeg": 190,
+            "windSpeedMps": 6,
+            "precipitationRateMmh": 0
+          },
+          "90": {
+            "temperatureC": 23,
+            "pressureHpa": 1007,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 72,
+            "windDirectionDeg": 190,
+            "windSpeedMps": 6,
+            "precipitationRateMmh": 0
+          },
+          "120": {
+            "temperatureC": 23,
+            "pressureHpa": 1007,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 72,
+            "windDirectionDeg": 190,
+            "windSpeedMps": 6,
+            "precipitationRateMmh": 0
+          },
+          "150": {
+            "temperatureC": 23,
+            "pressureHpa": 1007,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 72,
+            "windDirectionDeg": 190,
+            "windSpeedMps": 6,
+            "precipitationRateMmh": 0
+          },
+          "180": {
+            "temperatureC": 23,
+            "pressureHpa": 1007,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 72,
+            "windDirectionDeg": 190,
+            "windSpeedMps": 6,
+            "precipitationRateMmh": 1.325098874685
+          },
+          "210": {
+            "temperatureC": 17,
+            "pressureHpa": 1011,
+            "pressureTendencyHpaPer3h": 4,
+            "relativeHumidityPct": 58,
+            "windDirectionDeg": 275,
+            "windSpeedMps": 8.5,
+            "precipitationRateMmh": 0.996181744504
+          },
+          "240": {
+            "temperatureC": 17,
+            "pressureHpa": 1011,
+            "pressureTendencyHpaPer3h": 4,
+            "relativeHumidityPct": 58,
+            "windDirectionDeg": 275,
+            "windSpeedMps": 8.5,
+            "precipitationRateMmh": 0
+          },
+          "270": {
+            "temperatureC": 17,
+            "pressureHpa": 1011,
+            "pressureTendencyHpaPer3h": 4,
+            "relativeHumidityPct": 55,
+            "windDirectionDeg": 275,
+            "windSpeedMps": 8.5,
+            "precipitationRateMmh": 0
+          },
+          "300": {
+            "temperatureC": 17,
+            "pressureHpa": 1011,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 52,
+            "windDirectionDeg": 275,
+            "windSpeedMps": 8.5,
+            "precipitationRateMmh": 0
+          }
+        }
+      }
+    },
+    "warm-front-gradual-change": {
+      "contentVersion": "wc04-warm-front-4",
+      "seed": 2026092103,
+      "stepMinutes": 30,
+      "stations": {
+        "west": {
+          "0": {
+            "temperatureC": 16,
+            "pressureHpa": 1015,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 65,
+            "windDirectionDeg": 105,
+            "windSpeedMps": 3,
+            "precipitationRateMmh": 0
+          },
+          "30": {
+            "temperatureC": 16,
+            "pressureHpa": 1015,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 65,
+            "windDirectionDeg": 105,
+            "windSpeedMps": 3,
+            "precipitationRateMmh": 1.104015850867
+          },
+          "60": {
+            "temperatureC": 17.666666666667,
+            "pressureHpa": 1014.333333333333,
+            "pressureTendencyHpaPer3h": -0.666666666667,
+            "relativeHumidityPct": 69,
+            "windDirectionDeg": 121.666666666667,
+            "windSpeedMps": 3.666666666667,
+            "precipitationRateMmh": 1.377578038039
+          },
+          "90": {
+            "temperatureC": 19.333333333333,
+            "pressureHpa": 1013.666666666667,
+            "pressureTendencyHpaPer3h": -1.333333333333,
+            "relativeHumidityPct": 73,
+            "windDirectionDeg": 138.333333333333,
+            "windSpeedMps": 4.333333333333,
+            "precipitationRateMmh": 0
+          },
+          "120": {
+            "temperatureC": 21,
+            "pressureHpa": 1013,
+            "pressureTendencyHpaPer3h": -2,
+            "relativeHumidityPct": 77,
+            "windDirectionDeg": 155,
+            "windSpeedMps": 5,
+            "precipitationRateMmh": 0
+          },
+          "150": {
+            "temperatureC": 21,
+            "pressureHpa": 1013,
+            "pressureTendencyHpaPer3h": -1.333333333333,
+            "relativeHumidityPct": 77,
+            "windDirectionDeg": 155,
+            "windSpeedMps": 5,
+            "precipitationRateMmh": 0
+          },
+          "180": {
+            "temperatureC": 21,
+            "pressureHpa": 1013,
+            "pressureTendencyHpaPer3h": -0.666666666667,
+            "relativeHumidityPct": 77,
+            "windDirectionDeg": 155,
+            "windSpeedMps": 5,
+            "precipitationRateMmh": 0
+          },
+          "210": {
+            "temperatureC": 21,
+            "pressureHpa": 1013,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 77,
+            "windDirectionDeg": 155,
+            "windSpeedMps": 5,
+            "precipitationRateMmh": 0
+          },
+          "240": {
+            "temperatureC": 21,
+            "pressureHpa": 1013,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 77,
+            "windDirectionDeg": 155,
+            "windSpeedMps": 5,
+            "precipitationRateMmh": 0
+          },
+          "270": {
+            "temperatureC": 21,
+            "pressureHpa": 1013,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 77,
+            "windDirectionDeg": 155,
+            "windSpeedMps": 5,
+            "precipitationRateMmh": 0
+          },
+          "300": {
+            "temperatureC": 21,
+            "pressureHpa": 1013,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 77,
+            "windDirectionDeg": 155,
+            "windSpeedMps": 5,
+            "precipitationRateMmh": 0
+          }
+        },
+        "central": {
+          "0": {
+            "temperatureC": 15,
+            "pressureHpa": 1016,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 62,
+            "windDirectionDeg": 110,
+            "windSpeedMps": 3,
+            "precipitationRateMmh": 0
+          },
+          "30": {
+            "temperatureC": 15,
+            "pressureHpa": 1016,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 62,
+            "windDirectionDeg": 110,
+            "windSpeedMps": 3,
+            "precipitationRateMmh": 0
+          },
+          "60": {
+            "temperatureC": 15,
+            "pressureHpa": 1016,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 62,
+            "windDirectionDeg": 110,
+            "windSpeedMps": 3,
+            "precipitationRateMmh": 0
+          },
+          "90": {
+            "temperatureC": 15,
+            "pressureHpa": 1016,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 62,
+            "windDirectionDeg": 110,
+            "windSpeedMps": 3,
+            "precipitationRateMmh": 0
+          },
+          "120": {
+            "temperatureC": 16.666666666667,
+            "pressureHpa": 1015.333333333333,
+            "pressureTendencyHpaPer3h": -0.666666666667,
+            "relativeHumidityPct": 66,
+            "windDirectionDeg": 126.666666666667,
+            "windSpeedMps": 3.666666666667,
+            "precipitationRateMmh": 1.538461538462
+          },
+          "150": {
+            "temperatureC": 18.333333333333,
+            "pressureHpa": 1014.666666666667,
+            "pressureTendencyHpaPer3h": -1.333333333333,
+            "relativeHumidityPct": 70,
+            "windDirectionDeg": 143.333333333333,
+            "windSpeedMps": 4.333333333333,
+            "precipitationRateMmh": 0.9
+          },
+          "180": {
+            "temperatureC": 20,
+            "pressureHpa": 1014,
+            "pressureTendencyHpaPer3h": -2,
+            "relativeHumidityPct": 74,
+            "windDirectionDeg": 160,
+            "windSpeedMps": 5,
+            "precipitationRateMmh": 0
+          },
+          "210": {
+            "temperatureC": 20,
+            "pressureHpa": 1014,
+            "pressureTendencyHpaPer3h": -1.333333333333,
+            "relativeHumidityPct": 74,
+            "windDirectionDeg": 160,
+            "windSpeedMps": 5,
+            "precipitationRateMmh": 0
+          },
+          "240": {
+            "temperatureC": 20,
+            "pressureHpa": 1014,
+            "pressureTendencyHpaPer3h": -0.666666666667,
+            "relativeHumidityPct": 74,
+            "windDirectionDeg": 160,
+            "windSpeedMps": 5,
+            "precipitationRateMmh": 0
+          },
+          "270": {
+            "temperatureC": 20,
+            "pressureHpa": 1014,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 74,
+            "windDirectionDeg": 160,
+            "windSpeedMps": 5,
+            "precipitationRateMmh": 0
+          },
+          "300": {
+            "temperatureC": 20,
+            "pressureHpa": 1014,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 74,
+            "windDirectionDeg": 160,
+            "windSpeedMps": 5,
+            "precipitationRateMmh": 0
+          }
+        },
+        "east": {
+          "0": {
+            "temperatureC": 14,
+            "pressureHpa": 1017,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 60,
+            "windDirectionDeg": 115,
+            "windSpeedMps": 3,
+            "precipitationRateMmh": 0
+          },
+          "30": {
+            "temperatureC": 14,
+            "pressureHpa": 1017,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 60,
+            "windDirectionDeg": 115,
+            "windSpeedMps": 3,
+            "precipitationRateMmh": 0
+          },
+          "60": {
+            "temperatureC": 14,
+            "pressureHpa": 1017,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 60,
+            "windDirectionDeg": 115,
+            "windSpeedMps": 3,
+            "precipitationRateMmh": 0
+          },
+          "90": {
+            "temperatureC": 14,
+            "pressureHpa": 1017,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 60,
+            "windDirectionDeg": 115,
+            "windSpeedMps": 3,
+            "precipitationRateMmh": 0
+          },
+          "120": {
+            "temperatureC": 14,
+            "pressureHpa": 1017,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 60,
+            "windDirectionDeg": 115,
+            "windSpeedMps": 3,
+            "precipitationRateMmh": 0
+          },
+          "150": {
+            "temperatureC": 14,
+            "pressureHpa": 1017,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 60,
+            "windDirectionDeg": 115,
+            "windSpeedMps": 3,
+            "precipitationRateMmh": 0
+          },
+          "180": {
+            "temperatureC": 15.666666666667,
+            "pressureHpa": 1016.333333333333,
+            "pressureTendencyHpaPer3h": -0.666666666667,
+            "relativeHumidityPct": 64,
+            "windDirectionDeg": 131.666666666667,
+            "windSpeedMps": 3.666666666667,
+            "precipitationRateMmh": 0.40951737295
+          },
+          "210": {
+            "temperatureC": 17.333333333333,
+            "pressureHpa": 1015.666666666667,
+            "pressureTendencyHpaPer3h": -1.333333333333,
+            "relativeHumidityPct": 68,
+            "windDirectionDeg": 148.333333333333,
+            "windSpeedMps": 4.333333333333,
+            "precipitationRateMmh": 1.565384615385
+          },
+          "240": {
+            "temperatureC": 19,
+            "pressureHpa": 1015,
+            "pressureTendencyHpaPer3h": -2,
+            "relativeHumidityPct": 72,
+            "windDirectionDeg": 165,
+            "windSpeedMps": 5,
+            "precipitationRateMmh": 0.387963827005
+          },
+          "270": {
+            "temperatureC": 19,
+            "pressureHpa": 1015,
+            "pressureTendencyHpaPer3h": -1.333333333333,
+            "relativeHumidityPct": 72,
+            "windDirectionDeg": 165,
+            "windSpeedMps": 5,
+            "precipitationRateMmh": 0
+          },
+          "300": {
+            "temperatureC": 19,
+            "pressureHpa": 1015,
+            "pressureTendencyHpaPer3h": -0.666666666667,
+            "relativeHumidityPct": 72,
+            "windDirectionDeg": 165,
+            "windSpeedMps": 5,
+            "precipitationRateMmh": 0
+          }
+        }
+      }
+    },
+    "uncertain-boundary-variant": {
+      "contentVersion": "wc04-uncertain-boundary-3",
+      "seed": 2026092104,
+      "stepMinutes": 30,
+      "stations": {
+        "west": {
+          "0": {
+            "temperatureC": 20,
+            "pressureHpa": 1010,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 70,
+            "windDirectionDeg": 165,
+            "windSpeedMps": 4,
+            "precipitationRateMmh": 0
+          },
+          "30": {
+            "temperatureC": 20,
+            "pressureHpa": 1010,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 70,
+            "windDirectionDeg": 165,
+            "windSpeedMps": 4,
+            "precipitationRateMmh": 0
+          },
+          "60": {
+            "temperatureC": 20,
+            "pressureHpa": 1010,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 70,
+            "windDirectionDeg": 165,
+            "windSpeedMps": 4,
+            "precipitationRateMmh": 0
+          },
+          "90": {
+            "temperatureC": 20,
+            "pressureHpa": 1010,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 70,
+            "windDirectionDeg": 165,
+            "windSpeedMps": 4,
+            "precipitationRateMmh": 0.966498312941
+          },
+          "120": {
+            "temperatureC": 17.251990341814,
+            "pressureHpa": 1011.29616555348,
+            "pressureTendencyHpaPer3h": 1.29616555348,
+            "relativeHumidityPct": 65,
+            "windDirectionDeg": 187.604509156197,
+            "windSpeedMps": 5,
+            "precipitationRateMmh": 0.438894629901
+          },
+          "150": {
+            "temperatureC": 15.585677870549,
+            "pressureHpa": 1012.534736805223,
+            "pressureTendencyHpaPer3h": 2.534736805223,
+            "relativeHumidityPct": 60,
+            "windDirectionDeg": 220.206565529108,
+            "windSpeedMps": 6,
+            "precipitationRateMmh": 0
+          },
+          "180": {
+            "temperatureC": 15.982885219157,
+            "pressureHpa": 1012.216110002995,
+            "pressureTendencyHpaPer3h": 2.216110002995,
+            "relativeHumidityPct": 60,
+            "windDirectionDeg": 220.118561733514,
+            "windSpeedMps": 6,
+            "precipitationRateMmh": 0
+          },
+          "210": {
+            "temperatureC": 15.005841320381,
+            "pressureHpa": 1012.753348048404,
+            "pressureTendencyHpaPer3h": 1.457182494924,
+            "relativeHumidityPct": 60,
+            "windDirectionDeg": 222.07249500975,
+            "windSpeedMps": 6,
+            "precipitationRateMmh": 0
+          },
+          "240": {
+            "temperatureC": 15.66449958412,
+            "pressureHpa": 1012.357097392157,
+            "pressureTendencyHpaPer3h": -0.177639413066,
+            "relativeHumidityPct": 60,
+            "windDirectionDeg": 214.876728922129,
+            "windSpeedMps": 6,
+            "precipitationRateMmh": 0
+          },
+          "270": {
+            "temperatureC": 15.322400843725,
+            "pressureHpa": 1012.761586271785,
+            "pressureTendencyHpaPer3h": 0.54547626879,
+            "relativeHumidityPct": 60,
+            "windDirectionDeg": 215.353583887219,
+            "windSpeedMps": 6,
+            "precipitationRateMmh": 0
+          },
+          "300": {
+            "temperatureC": 15.571221403778,
+            "pressureHpa": 1012.896067918092,
+            "pressureTendencyHpaPer3h": 0.142719869688,
+            "relativeHumidityPct": 60,
+            "windDirectionDeg": 220.37099667266,
+            "windSpeedMps": 6,
+            "precipitationRateMmh": 0
+          }
+        },
+        "central": {
+          "0": {
+            "temperatureC": 21,
+            "pressureHpa": 1009,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 72,
+            "windDirectionDeg": 170,
+            "windSpeedMps": 4.5,
+            "precipitationRateMmh": 0
+          },
+          "30": {
+            "temperatureC": 21,
+            "pressureHpa": 1009,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 72,
+            "windDirectionDeg": 170,
+            "windSpeedMps": 4.5,
+            "precipitationRateMmh": 0
+          },
+          "60": {
+            "temperatureC": 21,
+            "pressureHpa": 1009,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 72,
+            "windDirectionDeg": 170,
+            "windSpeedMps": 4.5,
+            "precipitationRateMmh": 0
+          },
+          "90": {
+            "temperatureC": 21,
+            "pressureHpa": 1009,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 72,
+            "windDirectionDeg": 170,
+            "windSpeedMps": 4.5,
+            "precipitationRateMmh": 0
+          },
+          "120": {
+            "temperatureC": 21,
+            "pressureHpa": 1009,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 72,
+            "windDirectionDeg": 170,
+            "windSpeedMps": 4.5,
+            "precipitationRateMmh": 0.315039198903
+          },
+          "150": {
+            "temperatureC": 19.19782064762,
+            "pressureHpa": 1009.928728760779,
+            "pressureTendencyHpaPer3h": 0.928728760779,
+            "relativeHumidityPct": 67,
+            "windDirectionDeg": 191.770430434495,
+            "windSpeedMps": 5.5,
+            "precipitationRateMmh": 1.192307692308
+          },
+          "180": {
+            "temperatureC": 16.760420653038,
+            "pressureHpa": 1011.535463123024,
+            "pressureTendencyHpaPer3h": 2.535463123024,
+            "relativeHumidityPct": 62,
+            "windDirectionDeg": 229.186942644417,
+            "windSpeedMps": 6.5,
+            "precipitationRateMmh": 0.295349248972
+          },
+          "210": {
+            "temperatureC": 16.752741076984,
+            "pressureHpa": 1011.477449870668,
+            "pressureTendencyHpaPer3h": 2.477449870668,
+            "relativeHumidityPct": 62,
+            "windDirectionDeg": 221.946606941521,
+            "windSpeedMps": 6.5,
+            "precipitationRateMmh": 0
+          },
+          "240": {
+            "temperatureC": 16.283519683639,
+            "pressureHpa": 1011.259772553854,
+            "pressureTendencyHpaPer3h": 1.331043793075,
+            "relativeHumidityPct": 62,
+            "windDirectionDeg": 227.597818545997,
+            "windSpeedMps": 6.5,
+            "precipitationRateMmh": 0
+          },
+          "270": {
+            "temperatureC": 16.603258459829,
+            "pressureHpa": 1011.63852102235,
+            "pressureTendencyHpaPer3h": 0.103057899326,
+            "relativeHumidityPct": 62,
+            "windDirectionDeg": 219.933471124619,
+            "windSpeedMps": 6.5,
+            "precipitationRateMmh": 0
+          },
+          "300": {
+            "temperatureC": 16.012367280666,
+            "pressureHpa": 1011.43237790931,
+            "pressureTendencyHpaPer3h": -0.045071961358,
+            "relativeHumidityPct": 62,
+            "windDirectionDeg": 227.218456890434,
+            "windSpeedMps": 6.5,
+            "precipitationRateMmh": 0
+          }
+        },
+        "east": {
+          "0": {
+            "temperatureC": 22,
+            "pressureHpa": 1008,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 74,
+            "windDirectionDeg": 175,
+            "windSpeedMps": 5,
+            "precipitationRateMmh": 0
+          },
+          "30": {
+            "temperatureC": 22,
+            "pressureHpa": 1008,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 74,
+            "windDirectionDeg": 175,
+            "windSpeedMps": 5,
+            "precipitationRateMmh": 0
+          },
+          "60": {
+            "temperatureC": 22,
+            "pressureHpa": 1008,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 74,
+            "windDirectionDeg": 175,
+            "windSpeedMps": 5,
+            "precipitationRateMmh": 0
+          },
+          "90": {
+            "temperatureC": 22,
+            "pressureHpa": 1008,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 74,
+            "windDirectionDeg": 175,
+            "windSpeedMps": 5,
+            "precipitationRateMmh": 0
+          },
+          "120": {
+            "temperatureC": 22,
+            "pressureHpa": 1008,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 74,
+            "windDirectionDeg": 175,
+            "windSpeedMps": 5,
+            "precipitationRateMmh": 0
+          },
+          "150": {
+            "temperatureC": 22,
+            "pressureHpa": 1008,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 74,
+            "windDirectionDeg": 175,
+            "windSpeedMps": 5,
+            "precipitationRateMmh": 0
+          },
+          "180": {
+            "temperatureC": 22,
+            "pressureHpa": 1008,
+            "pressureTendencyHpaPer3h": 0,
+            "relativeHumidityPct": 74,
+            "windDirectionDeg": 175,
+            "windSpeedMps": 5,
+            "precipitationRateMmh": 0.548514086396
+          },
+          "210": {
+            "temperatureC": 19.768047033809,
+            "pressureHpa": 1009.641937595606,
+            "pressureTendencyHpaPer3h": 1.641937595606,
+            "relativeHumidityPct": 69,
+            "windDirectionDeg": 208.709247119725,
+            "windSpeedMps": 6,
+            "precipitationRateMmh": 1.134521589932
+          },
+          "240": {
+            "temperatureC": 17.211263276869,
+            "pressureHpa": 1010.723173933476,
+            "pressureTendencyHpaPer3h": 2.723173933476,
+            "relativeHumidityPct": 64,
+            "windDirectionDeg": 237.660957701504,
+            "windSpeedMps": 7,
+            "precipitationRateMmh": 0.089866531936
+          },
+          "270": {
+            "temperatureC": 17.885396401864,
+            "pressureHpa": 1010.144485533051,
+            "pressureTendencyHpaPer3h": 2.144485533051,
+            "relativeHumidityPct": 64,
+            "windDirectionDeg": 235.181607630104,
+            "windSpeedMps": 7,
+            "precipitationRateMmh": 0
+          },
+          "300": {
+            "temperatureC": 17.340384033509,
+            "pressureHpa": 1010.550523381122,
+            "pressureTendencyHpaPer3h": 0.908585785516,
+            "relativeHumidityPct": 64,
+            "windDirectionDeg": 226.878785487264,
+            "windSpeedMps": 7,
+            "precipitationRateMmh": 0
+          }
+        }
+      }
+    }
+  }
+}

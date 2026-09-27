@@ -138,7 +138,7 @@ export function WeatherMap({
                 <circle
                   cx={toX(center.x)}
                   cy={toY(center.y)}
-                  r={13}
+                  r={toX(scenarioCell.footprintRadius)}
                   fill={`url(#${hatchId})`}
                   className={styles.precipitation}
                 />

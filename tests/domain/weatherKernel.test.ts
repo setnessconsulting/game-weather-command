@@ -31,22 +31,22 @@ describe("weather kernel", () => {
     expect(halfway.stations.central).toEqual({
       temperatureC: 19,
       pressureHpa: 1011,
-      pressureTendencyHpaPer3h: 1,
+      pressureTendencyHpaPer3h: 4,
       relativeHumidityPct: 60,
       windDirectionDeg: 225,
       windSpeedMps: 6.5,
-      precipitationRateMmh: 3
+      precipitationRateMmh: 2.5
     });
 
     const after = stateAtMinute(frontPassageFixture, 120);
     expect(after.stations.central).toEqual({
       temperatureC: 15,
       pressureHpa: 1015,
-      pressureTendencyHpaPer3h: 3,
+      pressureTendencyHpaPer3h: 8,
       relativeHumidityPct: 50,
       windDirectionDeg: 270,
       windSpeedMps: 8,
-      precipitationRateMmh: 6
+      precipitationRateMmh: 0
     });
   });
 
@@ -59,8 +59,9 @@ describe("weather kernel", () => {
     ]);
     expect(state.precipitationCells[0]).toEqual({
       id: "band",
-      center: { x: 0.56, y: 0.5 },
-      intensityMmh: 6
+      center: { x: 0.6, y: 0.5 },
+      intensityMmh: 6,
+      footprintRadius: 0.1
     });
   });
 

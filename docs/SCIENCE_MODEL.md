@@ -8,10 +8,12 @@ Weather Command is a pedagogical atmospheric model. It must be scientifically co
 
 Primary references:
 
-- NGSS MS-ESS2-5: https://www.nextgenscience.org/topic-arrangement/msweather-and-climate
-- NWS weather education: https://www.weather.gov/education
-- NWS air masses/fronts: https://www.weather.gov/jkl/education
-- NWS educational resources: https://www.weather.gov/learning
+- NGSS MS-ESS2-5: https://www.nextgenscience.org/pe/ms-ess2-5-earths-systems
+- NWS air masses/fronts ("Basic Discussion on Pressure"): https://www.weather.gov/lmk/basic-fronts
+- NOAA/NESDIS weather-map education: https://www.nesdis.noaa.gov/about/k-12-education/weather-forecasting/how-read-weather-map
+
+The canonical source register in `src/scenarios/scienceSources.ts` is the authoritative per-relationship
+mapping; these URLs are the primary references it resolves to.
 
 The canonical model follows the NGSS emphasis on high-to-low pressure flow, changing temperature/pressure/humidity/precipitation/wind at a fixed location, sudden changes when air masses interact, and probabilistic prediction.
 
@@ -79,6 +81,12 @@ At least three synchronized locations expose time-stamped observations:
 
 A simplified radar-style field may be derived from scenario truth. It is evidence, not independent truth. If rendered densely, presentation may use Canvas, but the underlying precipitation data remains semantic domain state.
 
+In the canonical Front Passage content the direction of derivation is binding: **station precipitation
+is computed from the authored band geometry**, never authored per station. Each band carries an
+authored `footprintRadius`; a station reports precipitation exactly while a band centre is inside
+that radius, scaled by current intensity with a linear falloff. The map layer and the station record
+are therefore two renderings of one source of truth and cannot disagree about when it is raining.
+
 ## Front motion and station truth must agree
 
 Station observations and front/precipitation geometry are authored separately. That separation is
@@ -86,10 +94,20 @@ useful - it keeps the presentation layer from owning science - but it lets an au
 front far away from a station that is recording a frontal change, which would teach the wrong causal
 lesson from the game's own evidence.
 
-Binding constraint: for every station a boundary-linked effect names, the authored front motion must
-place the boundary at that station inside the authored change window, and `transitionWidth` must equal
-the distance the front travels across that window. The scenario validation layer enforces this and
-fails closed. See `docs/SCENARIO_SCHEMA.md`.
+Binding constraints, enforced fail-closed by the scenario validation layer (see
+`docs/SCENARIO_SCHEMA.md`):
+
+1. For every station a boundary-linked effect names, the authored front motion must place the
+   boundary at that station inside the authored change window. The station's observation ramp spans
+   the same duration as the front's traverse of the transition zone, and the crossing falls inside
+   the ramp window (the implementation guarantees equal duration plus an in-window crossing, not
+   interval equality).
+2. `transitionWidth` must equal the distance the front travels across that window.
+3. Precipitation bands must move with a modeled front, and station precipitation is band-derived
+   (above), so the radar layer and the station record cannot disagree.
+4. Pressure tendency is computed from the produced pressure trajectory - the change over the
+   preceding 3 h, clamped at the scenario start - so the tendency column cannot disagree with the
+   pressure chart beside it. Authored tendency values are rejected fail-closed.
 
 ## Determinism
 
@@ -135,7 +153,8 @@ Verification must not compare the learner with one hidden scalar answer.
 The **observed transition window** is the grading truth for timing. It is derived only from the
 target station's own reported observations — never from authoring metadata or map geometry.
 
-Definition (implemented by `deriveObservedTransitionWindow` in the game layer):
+Definition (implemented by `deriveTransitionWindow`/`deriveStationTransitionWindow` in the domain
+layer; the game layer's `deriveObservedTransitionWindow` is a series-based wrapper over it):
 
 1. For every consecutive pair of observation steps, compute the absolute temperature-change rate
    (°C per scenario minute).

@@ -1,7 +1,7 @@
 import type { KernelScenarioDefinition } from "@/domain";
 
 const baseStation = {
-  pressureTendencyHpaPer3h: -1,
+  pressureTendencyHpaPer3h: 0,
   relativeHumidityPct: 70,
   windDirectionDeg: 180,
   windSpeedMps: 5,
@@ -74,9 +74,10 @@ export const frontPassageFixture: KernelScenarioDefinition = {
     {
       id: "band",
       initialCenter: { x: 0.4, y: 0.5 },
-      movement: { x: 0.04, y: 0 },
+      movement: { x: 0.05, y: 0 },
       initialIntensityMmh: 2,
       intensityDeltaMmhPerStep: 1,
+      footprintRadius: 0.1,
       sourceRefIds: ["source-fronts"]
     }
   ],
@@ -90,11 +91,9 @@ export const frontPassageFixture: KernelScenarioDefinition = {
       delta: {
         temperatureC: -8,
         pressureHpa: 8,
-        pressureTendencyHpaPer3h: 4,
         relativeHumidityPct: -20,
         windDirectionDeg: 90,
-        windSpeedMps: 3,
-        precipitationRateMmh: 6
+        windSpeedMps: 3
       },
       sourceRefIds: ["source-fronts"]
     }

@@ -148,6 +148,11 @@ Precipitation may be modeled as:
 
 The data model is independent of whether SVG or Canvas renders it.
 
+In the canonical Front Passage content, each cell carries an authored `footprintRadius` and station
+precipitation is **derived from band geometry** (see "Front motion / station change coherence", rule 4):
+a station reports rain exactly while a band covers it. The radar-style map layer and the station
+observations are therefore two renderings of one source of truth and cannot disagree.
+
 ## Forecast windows
 
 ```ts
@@ -217,9 +222,12 @@ Binding rules:
 
 Review finding **F10** (undefined / inconsistent `transitionArrivalMinute` across the four Front
 Passage missions) is therefore closed for *definition*: the half-maximum observed window is the
-canonical meaning, and accepted ranges are envelopes around it. Remaining per-mission envelope
-alignment (for example warm-front onset vs accepted range) stays under GAME-341 / WC-04 human
-science disposition and must not be silently rewritten without a `contentVersion` bump.
+canonical meaning, and accepted ranges are envelopes around it. Per-mission envelope alignment is
+enforced fail-closed at the authored-data boundary (`parseWeatherScenario`): an envelope that does
+not contain the target station's observed window is rejected, so a defensible learner forecast can
+never be displayed beside an authored envelope that excludes it. The warm-front envelope was aligned
+to its observed window (90-180) as part of the F14 remediation; all four canonical missions now
+satisfy the rule.
 
 ## Uncertain Boundary rule
 
@@ -249,8 +257,14 @@ interface ScienceSource {
   relationship: string;
   usage: string;
   reviewed: boolean;
+  accessedOn?: string;
+  reviewedBy?: string;
 }
 ```
+
+`accessedOn`/`reviewedBy` make `reviewed: true` traceable: they record when the source was checked
+and by whom (for example an AI-assisted technical review, which is not the required human science
+sign-off).
 
 ## Model boundaries
 
@@ -276,13 +290,26 @@ Rules for a zonal front (a boundary spanning the region that translates along `+
    Later boundary-linked effects on the same station (for example post-frontal clearing) are follow-ups,
    not passages, and are not constrained by this rule.
 2. **Transition width.** `transitionWidth` must equal the distance the front travels during that
-   station's change window - `movement.x * (endMinute - startMinute) / stepMinutes`. The station then
-   traverses the authored transition zone exactly across the window over which its observation ramps.
+   station's change window - `movement.x * (endMinute - startMinute) / stepMinutes`. The station's
+   observation ramp therefore spans the same duration as the front's traverse of the authored
+   transition zone, and the crossing falls inside the ramp window. (An earlier wording claimed the
+   traversal interval equals the window exactly; the implementation guarantees equal duration plus
+   an in-window crossing, which is what the graded outcomes rely on. See review finding F17.)
    This is also what makes "abrupt" versus "gradual" a quantitative property of the content rather
    than a label: warm fronts carry a materially larger transition width than cold fronts.
 3. **Precipitation bands ride fronts.** Every precipitation cell must share a movement vector with a
    modeled boundary, so the precipitation layer and the front layer cannot disagree about where the
    frontal band is.
+4. **Precipitation is derived, not authored.** Each cell carries an authored `footprintRadius`
+   (normalized region units). A station reports precipitation exactly while a band centre is inside
+   that radius of it, scaled by the band's current intensity. Station effects must not author
+   `precipitationRateMmh`; the schema rejects such deltas fail-closed, because an authored value
+   would be silently ignored by the kernel and would contradict the band the learner sees.
+5. **Pressure tendency is derived, not authored.** A station's tendency is the change over the
+   preceding 3 h of the pressure trajectory the kernel produces (clamped at the scenario start).
+   Station effects and station initials must not author `pressureTendencyHpaPer3h`; the schema
+   rejects such values fail-closed, so the tendency column can never disagree with the pressure
+   chart beside it.
 
 Boundaries with a non-zero `movement.y` are outside the current v1 front model and are skipped rather
 than guessed at. Station positions are therefore load-bearing authored data, not decoration: moving a
@@ -300,6 +327,8 @@ At minimum:
 - every effect/source relationship has a source or explicit pedagogical simplification;
 - uncertain accepted ranges are internally coherent;
 - front motion, station change windows, and precipitation bands agree (see above);
+- station effects never author precipitation or pressure tendency (both are kernel-derived);
+- every accepted timing envelope contains its target station's observed transition window;
 - golden trace can run from initial state to completion.
 
 ## Golden trace identity

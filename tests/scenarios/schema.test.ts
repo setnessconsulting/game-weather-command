@@ -78,6 +78,14 @@ function validScenario(): WeatherScenarioV1 {
         delta: { temperatureC: -5 },
         sourceRefIds: ["s1"],
       },
+      {
+        id: "central-change",
+        stationId: "central",
+        startMinute: 90,
+        endMinute: 150,
+        delta: { temperatureC: -4 },
+        sourceRefIds: ["s1"],
+      },
     ],
     forecastWindows: [
       { id: "central-window", targetStationIds: ["central"], startMinute: 0, endMinute: 150 },

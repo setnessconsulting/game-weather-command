@@ -1,3 +1,6 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+
 import { describe, expect, it } from "vitest";
 
 import { DomainScenarioError, getScenarioOutcomeFacts, stateAtMinute } from "@/domain";
@@ -13,10 +16,6 @@ import {
   toKernelScenario,
   type WeatherScenarioV1,
 } from "@/scenarios/schema";
-
-function centralAt(scenario: WeatherScenarioV1, minute: number) {
-  return stateAtMinute(toKernelScenario(scenario), minute).stations.central;
-}
 
 /**
  * Independent re-derivation of the front's position, so the coherence claims below are
@@ -71,73 +70,28 @@ describe("WC-04 canonical Front Passage science content", () => {
     }
   });
 
-  it("locks the guided cold-front Central Station golden trace", () => {
-    expect([
-      centralAt(guidedColdFront, 0),
-      centralAt(guidedColdFront, 60),
-      centralAt(guidedColdFront, 120),
-      centralAt(guidedColdFront, 180),
-      centralAt(guidedColdFront, 240),
-    ]).toEqual([
-      { temperatureC: 23, pressureHpa: 1006, pressureTendencyHpaPer3h: -2, relativeHumidityPct: 78, windDirectionDeg: 190, windSpeedMps: 4, precipitationRateMmh: 0 },
-      { temperatureC: 23, pressureHpa: 1006, pressureTendencyHpaPer3h: -2, relativeHumidityPct: 78, windDirectionDeg: 190, windSpeedMps: 4, precipitationRateMmh: 0 },
-      { temperatureC: 16, pressureHpa: 1010, pressureTendencyHpaPer3h: 2, relativeHumidityPct: 60, windDirectionDeg: 265, windSpeedMps: 7, precipitationRateMmh: 4 },
-      { temperatureC: 16, pressureHpa: 1010, pressureTendencyHpaPer3h: 2, relativeHumidityPct: 56, windDirectionDeg: 265, windSpeedMps: 7, precipitationRateMmh: 2 },
-      { temperatureC: 16, pressureHpa: 1010, pressureTendencyHpaPer3h: 2, relativeHumidityPct: 52, windDirectionDeg: 265, windSpeedMps: 7, precipitationRateMmh: 0 },
+  it("locks every station observation of every canonical scenario in the golden matrix", () => {
+    // The full three-station by every-step matrix is locked in
+    // tests/fixtures/goldenObservationMatrix.json and asserted by
+    // tests/scenarios/goldenObservationMatrix.test.ts. This test keeps the binding
+    // visible here: the matrix must cover exactly the four canonical scenarios.
+    const matrix = JSON.parse(
+      readFileSync(resolve(process.cwd(), "tests/fixtures/goldenObservationMatrix.json"), "utf8")
+    ) as { scenarios: Record<string, { contentVersion: string }> };
+
+    expect(Object.keys(matrix.scenarios).sort()).toEqual([
+      "guided-cold-front-shift",
+      "independent-cold-front-variant",
+      "uncertain-boundary-variant",
+      "warm-front-gradual-change",
     ]);
+    for (const scenario of canonicalFrontPassageScenarios) {
+      expect(matrix.scenarios[scenario.scenarioId]?.contentVersion).toBe(scenario.contentVersion);
+    }
   });
 
-  it("locks the independent cold-front Central Station golden trace", () => {
-    expect([
-      centralAt(independentColdFront, 0),
-      centralAt(independentColdFront, 120),
-      centralAt(independentColdFront, 180),
-      centralAt(independentColdFront, 240),
-      centralAt(independentColdFront, 300),
-    ]).toEqual([
-      { temperatureC: 22, pressureHpa: 1008, pressureTendencyHpaPer3h: -1.5, relativeHumidityPct: 69, windDirectionDeg: 185, windSpeedMps: 5, precipitationRateMmh: 0 },
-      { temperatureC: 22, pressureHpa: 1008, pressureTendencyHpaPer3h: -1.5, relativeHumidityPct: 69, windDirectionDeg: 185, windSpeedMps: 5, precipitationRateMmh: 0 },
-      { temperatureC: 16, pressureHpa: 1012, pressureTendencyHpaPer3h: 1.5, relativeHumidityPct: 55, windDirectionDeg: 270, windSpeedMps: 7.5, precipitationRateMmh: 2 },
-      { temperatureC: 16, pressureHpa: 1012, pressureTendencyHpaPer3h: 1.5, relativeHumidityPct: 49, windDirectionDeg: 270, windSpeedMps: 7.5, precipitationRateMmh: 0 },
-      { temperatureC: 16, pressureHpa: 1012, pressureTendencyHpaPer3h: 1.5, relativeHumidityPct: 49, windDirectionDeg: 270, windSpeedMps: 7.5, precipitationRateMmh: 0 },
-    ]);
-  });
-
-  it("locks the warm-front Central Station golden trace and preserves gradual change", () => {
-    expect([
-      centralAt(warmFront, 0),
-      centralAt(warmFront, 120),
-      centralAt(warmFront, 180),
-      centralAt(warmFront, 300),
-    ]).toEqual([
-      { temperatureC: 15, pressureHpa: 1016, pressureTendencyHpaPer3h: -1, relativeHumidityPct: 62, windDirectionDeg: 110, windSpeedMps: 3, precipitationRateMmh: 0 },
-      { temperatureC: 16.666666666667, pressureHpa: 1015.333333333333, pressureTendencyHpaPer3h: -0.5, relativeHumidityPct: 66, windDirectionDeg: 126.666666666667, windSpeedMps: 3.666666666667, precipitationRateMmh: 0.666666666667 },
-      { temperatureC: 20, pressureHpa: 1014, pressureTendencyHpaPer3h: 0.5, relativeHumidityPct: 74, windDirectionDeg: 160, windSpeedMps: 5, precipitationRateMmh: 2 },
-      { temperatureC: 20, pressureHpa: 1014, pressureTendencyHpaPer3h: 0.5, relativeHumidityPct: 74, windDirectionDeg: 160, windSpeedMps: 5, precipitationRateMmh: 0 },
-    ]);
-  });
-
-  it("locks the full seeded uncertain-boundary trace without randomizing truth after commitment", () => {
+  it("keeps the uncertain mission's observational noise bounded around the authored change", () => {
     const kernel = toKernelScenario(uncertainBoundary);
-    const trace = uncertainBoundary.timeline.checkpoints.map(
-      (minute) => stateAtMinute(kernel, minute).stations.central,
-    );
-
-    // Replay identity: the same scenario/seed/time reproduces the same observation exactly.
-    expect(trace).toEqual(uncertainBoundary.timeline.checkpoints.map(
-      (minute) => stateAtMinute(kernel, minute).stations.central,
-    ));
-
-    expect(trace).toEqual([
-      { temperatureC: 21, pressureHpa: 1009, pressureTendencyHpaPer3h: -0.8, relativeHumidityPct: 72, windDirectionDeg: 170, windSpeedMps: 4.5, precipitationRateMmh: 0 },
-      { temperatureC: 21, pressureHpa: 1009, pressureTendencyHpaPer3h: -0.8, relativeHumidityPct: 72, windDirectionDeg: 170, windSpeedMps: 4.5, precipitationRateMmh: 0 },
-      { temperatureC: 21, pressureHpa: 1009, pressureTendencyHpaPer3h: -0.8, relativeHumidityPct: 72, windDirectionDeg: 170, windSpeedMps: 4.5, precipitationRateMmh: 0 },
-      { temperatureC: 16.834365343675, pressureHpa: 1011.541832670011, pressureTendencyHpaPer3h: 0.7, relativeHumidityPct: 62, windDirectionDeg: 222.077103231102, windSpeedMps: 6.5, precipitationRateMmh: 2.5 },
-      { temperatureC: 16.67458553263, pressureHpa: 1011.110333937034, pressureTendencyHpaPer3h: 0.7, relativeHumidityPct: 62, windDirectionDeg: 217.224070884287, windSpeedMps: 6.5, precipitationRateMmh: 2.5 },
-      { temperatureC: 16.922274971846, pressureHpa: 1011.177922178432, pressureTendencyHpaPer3h: 0.7, relativeHumidityPct: 62, windDirectionDeg: 222.58282828331, windSpeedMps: 6.5, precipitationRateMmh: 2.5 },
-    ]);
-
-    // Bounded observational variation must stay genuinely bounded.
     const amplitude = uncertainBoundary.stationEffects[1]!.noise!.temperatureC!.amplitude;
     const settled = stateAtMinute(kernel, uncertainBoundary.timeline.maxMinute).stations.central!;
     expect(Math.abs(settled.temperatureC - (21 - 4.5))).toBeLessThanOrEqual(amplitude);
@@ -229,7 +183,7 @@ describe("WC-04 front motion and station evidence agree", () => {
     );
   });
 
-  it("keeps each frontal precipitation band riding its front across the affected stations", () => {
+  it("keeps each frontal precipitation band riding its front", () => {
     for (const scenario of canonicalFrontPassageScenarios) {
       const boundary = scenario.boundaries[0]!;
       expect(scenario.precipitationCells.length).toBeGreaterThan(0);
@@ -237,21 +191,59 @@ describe("WC-04 front motion and station evidence agree", () => {
         expect(cell.movement).toEqual(boundary.movement);
       }
     }
+  });
 
-    // The warm-front band sits ahead of the front but must still arrive inside the
-    // window in which each station's precipitation is authored to change.
+  it("makes station precipitation agree with the band at every station and minute", () => {
+    // F12 invariant: a station reports precipitation exactly while an authored band
+    // covers it, so the radar-style layer and the station record can never disagree
+    // about when it is raining.
     for (const scenario of canonicalFrontPassageScenarios) {
+      const kernel = toKernelScenario(scenario);
       const cell = scenario.precipitationCells[0]!;
       for (const station of scenario.stations) {
-        const window = passageWindow(scenario, station.id);
-        const bandArrival =
-          (((station.position.x - cell.initialCenter.x) / cell.movement.x) * scenario.timeline.stepMinutes);
-        expect(
-          bandArrival,
-          `${scenario.scenarioId}/${station.id} band arrival ${bandArrival} must fall in [${window.startMinute}, ${window.endMinute}]`,
-        ).toBeGreaterThanOrEqual(window.startMinute);
-        expect(bandArrival).toBeLessThanOrEqual(window.endMinute);
+        for (
+          let minute = 0;
+          minute <= scenario.timeline.maxMinute;
+          minute += scenario.timeline.stepMinutes
+        ) {
+          const stepIndex = minute / scenario.timeline.stepMinutes;
+          const center = {
+            x: cell.initialCenter.x + cell.movement.x * stepIndex,
+            y: cell.initialCenter.y + cell.movement.y * stepIndex
+          };
+          const intensity = Math.max(
+            0,
+            cell.initialIntensityMmh + cell.intensityDeltaMmhPerStep * stepIndex
+          );
+          const distance = Math.hypot(station.position.x - center.x, station.position.y - center.y);
+          // The exact footprint boundary is a float-noise zone; the invariant is only
+          // asserted where coverage is unambiguous.
+          if (Math.abs(distance - cell.footprintRadius) < 1e-6) continue;
+          const covered = distance < cell.footprintRadius && intensity > 0;
+          const reported = stateAtMinute(kernel, minute).stations[station.id]!.precipitationRateMmh > 0;
+          expect(
+            reported,
+            `${scenario.scenarioId}/${station.id} at minute ${minute}: rain must match band coverage`
+          ).toBe(covered);
+        }
       }
+    }
+  });
+
+  it("clears the uncertain mission's rain once the band leaves the region", () => {
+    // F15: the uncertain mission has no post-passage clearing effects; the band
+    // leaving the region is what ends the rain, matching the other three missions.
+    const kernel = toKernelScenario(uncertainBoundary);
+    const finalMinute = uncertainBoundary.timeline.maxMinute;
+    const cell = uncertainBoundary.precipitationCells[0]!;
+    const stepIndex = finalMinute / uncertainBoundary.timeline.stepMinutes;
+    const centerX = cell.initialCenter.x + cell.movement.x * stepIndex;
+    expect(centerX).toBeGreaterThan(1);
+    for (const station of uncertainBoundary.stations) {
+      expect(
+        stateAtMinute(kernel, finalMinute).stations[station.id]!.precipitationRateMmh,
+        `${station.id} must be dry once the band has left`
+      ).toBe(0);
     }
   });
 });
@@ -279,6 +271,42 @@ describe("WC-04 authored coherence fails closed", () => {
     const malformed = structuredClone(guidedColdFront);
     malformed.precipitationCells[0]!.movement = { x: 0.04, y: 0 };
     expect(() => parseWeatherScenario(malformed)).toThrow(/must move with a modeled front/);
+  });
+
+  it("rejects a station effect that authors precipitation instead of deriving it from the band", () => {
+    const malformed = structuredClone(guidedColdFront);
+    malformed.stationEffects[0]!.delta.precipitationRateMmh = 4;
+    expect(() => parseWeatherScenario(malformed)).toThrow(/must not author precipitationRateMmh/);
+  });
+
+  it("rejects a station effect that authors pressure tendency instead of deriving it from the trajectory", () => {
+    const malformed = structuredClone(guidedColdFront);
+    malformed.stationEffects[0]!.delta.pressureTendencyHpaPer3h = 4;
+    expect(() => parseWeatherScenario(malformed)).toThrow(/must not author precipitationRateMmh/);
+  });
+
+  it("rejects an accepted envelope that excludes the observed transition window", () => {
+    const malformed = structuredClone(warmFront);
+    // The observed Valley Station window is 90-180; 120-180 excludes the onset.
+    malformed.acceptedRanges[0]!.transitionArrivalMinute = { min: 120, max: 180 };
+    expect(() => parseWeatherScenario(malformed)).toThrow(/does not contain the observed transition window/);
+  });
+
+  it("rejects an accepted envelope for a station with no derivable transition", () => {
+    const malformed = structuredClone(guidedColdFront);
+    malformed.forecastWindows[0]!.targetStationIds = ["central", "west"];
+    malformed.acceptedRanges[0]!.targetStationId = "west";
+    // Remove west's temperature change: its record then shows no derivable transition.
+    delete malformed.stationEffects[0]!.delta.temperatureC;
+    expect(() => parseWeatherScenario(malformed)).toThrow(/no derivable temperature transition/);
+  });
+
+  it("rejects an accepted envelope that excludes another station's observed window", () => {
+    const malformed = structuredClone(guidedColdFront);
+    malformed.forecastWindows[0]!.targetStationIds = ["central", "east"];
+    malformed.acceptedRanges[0]!.targetStationId = "east";
+    // East's observed window is 150-180; the guided envelope 90-120 excludes it.
+    expect(() => parseWeatherScenario(malformed)).toThrow(/does not contain the observed transition window/);
   });
 
 });

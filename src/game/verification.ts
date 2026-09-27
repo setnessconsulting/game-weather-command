@@ -46,6 +46,8 @@ export interface EvidenceQualityAssessment {
   readonly usedRelevant: readonly string[];
   readonly unusedRelevant: readonly string[];
   readonly coverageRatio: number;
+  readonly precisionRatio: number;
+  readonly f1Score: number;
   readonly level: SupportLevel;
   readonly detail: string;
 }
@@ -273,6 +275,13 @@ function assessPrecipitationProbability(
   };
 }
 
+/**
+ * Evidence quality is an F1 score over recall (share of the debrief's evidence that was
+ * attached) and precision (share of what was attached that the debrief actually relies
+ * on). Recall alone would make "attach everything" a reasoning-free dominant strategy in
+ * any mission that carries distractor evidence; the precision term keeps attachment
+ * honest without penalising learners while every available set is relevant.
+ */
 function assessEvidenceQuality(
   selected: readonly string[],
   relevant: readonly string[]
@@ -280,8 +289,13 @@ function assessEvidenceQuality(
   const usedRelevant = relevant.filter((id) => selected.includes(id));
   const unusedRelevant = relevant.filter((id) => !selected.includes(id));
   const coverageRatio = relevant.length === 0 ? 0 : usedRelevant.length / relevant.length;
+  const precisionRatio = selected.length === 0 ? 0 : usedRelevant.length / selected.length;
+  const f1Score =
+    coverageRatio + precisionRatio === 0
+      ? 0
+      : (2 * coverageRatio * precisionRatio) / (coverageRatio + precisionRatio);
   const level: SupportLevel =
-    coverageRatio >= 0.67 ? "supported" : coverageRatio > 0 ? "partially-supported" : "unsupported";
+    f1Score >= 0.67 ? "supported" : f1Score > 0 ? "partially-supported" : "unsupported";
 
   const detail =
     relevant.length === 0
@@ -289,7 +303,10 @@ function assessEvidenceQuality(
       : usedRelevant.length === 0
         ? "None of the evidence this mission's debrief relies on was attached to the forecast. Attaching evidence is how a forecast becomes checkable, so this is the main thing to change next time."
         : `You attached ${usedRelevant.length} of the ${relevant.length} evidence sets this mission's debrief relies on.` +
-          (unusedRelevant.length > 0 ? ` Not attached: ${unusedRelevant.join(", ")}.` : " That is full coverage.");
+          (unusedRelevant.length > 0 ? ` Not attached: ${unusedRelevant.join(", ")}.` : " That is full coverage.") +
+          (precisionRatio < 1
+            ? " Some of what you attached is not part of this mission's reasoning; the debrief scores relevance, not volume."
+            : "");
 
   return {
     selected,
@@ -297,6 +314,8 @@ function assessEvidenceQuality(
     usedRelevant,
     unusedRelevant,
     coverageRatio: roundTo(coverageRatio, 2),
+    precisionRatio: roundTo(precisionRatio, 2),
+    f1Score: roundTo(f1Score, 2),
     level,
     detail
   };

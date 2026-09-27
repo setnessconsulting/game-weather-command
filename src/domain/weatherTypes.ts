@@ -47,6 +47,12 @@ export interface PrecipitationCellDefinition {
   readonly movement: NormalizedPoint;
   readonly initialIntensityMmh: number;
   readonly intensityDeltaMmhPerStep: number;
+  /**
+   * Radius of the band's footprint in normalized region units. A station reports
+   * precipitation exactly while a band centre is inside this radius of it, so the
+   * radar-style layer and the station observations cannot disagree about rain.
+   */
+  readonly footprintRadius: number;
   readonly sourceRefIds: readonly string[];
 }
 
@@ -120,6 +126,7 @@ export interface PrecipitationCellState {
   readonly id: string;
   readonly center: NormalizedPoint;
   readonly intensityMmh: number;
+  readonly footprintRadius: number;
 }
 
 export type ScenarioProgress =

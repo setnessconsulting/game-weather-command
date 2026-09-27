@@ -75,6 +75,7 @@ function coherentScenario(): KernelScenarioDefinition {
         movement: { x: 0.05, y: 0 },
         initialIntensityMmh: 2,
         intensityDeltaMmhPerStep: 0,
+        footprintRadius: 0.1,
         sourceRefIds: ["source-fronts"],
       },
     ],

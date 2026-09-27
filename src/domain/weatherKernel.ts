@@ -69,7 +69,18 @@ function applyDelta(
   };
 }
 
-function observationAt(
+/**
+ * Station observation before the two derived dimensions are applied: the authored
+ * effect deltas (with seeded observational noise) for every dimension the station
+ * instruments directly, plus the derived placeholders for tendency and precipitation.
+ *
+ * Pressure tendency and precipitation are NOT authored per-effect deltas. Tendency is
+ * derived from the pressure trajectory the kernel actually produces, and precipitation
+ * is derived from the precipitation-band geometry, so the tendency column, the
+ * pressure chart, the radar-style band and the station rain readings can never
+ * contradict one another. See docs/SCIENCE_MODEL.md.
+ */
+function rawObservationAt(
   scenario: KernelScenarioDefinition,
   stationId: string,
   minute: number
@@ -77,7 +88,10 @@ function observationAt(
   const station = scenario.stations.find((candidate) => candidate.id === stationId);
   if (!station) throw new DomainScenarioError(`Unknown station "${stationId}".`);
 
-  let observation = station.initial;
+  let observation: StationObservation = {
+    ...station.initial,
+    pressureTendencyHpaPer3h: station.initial.pressureTendencyHpaPer3h ?? 0
+  };
   const effects = scenario.stationEffects.filter((effect) => effect.stationId === stationId);
 
   for (const effect of effects) {
@@ -109,8 +123,54 @@ function observationAt(
     }
   }
 
-  assertSaneObservation(observation, `station ${stationId} at minute ${minute}`);
   return observation;
+}
+
+/** Precipitation reported by a station at a minute, derived from band geometry. */
+export function precipitationAt(
+  scenario: KernelScenarioDefinition,
+  stationId: string,
+  minute: number
+): number {
+  const station = scenario.stations.find((candidate) => candidate.id === stationId);
+  if (!station) throw new DomainScenarioError(`Unknown station "${stationId}".`);
+
+  const stepIndex = minute / scenario.timeline.stepMinutes;
+  let precipitation = 0;
+  for (const cell of scenario.precipitationCells) {
+    const center = translate(cell.initialCenter, cell.movement, stepIndex);
+    const intensity = Math.max(0, cell.initialIntensityMmh + cell.intensityDeltaMmhPerStep * stepIndex);
+    const distance = Math.hypot(station.position.x - center.x, station.position.y - center.y);
+    if (distance < cell.footprintRadius) {
+      precipitation += intensity * (1 - distance / cell.footprintRadius);
+    }
+  }
+  return canonicalNumber(precipitation);
+}
+
+function observationAt(
+  scenario: KernelScenarioDefinition,
+  stationId: string,
+  minute: number
+): StationObservation {
+  const observation = rawObservationAt(scenario, stationId, minute);
+
+  // Tendency: change over the preceding 3 h of the pressure trajectory this kernel
+  // produces, clamped at the scenario start. Computed, never authored, so the
+  // tendency column always agrees with the pressure chart beside it.
+  const tendencyWindowStart = Math.max(scenario.timeline.startMinute, minute - 90);
+  const tendency = canonicalNumber(
+    observation.pressureHpa - rawObservationAt(scenario, stationId, tendencyWindowStart).pressureHpa
+  );
+
+  const derived: StationObservation = {
+    ...observation,
+    pressureTendencyHpaPer3h: tendency,
+    precipitationRateMmh: precipitationAt(scenario, stationId, minute)
+  };
+
+  assertSaneObservation(derived, `station ${stationId} at minute ${minute}`);
+  return derived;
 }
 
 export function stateAtMinute(
@@ -162,7 +222,8 @@ export function stateAtMinute(
       center: translate(cell.initialCenter, cell.movement, stepIndex),
       intensityMmh: canonicalNumber(
         Math.max(0, cell.initialIntensityMmh + cell.intensityDeltaMmhPerStep * stepIndex)
-      )
+      ),
+      footprintRadius: cell.footprintRadius
     })),
     progress
   };
@@ -170,6 +231,71 @@ export function stateAtMinute(
 
 export function initializeScenario(scenario: KernelScenarioDefinition): ScenarioState {
   return stateAtMinute(scenario, scenario.timeline.startMinute);
+}
+
+export interface StationTransitionWindow {
+  readonly startMinute: number;
+  readonly endMinute: number;
+}
+
+export interface SeriesPoint {
+  readonly minute: number;
+  readonly temperatureC: number;
+}
+
+/**
+ * Observed transition window for a series of station observations: the enclosing span
+ * of consecutive observation steps whose absolute temperature-change rate is at least
+ * half of the series' maximum rate. A front passage is the fastest sustained change in
+ * a station record, so this recovers the passage window from public evidence alone
+ * without exposing authoring metadata. Returns undefined when the record contains no
+ * meaningful temperature change.
+ */
+export function deriveTransitionWindow(
+  points: readonly SeriesPoint[],
+  stepMinutes: number
+): StationTransitionWindow | undefined {
+  if (points.length < 2) return undefined;
+
+  const total = Math.abs(points[points.length - 1]!.temperatureC - points[0]!.temperatureC);
+  if (total < 0.5) return undefined;
+
+  const rates = points.slice(1).map((point, index) =>
+    Math.abs(point.temperatureC - points[index]!.temperatureC) / stepMinutes
+  );
+  const maxRate = Math.max(...rates);
+  if (maxRate <= 0) return undefined;
+
+  const threshold = maxRate / 2;
+  let startMinute: number | undefined;
+  let endMinute: number | undefined;
+
+  rates.forEach((rate, index) => {
+    if (rate < threshold) return;
+    const from = points[index]!.minute;
+    const to = points[index + 1]!.minute;
+    if (startMinute === undefined) startMinute = from;
+    endMinute = to;
+  });
+
+  if (startMinute === undefined || endMinute === undefined) return undefined;
+  return { startMinute, endMinute };
+}
+
+/**
+ * Observed transition window for a station over a full kernel scenario, derived only
+ * from the station's own reported observations. See `deriveTransitionWindow`.
+ */
+export function deriveStationTransitionWindow(
+  scenario: KernelScenarioDefinition,
+  stationId: string
+): StationTransitionWindow | undefined {
+  const { startMinute, stepMinutes, maxMinute } = scenario.timeline;
+  const points: SeriesPoint[] = [];
+  for (let minute = startMinute; minute <= maxMinute; minute += stepMinutes) {
+    points.push({ minute, temperatureC: stateAtMinute(scenario, minute).stations[stationId]!.temperatureC });
+  }
+  return deriveTransitionWindow(points, stepMinutes);
 }
 
 export function advanceScenario(

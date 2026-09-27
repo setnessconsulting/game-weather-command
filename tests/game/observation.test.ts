@@ -257,7 +257,7 @@ describe("station series", () => {
 });
 
 describe("regional summary", () => {
-  it("describes motion, orientation and extrapolated arrival in words as well as numbers", () => {
+  it("describes motion, orientation and distance in words as well as numbers, and never a computed arrival minute", () => {
     const scenario = canonicalFrontPassageScenarios[0]!;
     const machine = createSessionMachine(scenario);
     const summary = buildRegionalSummary(scenario, machine.kernel, stateAtMinute(machine.kernel, 0));
@@ -269,14 +269,21 @@ describe("regional summary", () => {
     expect(boundary.airMassLabels).toHaveLength(2);
 
     const sorted = [...scenario.stations].sort((a, b) => a.position.x - b.position.x);
-    const etas = sorted.map(
-      (station) => boundary.proximity.find((proximity) => proximity.stationId === station.id)!.etaMinutes
+    const distances = sorted.map(
+      (station) => boundary.proximity.find((proximity) => proximity.stationId === station.id)!.distanceNormalized
     );
-    expect(etas.every((eta) => typeof eta === "number")).toBe(true);
-    expect(etas).toEqual([...etas].sort((a, b) => a! - b!));
+    expect(distances.every((distance) => typeof distance === "number" && distance >= 0)).toBe(true);
+    expect(distances).toEqual([...distances].sort((a, b) => a! - b!));
+
+    const serialized = JSON.stringify(summary);
+    expect(serialized).not.toContain("etaMinutes");
+    expect(serialized).not.toContain("Extrapolated arrival");
+    for (const proximity of boundary.proximity) {
+      expect(proximity.note).toContain("constant speed");
+    }
   });
 
-  it("explains when arrival cannot be extrapolated after the front has passed", () => {
+  it("explains when the front has already passed a station", () => {
     const scenario = canonicalFrontPassageScenarios[0]!;
     const machine = createSessionMachine(scenario);
     const summary = buildRegionalSummary(
@@ -285,8 +292,8 @@ describe("regional summary", () => {
       stateAtMinute(machine.kernel, scenario.timeline.maxMinute)
     );
     const west = summary.boundaries[0]!.proximity.find((proximity) => proximity.stationId === "west")!;
-    expect(west.etaMinutes).toBeUndefined();
     expect(west.note).toContain("already past");
+    expect(west.distanceNormalized).toBeGreaterThan(0);
   });
 
   it("reports precipitation cells with intensity trend and position", () => {

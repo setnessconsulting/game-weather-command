@@ -103,6 +103,20 @@ export function assertScenarioCoherence(scenario: KernelScenarioDefinition): voi
   const stationById = new Map(scenario.stations.map((station) => [station.id, station]));
   const boundaryById = new Map(scenario.boundaries.map((boundary) => [boundary.id, boundary]));
 
+  // Precipitation is derived from band geometry and pressure tendency from the pressure
+  // trajectory, so an authored delta for either would be silently ignored by the kernel
+  // while still reading as authored science. Fail closed instead.
+  for (const effect of scenario.stationEffects) {
+    if (effect.delta.precipitationRateMmh !== undefined || effect.delta.pressureTendencyHpaPer3h !== undefined) {
+      throw new DomainScenarioError(
+        `Effect ${effect.id} must not author precipitationRateMmh or pressureTendencyHpaPer3h: ` +
+          "precipitation is derived from the precipitation-band geometry and pressure tendency " +
+          "from the produced pressure trajectory, so an authored value would contradict the " +
+          "derived evidence surfaces."
+      );
+    }
+  }
+
   for (const effect of passageEffects(scenario)) {
     const boundary = boundaryById.get(effect.boundaryId!)!;
     if (boundary.movement.y !== 0) continue;

@@ -1,4 +1,4 @@
-import { stateAtMinute } from "@/domain";
+import { deriveTransitionWindow, stateAtMinute } from "@/domain";
 import type {
   BoundaryDefinition,
   KernelScenarioDefinition,
@@ -101,42 +101,21 @@ export interface TransitionWindow {
 /**
  * Observed transition window, derived only from the station's own reported observations.
  *
- * Definition (also documented in docs/SCIENCE_MODEL.md):
- * the window spans every consecutive pair of observation steps whose temperature change
- * rate is at least half of that station's maximum rate over the scenario, taken as the
- * enclosing span of those intervals. A front passage is the fastest sustained change in a
- * station record, so this recovers the authored passage window from public evidence alone
- * without exposing any authoring metadata to the learner or to grading.
+ * The derivation lives in the domain (`deriveTransitionWindow`) because it is science,
+ * not presentation: the enclosing span of consecutive observation steps whose
+ * temperature-change rate is at least half of that station's maximum rate over the
+ * scenario. A front passage is the fastest sustained change in a station record, so this
+ * recovers the passage window from public evidence alone without exposing any authoring
+ * metadata to the learner or to grading.
  *
  * Returns undefined when the record contains no meaningful temperature change.
  */
 export function deriveObservedTransitionWindow(series: StationSeries): TransitionWindow | undefined {
-  const { points, stepMinutes } = series;
-  if (points.length < 2) return undefined;
-
-  const total = Math.abs(points[points.length - 1]!.observation.temperatureC - points[0]!.observation.temperatureC);
-  if (total < 0.5) return undefined;
-
-  const rates = points.slice(1).map((point, index) =>
-    Math.abs(point.observation.temperatureC - points[index]!.observation.temperatureC) / stepMinutes
+  const window = deriveTransitionWindow(
+    series.points.map((point) => ({ minute: point.minute, temperatureC: point.observation.temperatureC })),
+    series.stepMinutes
   );
-  const maxRate = Math.max(...rates);
-  if (maxRate <= 0) return undefined;
-
-  const threshold = maxRate / 2;
-  let startMinute: number | undefined;
-  let endMinute: number | undefined;
-
-  rates.forEach((rate, index) => {
-    if (rate < threshold) return;
-    const from = points[index]!.minute;
-    const to = points[index + 1]!.minute;
-    if (startMinute === undefined) startMinute = from;
-    endMinute = to;
-  });
-
-  if (startMinute === undefined || endMinute === undefined) return undefined;
-  return { startMinute, endMinute };
+  return window;
 }
 
 export interface ObservedTransition extends TransitionWindow {
@@ -214,7 +193,6 @@ export interface BoundaryProximity {
   readonly stationId: string;
   readonly stationName: string;
   readonly distanceNormalized: number;
-  readonly etaMinutes?: number;
   readonly note: string;
 }
 
@@ -288,9 +266,14 @@ function boundarySpeedPerHour(movement: NormalizedPoint, stepMinutes: number): n
 }
 
 /**
- * Approximate arrival of a straight translating boundary at a station.
- * This is the extrapolation a learner is expected to reason with, not the
- * scenario's authored answer; it deliberately ignores curvature and speed changes.
+ * Position of a straight translating boundary relative to a station.
+ *
+ * Only distance and modelled motion are published. The game never prints a computed
+ * arrival minute: every v1 front translates at exactly constant speed, so a printed ETA
+ * would be the graded crossing answer rather than the rough extrapolation it claims to
+ * be, and on the uncertain mission a single precise arrival would teach false
+ * precision. The learner reasons with distance and speed themselves — that reasoning
+ * is the mission objective, not a value the interface should hand over.
  */
 function boundaryEta(
   boundaryPosition: NormalizedPoint,
@@ -298,7 +281,9 @@ function boundaryEta(
   stationPosition: NormalizedPoint,
   minute: number,
   stepMinutes: number
-): { etaMinutes?: number; distanceNormalized: number; note: string } {
+): { distanceNormalized: number; note: string } {
+  void minute;
+  void stepMinutes;
   const primary = Math.abs(movement.x) >= Math.abs(movement.y)
     ? { axis: "x" as const, velocity: movement.x }
     : { axis: "y" as const, velocity: movement.y };
@@ -309,7 +294,7 @@ function boundaryEta(
   if (primary.velocity === 0) {
     return {
       distanceNormalized: normalize(Math.abs(remaining)),
-      note: "This boundary is not modelled as moving across the region, so arrival cannot be extrapolated."
+      note: "This boundary is not modelled as moving across the region."
     };
   }
 
@@ -317,21 +302,16 @@ function boundaryEta(
   if (remaining / primary.velocity < 0) {
     return {
       distanceNormalized: regionWidthsAway,
-      note: "The boundary is already past this station or moving away from it, so no arrival time is extrapolated."
+      note: "The boundary is already past this station or moving away from it."
     };
   }
 
-  // Deliberately left off the observation-step grid: a snapped value would look like a
-  // known arrival time rather than the rough extrapolation it is.
-  const stepsToArrival = remaining / primary.velocity;
-  const etaMinutes = Math.round(minute + stepsToArrival * stepMinutes);
   return {
-    ...(Number.isFinite(etaMinutes) && etaMinutes <= minute + 24 * 60 ? { etaMinutes } : {}),
     distanceNormalized: regionWidthsAway,
     note:
-      `About ${Math.round(regionWidthsAway * 100)} % of the region's width away, travelling at the current speed. ` +
-      `Extrapolated arrival ${Number.isFinite(etaMinutes) ? formatSimulatedTimestamp(etaMinutes) : "unknown"} — ` +
-      "real fronts change speed and direction, so treat this as rough."
+      `About ${Math.round(regionWidthsAway * 100)} % of the region's width away. ` +
+      "This model moves the front at a constant speed; real fronts change speed and direction, " +
+      "so estimate arrival yourself from the map and the clock rather than trusting a single number."
   };
 }
 
@@ -368,7 +348,6 @@ export function buildRegionalSummary(
         stationId: station.id,
         stationName: station.name,
         distanceNormalized: result.distanceNormalized,
-        ...(result.etaMinutes !== undefined ? { etaMinutes: result.etaMinutes } : {}),
         note: result.note
       };
     });

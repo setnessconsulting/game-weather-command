@@ -36,6 +36,16 @@ avoids requiring recall of cloud-type names or weather-map/station symbols.
 Source:
 https://www.nextgenscience.org/pe/ms-ess2-5-earths-systems
 
+Mechanic-to-standard mapping (F19):
+
+| Game mechanic | MS-ESS2-5 element | How it is exercised |
+| --- | --- | --- |
+| Station/map/trend evidence inspection | SEP-3 Planning and Carrying Out Investigations | v1 provides the data (maps, station records, visualizations) rather than having learners plan an investigation; the clarification statement explicitly permits provided data |
+| Evidence -> forecast -> verification loop | CCC-2 Cause and Effect | Every mission requires attributing observed changes to air-mass/boundary movement and checking the attribution against the record |
+| Temperature/pressure/humidity/wind/precipitation variables | DCI ESS2.C (The Roles of Water in Earth's Surface Processes) / ESS2.D (Weather and Climate) | All five variables are observed, trended and forecast; ESS2.D's "weather can only be predicted probabilistically" is cited directly for the uncertain mission's objective |
+| Probabilistic forecast with confidence | Clarification statement: prediction within probabilistic ranges | Forecasts are ranges with stated confidence; verification scores calibration separately from correctness |
+| No symbol-memorization path | Assessment boundary | Success requires reading evidence, not recalling cloud/front symbols; front kinds are labelled in plain language throughout |
+
 ## Front relationships
 
 NWS educational material describes:
@@ -114,10 +124,13 @@ eastern station.
 1. a boundary-linked station effect claims a passage the authored front motion does not deliver
    inside that effect's window;
 2. a boundary's `transitionWidth` does not equal the distance the front travels during that
-   station's change window - the station must traverse the authored transition zone exactly across
-   the window over which its observation ramps;
+   station's change window - the station's observation ramp spans the same duration as the front's
+   traverse of the transition zone, and the crossing falls inside the ramp window (see F17 for
+   the exact guaranteed invariant);
 3. a precipitation cell does not move with a modeled front, so the radar layer and the front layer
-   cannot disagree about where the band is.
+   cannot disagree about where the band is;
+4. a station effect does not author `precipitationRateMmh` or `pressureTendencyHpaPer3h` - both
+   are kernel-derived (F12/F13), so an authored value would be silently ignored.
 
 It is wired in at the authored-data boundary (`parseWeatherScenario`), so a bad scenario fixture is
 rejected at parse time. The kernel contract is unchanged: the kernel still derives every scientific
@@ -144,13 +157,15 @@ helper is now typed on `WeatherScenarioV1`, so the four scenario families are ch
 
 ### F5 - LOW - Post-frontal wind sectors sit at the low end (OPEN - human disposition)
 
-Behind a cold front, NWS material and the NOAA jetstream pages describe winds typically from the west
-or northwest. The guided (265 deg) and independent (270 deg) missions land there. The uncertain mission
-settles near 217-235 deg (south-westerly) with an accepted sector of 200-250 deg. That is defensible
-for a deliberately weak, broad boundary - a weak front produces a weaker wind veer - and it is
-consistent with the smaller authored temperature/pressure deltas. It is recorded here rather than
-changed, because revising the canonical wind answer is a science-authoring decision that belongs to
-the human reviewer.
+The guided (265 deg) and independent (270 deg) missions settle westerly/north-westerly behind the
+front. The uncertain mission settles near 217-235 deg (south-westerly) with an accepted sector of
+200-250 deg. The cited sources describe convergence, temperature contrast and pressure differences
+at fronts; none of the quoted passages directly states a post-frontal wind direction, so no source
+claim is made here. The south-westerly sector is model-defensible for a deliberately weak, broad
+boundary - a weak front produces a weaker wind veer - and it is consistent with the smaller authored
+temperature/pressure deltas. It is recorded here rather than changed, because revising the canonical
+wind answer is a science-authoring decision that belongs to the human reviewer. (See F18 for the
+source-register correction this prompted.)
 
 ### F6 - LOW - Observational noise only exists once a transition starts (OPEN - forwarded)
 
@@ -161,7 +176,7 @@ begin changing until minute 90. The uncertainty framing therefore relies on the 
 and the wide transition zone rather than on pre-frontal observation scatter. Whether to add authored
 pre-frontal variability is a design decision for WC-05/WC-06; it is recorded, not silently changed.
 
-### F9 - MEDIUM - The uncertain mission never clears after the front passes (OPEN - human disposition)
+### F9 - MEDIUM - The uncertain mission never clears after the front passes (REMEDIATED at contentVersion -3; human disposition of the new behaviour recorded)
 
 The guided, independent, and warm-front missions all model post-passage clearing. The uncertain mission
 has no follow-up effects at all, so every station reaches +2.5 mm/h and holds it to the end of the
@@ -169,26 +184,32 @@ simulation. Cedar Station is fully changed by minute 150 but still reports 2.5 m
 300, 150 minutes after the front crossed it at minute 96. That contradicts the cold-front relationship
 the mission cites, where rain is a band associated with passage rather than a permanent state.
 
-Recommended remediation: add `west-clearing` (150-210) and `central-clearing` (180-240) mirroring the
-other missions (precip -2.5, RH -5) and re-lock the uncertain golden trace at `contentVersion` `-3`.
-Recorded rather than applied because the deliberately vague character of this mission makes sustained
-broad rain a plausible design intent, which is a science-authoring judgment for the human reviewer.
+**Remediation (applied).** Station precipitation is now derived from the authored band geometry
+(see F12): a station reports rain exactly while a band covers it. The uncertain mission's band leaves
+the region by the end of the timeline, so every station is dry at minute 300 - the same clearing
+behaviour the other three missions model with follow-up effects, now guaranteed by construction
+rather than by authored deltas. No new station effects were needed. The human reviewer is asked to
+accept this behaviour (or record an alternative disposition) as part of the science sign-off; the
+previous "sustained broad rain" reading is no longer the shipped behaviour.
 
-### F10 - MEDIUM - `transitionArrivalMinute` is undefined and the four missions disagree (OPEN - human disposition)
+### F10 - MEDIUM - `transitionArrivalMinute` is undefined and the four missions disagree (REMEDIATED at contentVersion -3; human disposition recorded)
 
-`transitionArrivalMinute` is a load-bearing forecast-verification input, but the term is defined nowhere
-in `docs/`, and the four canonical accepted ranges are not consistent with any single reading:
+`transitionArrivalMinute` is a load-bearing forecast-verification input. It is now defined in
+`docs/SCENARIO_SCHEMA.md` and `docs/SCIENCE_MODEL.md` as the authored accepted envelope for the
+**observed transition window** (half-maximum sustained temperature-change span) at the target station,
+and `parseWeatherScenario` fails closed unless the envelope contains that window.
 
-| Mission | Canonical change window | Accepted arrival range | Onset in range? | Completion in range? |
-| --- | --- | --- | --- | --- |
-| guided | 90-120 | 90-120 | yes | yes |
-| independent | 120-150 | 120-150 | yes | yes |
-| warm | 90-180 | 120-180 | no (90 < 120) | yes |
-| uncertain | 120-180 | 120-210 | yes | no (180 < 210) |
+| Mission | Observed window | Accepted arrival range (at -3) | Contains window? |
+| --- | --- | --- | --- |
+| guided | 90-120 | 90-120 | yes |
+| independent | 120-150 | 120-150 | yes |
+| warm | 90-180 | 90-180 (aligned from 120-180) | yes |
+| uncertain | 120-180 | 120-210 | yes |
 
-Without a definition, WC-06's verification could judge a defensible forecast wrong (or right) depending
-on an undocumented convention. Recommended: WC-06 owns an explicit definition and the four ranges are
-aligned to it as part of the forecast-verification story.
+The warm-front envelope was aligned to its observed window (F14) and the invariant is enforced at the
+authored-data boundary, so a defensible learner forecast can no longer be displayed beside an envelope
+that excludes it. The human reviewer is asked to confirm the per-mission envelopes as part of the
+science sign-off.
 
 ### F7 - LOW - Accepted ranges ship to the learner runtime (FORWARDED to WC-06)
 
@@ -197,20 +218,143 @@ not a hidden scalar answer key, which satisfies the "no hidden answer key" rule.
 never be surfaced in the UI before forecast commitment. This is a WC-06 verification obligation and is
 recorded here so it is not lost.
 
-### F8 - ACCEPTED - Warm-front pressure tendency turning weakly positive after passage
+### F8 - ACCEPTED (updated for derived tendency) - Warm-front pressure tendency after passage
 
 Ahead of a warm front the pressure falls; after passage the fall typically levels off, and some
-sources describe a slight rise. The warm mission authors -1.0 hPa/3h initially and +0.5 hPa/3h after
-passage. That reads as "stabilising / beginning to rise" rather than the sharp post-cold-front rise,
-which is the distinction the mission is teaching. Reviewed and accepted against:
+sources describe a slight rise. Pressure tendency is now **derived from the produced pressure
+trajectory** (F13): the change over the preceding 3 h, clamped at the scenario start. On the warm
+mission that reads about -0.7 hPa/3h mid-transition and "steady" after passage - the same
+"stabilising" distinction from the sharp post-cold-front rise the mission teaches, now guaranteed to
+agree with the pressure chart beside it. Reviewed and accepted against:
 
 - NWS Louisville, "Basic Discussion on Pressure": with a warm front the cool air ahead must retreat
   before warm air can advance; precipitation falls along and ahead of the front.
 - Independent educational summaries of warm-front passage describe pressure as stabilising or
   beginning to rise, explicitly *not* the sharp rise seen with a cold front.
-- FAA Balloon Flying Handbook ch. 4: "A quickly falling barometric pressure bottoms out during frontal
-  passage, then begins a gradual increase" - the cold-front case, used to check that the cold-front
-  missions' pressure-tendency reversal is the sharper one.
+
+(An earlier version of this disposition also quoted the FAA Balloon Flying Handbook ch. 4. That quote
+was removed during the F18 source-register correction: the handbook is not in the register and its
+exact URL could not be verified, so the disposition stands on the NWS and educational sources above
+rather than on an untraceable citation.)
+
+## Second independent review (F11-F21) - remediation record
+
+A second AI-assisted review of the vertical slice recorded findings F11-F21. As with the first review,
+this is **not** the human science sign-off; `scienceReviewStatus` remains `pending-independent` on all
+four scenarios. Machine-verifiable findings were remediated at `contentVersion` `-3`; items that are
+science-authoring or design judgments remain recorded for the human reviewer.
+
+### F11 - HIGH - Learner-visible table disclosed the graded timing answer (REMEDIATED)
+
+`boundaryEta` computed an arrival minute from the same constant-velocity boundary that defines the
+graded truth, and the observation panel published it ("Extrapolated arrival at each station") from
+minute 0 with a "treat this as rough" caveat that taught the learner to distrust a number that was in
+fact exact. **Remediated:** the game no longer prints a computed arrival minute anywhere. Front
+position, orientation, motion (direction and speed in region-widths per hour) and station distance
+remain as evidence; the note now describes the model honestly ("this model moves the front at a
+constant speed; real fronts change speed and direction, so estimate arrival yourself from the map and
+the clock"). The evidence facts, the observation table, the tutorial coaching and the summary copy
+were all changed with it, and tests now assert that no extrapolated arrival is published. The
+learner's own distance-over-speed reasoning is the mission objective; the interface no longer hands
+over the answer, including on the uncertain mission where a precise ETA would also have taught false
+precision.
+
+### F12 - HIGH - Rendered precipitation band contradicted station precipitation (REMEDIATED)
+
+The band rode the front while each station's rain ramped linearly across its whole change window and
+held, so the map and the station record disagreed about when it was raining in 53 of 126
+station-steps. **Remediated:** station precipitation is now **derived from the authored band
+geometry**. Each cell carries an authored `footprintRadius` (0.13 normalized region units for all four
+missions); a station reports precipitation exactly while a band centre is inside that radius, scaled
+by current intensity with a linear falloff. The radar-style layer and the station observations are two
+renderings of one source of truth and cannot disagree - a property now asserted by test at every
+station and minute of all four missions. The schema rejects any station-effect
+`precipitationRateMmh` delta fail-closed, so this defect class cannot be re-authored silently.
+
+### F13 - MEDIUM - pressureTendencyHpaPer3h contradicted the pressure series (REMEDIATED)
+
+The authored tendency was independent of the pressure trajectory, so the tendency column read
+"falling 2.0 hPa/3 h" beside a flat chart, and on the warm mission reported "rising" while the level
+was still falling. **Remediated:** tendency is computed as the change over the preceding 3 h of the
+pressure trajectory the kernel actually produces (clamped at the scenario start, so it reads "steady"
+before any change). The tendency column, the pressure chart, and the station reports are now one
+story. The schema rejects authored `pressureTendencyHpaPer3h` in effect deltas fail-closed, and
+station initials no longer carry the field (it is optional and defaults to 0, the kernel's computed
+value at minute 0). The warm-front F8 disposition was updated to the derived semantics (see above).
+
+### F14 - MEDIUM - Warm-front accepted envelope excluded the observed onset (REMEDIATED)
+
+The warm envelope was 120-180 against an observed window of 90-180, violating the binding rule the
+schema documents. **Remediated:** the envelope was aligned to 90-180 (inside its published 30-210
+window), and `parseWeatherScenario` now fails closed unless every accepted envelope contains its target
+station's observed transition window - so the shipped content can never again violate the rule the
+document calls binding.
+
+### F15 - MEDIUM - The uncertain mission never clears (REMEDIATED via F12)
+
+See F9 above: with precipitation derived from band geometry, the uncertain mission's rain ends when
+its band leaves the region, matching the clearing behaviour the other three missions model with
+follow-up effects. No new station effects were required; the trace was re-locked at `-3`.
+
+### F16 - MEDIUM - Golden traces locked only 1 of 3 stations (REMEDIATED)
+
+Exact observation values are now locked for **every station at every simulation step** of all four
+missions in `tests/fixtures/goldenObservationMatrix.json`, asserted by
+`tests/scenarios/goldenObservationMatrix.test.ts` against the live kernel. The matrix is keyed by
+scenarioId + contentVersion + seed and can be regenerated with `npm run test:golden:regenerate`
+after any content change. A content edit that broke any station trace now fails a locked
+expectation. (The engine-level replay conformance suite in `tests/scenarios/canonicalReplay.test.ts`
+remains the self-consistency check underneath.)
+
+### F17 - MEDIUM - Documents asserted a coherence invariant the content does not satisfy (REMEDIATED)
+
+`docs/FRONT_PASSAGE_SCIENCE_REVIEW.md` (this file, F1 remediation item 2) and `docs/SCENARIO_SCHEMA.md`
+both claimed the station "traverses the authored transition zone exactly across the window over which
+its observation ramps". The implementation guarantees equal **duration** plus an in-window crossing,
+not interval equality. Both documents were reworded to the guaranteed invariant. No graded outcome was
+affected (crossing minus ramp midpoint is -2.5 / +6 / 0 minutes for guided / warm / uncertain Central
+and -3 minutes for all three independent stations).
+
+### F18 - MEDIUM - Source register pointed at pages that do not state the attributed relationships (REMEDIATED)
+
+`nws-fronts` cited `weather.gov/jkl/education` (a generic course index) while the quoted front
+relationships actually come from `weather.gov/lmk/basic-fronts` (NWS Louisville, "Basic Discussion on
+Pressure", verified verbatim during the first review). **Remediated:** the register URL now cites the
+page the quotes come from. `ScienceSource` also gained optional `accessedOn`/`reviewedBy` fields so
+`reviewed: true` is traceable; all three entries record the 2026-09-21 AI-assisted technical review
+and explicitly note it is not the required human science sign-off. The unregistered FAA Balloon
+Flying Handbook quote was removed from the F8 disposition rather than cited to an unverifiable URL
+(see F8). The human reviewer is asked to confirm the register as part of the sign-off.
+
+### F19 - LOW - MS-ESS2-5 trace omitted the SEP, CCC and DCI elements (REMEDIATED)
+
+The mechanic-to-standard mapping table was added to the Curriculum authority section below. v1
+exercises SEP-3 (Planning and Carrying Out Investigations) only through interpreting provided data,
+which the MS-ESS2-5 clarification statement explicitly permits; CCC-2 (Cause and Effect) is exercised
+by every mission's evidence-to-forecast reasoning; DCI ESS2.C (weather variables) and ESS2.D
+("weather can only be predicted probabilistically", cited for the uncertain mission's objective) are
+named directly.
+
+### F20 - LOW - "Uncertain" is instrument noise on a deterministic ramp (OPEN - design)
+
+The uncertain mission's underlying truth is a fixed 60-minute ramp per station with +/-0.5 C,
++/-0.4 hPa and +/-8 deg of observational noise plus a wider envelope. This satisfies the letter of the
+rule (truth is not randomised after commitment; multiple defensible forecasts fit the ranges) but is
+not yet genuine atmospheric ambiguity. Richer ambiguity (two stations implying different front
+speeds, an ensemble-style range presented as evidence) is content design for WC-11, recorded here
+so it is not lost.
+
+### F21 - LOW - Three smaller observations (PARTIALLY REMEDIATED)
+
+(a) The guided forecast window id `central-next-three-hours` spans 0-150 (2.5 h). Internal
+identifier only; renaming would churn traces and refs for no learner-visible gain. Recorded, not
+changed. (b) Evidence `learningTags` were rendered to the learner ("tags: pressure, timing") and
+evidence quality was recall-only, making "attach everything" a reasoning-free dominant strategy.
+**Remediated:** tags now render as prose ("helps with: ..."), and evidence quality is an F1 score
+over recall *and* precision (share of attached evidence the debrief actually relies on), so attaching
+irrelevant evidence no longer yields full marks once missions carry distractors. Distractor-evidence
+authoring itself is WC-11 content work. (c) A commit after the observed change begins is classified
+"nowcast", which matches the documented definition; no change.
 
 ## Review checklist
 
@@ -218,16 +362,16 @@ which is the distinction the mission is teaching. Reviewed and accepted against:
 | --- | --- | --- |
 | 1 | Causal correctness | Pass - cold fronts advance cold/dry air and dry the station behind passage; warm fronts advance warm/moist air with precipitation along and ahead of the front |
 | 2 | Station-variable direction and magnitude | Pass except F5 (recorded) - directions match the cited relationships; magnitudes are plausible synthetic pedagogy |
-| 3 | Timing relationships | **Found F1, remediated** - front, band, and station timing now agree by construction and by test |
+| 3 | Timing relationships | **Found F1, remediated; re-verified at -3** - front, band, and station timing agree by construction and by test, for precipitation as well as temperature/pressure/wind (F12) |
 | 4 | Cold-front vs warm-front distinction | Pass - cold-front temperature change is 6-7 C in 30 min; the warm front moves 5 C across 90 min with a 0.30 transition width against 0.10-0.12 for the cold fronts |
-| 5 | Precipitation language does not imply universality | Pass - debrief text uses "band", "broken showers", "broader light-rain signal"; the bounded-precipitation boundary is now learner-facing |
-| 6 | Forecast ranges | Pass with note - every accepted range brackets the canonical outcome and fits its forecast window; **found F10**, `transitionArrivalMinute` is undefined |
+| 5 | Precipitation language does not imply universality | Pass - debrief text uses "band", "broken showers", "broader light-rain signal"; the bounded-precipitation boundary is now learner-facing; station rain is band-derived (F12) |
+| 6 | Forecast ranges | **Found F10/F14, remediated** - `transitionArrivalMinute` is defined, every accepted range contains its target station's observed window (fail-closed), and each fits its forecast window |
 | 7 | Confidence calibration | Pass - defensible confidence widens from `[medium, high]` on the guided mission to `[low, medium]` on the uncertain mission |
 | 8 | Deterministic uncertainty | Pass - seeded PRNG in the domain layer; replays reproduce identical observations; the noise key includes `contentVersion`, so a content revision re-draws the stream by design |
-| 9 | Debrief explanations | Pass with note - each debrief links evidence IDs to outcome dimensions and was checked against the corrected front timing; **found F9**, the uncertain mission never clears |
+| 9 | Debrief explanations | Pass - each debrief links evidence IDs to outcome dimensions and was checked against the corrected front timing; **found F9, remediated at -3** (band-derived clearing) |
 | 10 | Model boundaries/simplifications | **Found F2, remediated** |
 | 11 | No implication of live or operational forecasting | Pass - fictional region, synthetic stations, no live feeds; objectives are scenario-bounded |
-| 12 | Exact deterministic golden traces | **Found F3/F4, remediated** - all four missions lock exact traces |
+| 12 | Exact deterministic golden traces | **Found F3/F4/F16, remediated** - every station at every step of all four missions is locked in the golden matrix and asserted against the live kernel |
 
 ## Canonical replay conformance
 
@@ -255,8 +399,11 @@ observational noise), and moves the uncertain-boundary observations (which do).
 
 ## Golden-trace review
 
-The committed tests lock the Central Station trace for all four missions and now additionally assert
-the front/station coherence claims directly, independently of the validator's own arithmetic.
+`tests/fixtures/goldenObservationMatrix.json` locks **every station at every simulation step** for all
+four missions (F16), asserted against the live kernel by
+`tests/scenarios/goldenObservationMatrix.test.ts`; the committed scenario tests additionally assert
+the front/station coherence claims directly, independently of the validator's own arithmetic. The
+matrix is regenerated with `npm run test:golden:regenerate` after any content change.
 
 Determinism was preserved, not re-derived by hand. Comparing every checkpoint of every station before
 and after remediation:
@@ -281,13 +428,15 @@ test that backs it, and carries a fill-in decision worksheet covering F5, F6, F9
 A separate **human** reviewer must still record:
 
 - reviewer identity/role;
-- source set reviewed;
-- scenario content version(s);
-- findings by scenario, including disposition of F5 and F6;
+- source set reviewed (the register now cites the pages the quotes actually come from - F18);
+- scenario content version(s) - all four are at `contentVersion` `-3`;
+- findings by scenario, including disposition of F5 (uncertain post-frontal wind sector), F6
+  (pre-frontal observational variability), and confirmation of the F9/F10/F14 remediations
+  (band-derived clearing, defined `transitionArrivalMinute`, aligned warm envelope);
 - any required remediation;
 - final disposition.
 
 Only after that review is complete may the four canonical scenarios change from
 `pending-independent` to `independent-reviewed`.
 
-Until then, GAME-341 may move to **Review** but must not be closed as Done.
+Until then, GAME-341 stays in **Review** and must not be closed as Done.

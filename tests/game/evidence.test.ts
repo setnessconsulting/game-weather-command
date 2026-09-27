@@ -88,13 +88,14 @@ describe("evidence catalog gating", () => {
     expect(laterTrend.summary).not.toBe(earlyTrend.summary);
   });
 
-  it("describes front motion and extrapolated arrival for boundary evidence", () => {
+  it("describes front motion and distance for boundary evidence, never a computed arrival", () => {
     const machine = createSessionMachine(guided);
     const catalog = buildEvidenceCatalog(guided, machine.kernel, stateAtMinute(machine.kernel, 30));
     const boundary = catalog.unlocked.find((item) => item.kind === "boundary")!;
     const labels = boundary.facts.map((fact) => fact.label);
     expect(labels.some((label) => label.includes("position"))).toBe(true);
     expect(labels.some((label) => label.includes("motion"))).toBe(true);
-    expect(boundary.facts.some((fact) => fact.value.includes("extrapolated arrival"))).toBe(true);
+    expect(boundary.facts.some((fact) => fact.value.includes("of the region's width away"))).toBe(true);
+    expect(boundary.facts.some((fact) => fact.value.includes("extrapolated arrival"))).toBe(false);
   });
 });

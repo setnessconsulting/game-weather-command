@@ -177,10 +177,7 @@ function boundaryFacts(summary: RegionalSummary, boundaryIds: readonly string[])
     for (const proximity of boundary.proximity) {
       facts.push({
         label: `${boundary.kindLabel} → ${proximity.stationName}`,
-        value:
-          proximity.etaMinutes !== undefined
-            ? `extrapolated arrival ${formatSimulatedTimestamp(proximity.etaMinutes)}`
-            : "no arrival extrapolated",
+        value: `about ${Math.round(proximity.distanceNormalized * 100)} % of the region's width away`,
         note: proximity.note
       });
     }
@@ -243,7 +240,7 @@ function summaryFor(
     case "trend":
       return `How each of ${stationNames(targetIds)} has changed since the first reading, including the fastest change detected so far.`;
     case "boundary":
-      return `Where the front sits and where it is heading, plus a rough extrapolated arrival for each station.`;
+      return `Where the front sits, where it is heading, and how far it is from each station.`;
     case "precipitation":
       return `Extent, intensity and motion of the precipitation band associated with this system at ${regional.timestamp}.`;
     case "map":

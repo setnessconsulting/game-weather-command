@@ -125,11 +125,11 @@ export function ObservationPanel({
                 <p>{boundary.motionSummary}</p>
                 <div className={styles.tableScroll}>
                   <table className={styles.facts}>
-                    <caption>Extrapolated arrival at each station, assuming the current motion continues</caption>
+                    <caption>Distance from the front to each station, with the modelled motion</caption>
                     <thead>
                       <tr>
                         <th scope="col">Station</th>
-                        <th scope="col">Extrapolated arrival</th>
+                        <th scope="col">Distance</th>
                         <th scope="col">Basis</th>
                       </tr>
                     </thead>
@@ -137,11 +137,7 @@ export function ObservationPanel({
                       {boundary.proximity.map((proximity) => (
                         <tr key={proximity.stationId}>
                           <th scope="row">{proximity.stationName}</th>
-                          <td>
-                            {proximity.etaMinutes !== undefined
-                              ? formatSimulatedTimestamp(proximity.etaMinutes)
-                              : "not extrapolated"}
-                          </td>
+                          <td>{Math.round(proximity.distanceNormalized * 100)} % of the region's width</td>
                           <td>{proximity.note}</td>
                         </tr>
                       ))}
@@ -311,7 +307,7 @@ export function ObservationPanel({
                   <div className={styles.evidenceHeader}>
                     <h3>{item.title}</h3>
                     <span className={styles.evidenceMeta}>
-                      available {item.timestamp} · tags: {item.learningTags.join(", ")}
+                      available {item.timestamp} · helps with: {item.learningTags.join(", ")}
                     </span>
                   </div>
                   <p>{item.summary}</p>
