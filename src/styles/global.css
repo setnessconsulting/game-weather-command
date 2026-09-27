@@ -43,6 +43,11 @@ textarea {
 
 button {
   cursor: pointer;
+  /* Explicit surface background: unstyled buttons otherwise inherit the engine
+     default button face (e.g. #c0c0c0 in WebKit), which fails WCAG AA contrast
+     against --text. Found by the WebKit axe run in WC-12 qualification. */
+  background: var(--surface);
+  color: var(--text);
 }
 
 :focus-visible {

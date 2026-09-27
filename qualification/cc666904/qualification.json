@@ -1,0 +1,44 @@
+{
+  "sourceSha": "cc6669046b0d6da94b38a8990a05942738f702b6",
+  "generatedAt": "2026-09-27T18:40:31.853Z",
+  "steps": [
+    {
+      "label": "verify",
+      "command": "npm.cmd run verify",
+      "status": "pass",
+      "durationMs": 24936
+    },
+    {
+      "label": "bundle-report",
+      "command": "node scripts/bundle-report.mjs",
+      "status": "pass",
+      "durationMs": 131
+    },
+    {
+      "label": "test:e2e",
+      "command": "npm.cmd run test:e2e:run",
+      "status": "pass",
+      "durationMs": 18770
+    },
+    {
+      "label": "test:host",
+      "command": "npm.cmd run test:host:run",
+      "status": "pass",
+      "durationMs": 4098
+    },
+    {
+      "label": "release:manifest",
+      "command": "npm.cmd run release:manifest",
+      "status": "pass",
+      "durationMs": 670
+    },
+    {
+      "label": "release:check",
+      "command": "npm.cmd run release:check",
+      "status": "pass",
+      "durationMs": 763
+    }
+  ],
+  "result": "pass",
+  "failedSteps": []
+}

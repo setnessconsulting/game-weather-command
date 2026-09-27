@@ -1,0 +1,65 @@
+import { execSync } from "node:child_process";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const npm = process.platform === "win32" ? "npm.cmd" : "npm";
+
+function sha() {
+  return execSync("git rev-parse HEAD", { cwd: root, encoding: "utf8" }).trim();
+}
+
+function run(label, command, args, env) {
+  const started = Date.now();
+  try {
+    execSync(`${command} ${args.map((arg) => `"${arg}"`).join(" ")}`, {
+      cwd: root,
+      env: { ...process.env, ...env },
+      stdio: "inherit"
+    });
+    return { label, command: `${command} ${args.join(" ")}`, status: "pass", durationMs: Date.now() - started };
+  } catch (error) {
+    return {
+      label,
+      command: `${command} ${args.join(" ")}`,
+      status: "fail",
+      durationMs: Date.now() - started,
+      exitCode: error.status ?? 1
+    };
+  }
+}
+
+const sourceSha = sha();
+const shortSha = sourceSha.slice(0, 8);
+const outDir = join(root, "qualification", shortSha);
+mkdirSync(outDir, { recursive: true });
+
+const steps = [
+  run("verify", npm, ["run", "verify"], {}),
+  run("bundle-report", "node", ["scripts/bundle-report.mjs"], { QUALIFICATION_SHA: shortSha }),
+  run("test:e2e", npm, ["run", "test:e2e:run"], {}),
+  run("test:host", npm, ["run", "test:host:run"], {}),
+  run("release:manifest", npm, ["run", "release:manifest"], {}),
+  run("release:check", npm, ["run", "release:check"], {})
+];
+
+const failed = steps.filter((step) => step.status === "fail");
+const summary = {
+  sourceSha,
+  generatedAt: new Date().toISOString(),
+  steps,
+  result: failed.length === 0 ? "pass" : "fail",
+  failedSteps: failed.map((step) => step.label)
+};
+
+writeFileSync(join(outDir, "qualification.json"), `${JSON.stringify(summary, null, 2)}\n`);
+
+console.log(`\nQualification for ${shortSha}: ${summary.result.toUpperCase()}`);
+for (const step of steps) {
+  console.log(`  ${step.status.toUpperCase().padEnd(5)} ${step.label} (${Math.round(step.durationMs / 1000)}s)`);
+}
+if (failed.length > 0) {
+  console.log(`Failed steps: ${summary.failedSteps.join(", ")}`);
+}
+process.exitCode = failed.length === 0 ? 0 : 1;
