@@ -32,6 +32,20 @@ const horizontalOverflow = (page: Page): Promise<number> =>
 const focusedText = (page: Page): Promise<string> =>
   page.evaluate(() => document.activeElement?.textContent?.trim() ?? "");
 
+/**
+ * Wait for a toggled control to reach its settled colours before measuring anything.
+ *
+ * Accessibility checks sample computed style at a single instant. A control whose selected
+ * state is reached through a background transition can be sampled mid-interpolation, which
+ * reports a colour pair that no player ever sees for long - or, worse, a real pair that
+ * genuinely fails contrast. Waiting for the settled background makes the check deterministic
+ * and states what it is asserting.
+ */
+const expectSettledToggle = async (page: Page, name: string): Promise<void> => {
+  const control = page.getByRole("button", { name, exact: true });
+  await expect(control).toHaveCSS("background-color", "rgb(255, 209, 102)");
+};
+
 const startGuidedMission = async (page: Page): Promise<void> => {
   await page.goto("/");
   await page.getByRole("button", { name: /Open briefing for Cold Front Shift/ }).click();
@@ -85,6 +99,9 @@ test("the guided mission can be started and driven from the keyboard alone", asy
   await station.focus();
   await page.keyboard.press(" ");
   await expect(station).toHaveAttribute("aria-pressed", "true");
+  await expectSettledToggle(page, "West Station");
+  // The selected state is not carried by colour alone.
+  await expect(station).toHaveCSS("text-decoration-line", "underline");
 
   expect(runtime.unexpectedRequests).toEqual([]);
   expect(runtime.consoleErrors).toEqual([]);
@@ -145,6 +162,7 @@ test("motion is not reduced by default and can be switched on and off in-session
   await toggle.click();
   await expect(play).toBeDisabled();
   await expect(page.getByRole("button", { name: /Motion reduced/ })).toHaveAttribute("aria-pressed", "true");
+  await expectSettledToggle(page, "Motion reduced (tap to restore)");
 
   await page.getByRole("button", { name: /Motion reduced/ }).click();
   await expect(play).toBeEnabled();

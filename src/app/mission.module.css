@@ -262,6 +262,25 @@
   color: #10202f;
   border-color: var(--focus);
   font-weight: 700;
+  /* Non-colour cue for the selected state, so it survives greyscale, high-contrast and
+     print. The bold weight alone is too subtle to carry the state on its own. */
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+/*
+ * A selected state that also changes the text colour must not interpolate its background.
+ * Mid-transition the background is between the two surface colours while the text has
+ * already flipped, and that pair fails contrast badly - a real player sees it, and so does
+ * an automated check that samples at the wrong instant. The state change is instant; only
+ * the border colour eases.
+ */
+.pill[aria-checked="true"],
+.option[aria-checked="true"],
+.stationTab[aria-pressed="true"],
+.evidenceActions button[aria-pressed="true"],
+.timeToggles button[aria-pressed="true"] {
+  transition: border-color var(--transition-quick);
 }
 
 .coachingStep {

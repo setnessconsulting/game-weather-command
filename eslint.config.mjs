@@ -4,7 +4,10 @@ import { defineConfig, globalIgnores } from "eslint/config";
 import tseslint from "typescript-eslint";
 
 export default defineConfig(
-  globalIgnores(["node_modules/**", "dist/**", "coverage/**", "test-results/**", "playwright-report*/**", "*.tsbuildinfo"]),
+  // `qualification/` holds the copied Playwright report, so it must be ignored here too:
+  // `npm run qualify` followed by `npm run verify` used to lint a third-party bundle and
+  // report four thousand errors that had nothing to do with this code.
+  globalIgnores(["node_modules/**", "dist/**", "coverage/**", "test-results/**", "playwright-report*/**", "qualification/**", "*.tsbuildinfo"]),
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
