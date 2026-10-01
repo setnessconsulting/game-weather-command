@@ -2,6 +2,8 @@ name: WC-02 Bootstrap Verification
 
 on:
   pull_request:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -29,11 +31,15 @@ jobs:
       - run: npm run check:architecture
       - run: npm run build
       - run: npm run check:privacy
+      # Transfer budget, measured on the build produced above.
+      - run: node scripts/bundle-report.mjs
+        env:
+          QUALIFICATION_SHA: ${{ github.sha }}
 
   browser:
     needs: verify
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -42,6 +48,18 @@ jobs:
           cache: npm
       - name: Install exact committed dependency graph
         run: npm ci
-      - run: npx playwright install --with-deps chromium
+      # playwright.config.ts declares chromium, firefox, webkit and a touch device, so all
+      # four projects must have a browser. Installing chromium only made the declared matrix
+      # unrunnable here while the docs claimed it had passed.
+      - run: npx playwright install --with-deps chromium firefox webkit
       - run: npm run test:e2e
       - run: npm run test:host
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: wc-browser-evidence-${{ github.sha }}
+          path: |
+            playwright-report
+            test-results
+            qualification
+          retention-days: 30
