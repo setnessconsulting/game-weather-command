@@ -113,7 +113,6 @@ export function ObservationPanel({
             kernel={machine.kernel}
             state={canonicalState}
             selectedStationId={state.selectedStationId}
-            onSelectStation={onSelectStation}
             motionAllowed={motionAllowed}
           />
 

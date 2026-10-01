@@ -11,7 +11,6 @@ export interface WeatherMapProps {
   readonly kernel: KernelScenarioDefinition;
   readonly state: ScenarioState;
   readonly selectedStationId: string;
-  readonly onSelectStation?: (stationId: string) => void;
   readonly motionAllowed: boolean;
 }
 
@@ -40,7 +39,6 @@ export function WeatherMap({
   kernel,
   state,
   selectedStationId,
-  onSelectStation,
   motionAllowed
 }: WeatherMapProps) {
   const gradientId = useId();
@@ -79,12 +77,18 @@ export function WeatherMap({
         Regional map · {formatSimulatedTimestamp(state.minute)}
       </figcaption>
 
+      {/*
+        The map is a single accessible image, so it carries no interactive descendants:
+        a station marker inside role="img" is hidden from assistive technology and would
+        otherwise be a pointer-only control. Changing station is done with the labelled
+        station list under the map, which is the same action on a real control.
+      */}
       <div className={styles.mapFrame}>
         <svg
           viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
           role="img"
-          aria-label={`Regional forecast map at ${summary.timestamp}. Every fact shown here is repeated as text directly below the map.`}
-          className={motionAllowed ? styles.map : `${styles.map} ${styles.still}`}
+          aria-label={`Regional forecast map at ${summary.timestamp}. Every fact shown here is repeated as text directly below the map, and stations are selected from the station list below it.`}
+          className={styles.map}
           preserveAspectRatio="xMidYMid meet"
         >
           <defs>
@@ -185,11 +189,7 @@ export function WeatherMap({
           {stationGeometries.map(({ station, x, y }) => {
             const selected = station.id === selectedStationId;
             return (
-              <g
-                key={station.id}
-                className={styles.stationGroup}
-                onPointerUp={onSelectStation ? () => onSelectStation(station.id) : undefined}
-              >
+              <g key={station.id} className={styles.stationGroup}>
                 {selected ? <circle cx={x} cy={y} r="4.6" className={styles.stationSelectedRing} /> : null}
                 <circle cx={x} cy={y} r="2" className={styles.stationDot} />
                 <line x1={x - 3.4} y1={y} x2={x + 3.4} y2={y} className={styles.stationTick} />
@@ -202,6 +202,16 @@ export function WeatherMap({
           })}
         </svg>
       </div>
+
+      {/*
+        Reduced motion changes presentation, never information. The map itself does not
+        interpolate, so the observable effect of the preference is stated rather than implied.
+      */}
+      <p className={styles.motionNote} data-motion="reduced">
+        {motionAllowed
+          ? "The map redraws as the simulated clock advances."
+          : "Motion is reduced: the map shows each state directly as the simulated clock advances. Nothing is hidden."}
+      </p>
 
       <ul className={styles.legend}>
         {boundaryGeometries.map((geometry) => (

@@ -1,4 +1,10 @@
-import type { ForecastSessionState, SessionMachine } from "./session";
+import type { WeatherScenarioV1 } from "@/scenarios";
+import type { ForecastSessionState } from "./session";
+
+/** The step list only ever reads the scenario, so it does not need the whole machine. */
+export interface TutorialSource {
+  readonly scenario: WeatherScenarioV1;
+}
 
 export interface TutorialStep {
   readonly id: string;
@@ -8,7 +14,7 @@ export interface TutorialStep {
   isComplete(state: ForecastSessionState): boolean;
 }
 
-const hasEvidenceOfType = (machine: SessionMachine, state: ForecastSessionState, type: string): boolean =>
+const hasEvidenceOfType = (machine: TutorialSource, state: ForecastSessionState, type: string): boolean =>
   machine.scenario.evidence.some(
     (evidence) => evidence.type === type && state.openedEvidenceIds.includes(evidence.id)
   );
@@ -26,7 +32,7 @@ const allRangesEntered = (state: ForecastSessionState): boolean =>
  * number, range, station outcome or front arrival time, so completing the tutorial cannot
  * substitute for reading the evidence.
  */
-export function buildGuidedTutorial(machine: SessionMachine): readonly TutorialStep[] {
+export function buildGuidedTutorial(machine: TutorialSource): readonly TutorialStep[] {
   const types = new Set(machine.scenario.evidence.map((evidence) => evidence.type));
   const steps: TutorialStep[] = [];
 
@@ -159,18 +165,25 @@ export function buildGuidedTutorial(machine: SessionMachine): readonly TutorialS
   return steps;
 }
 
+/**
+ * The outstanding guided step, or `undefined` when there is nothing to coach.
+ *
+ * `guided` reveals the first hint immediately; `reduced` shows the same step but reveals
+ * nothing until the player asks, which is what "Hints on request" promises; `off` returns
+ * nothing so the panel stays silent.
+ */
 export function currentTutorialStep(
-  machine: SessionMachine,
+  machine: TutorialSource,
   state: ForecastSessionState
 ): TutorialStep | undefined {
-  if (state.assistance !== "guided") return undefined;
+  if (state.assistance === "off") return undefined;
   if (machine.scenario.missionType !== "guided-cold-front") return undefined;
   if (state.phase === "briefing") return undefined;
   return buildGuidedTutorial(machine).find((step) => !step.isComplete(state));
 }
 
 export function tutorialProgress(
-  machine: SessionMachine,
+  machine: TutorialSource,
   state: ForecastSessionState
 ): { readonly completed: number; readonly total: number } {
   const steps = buildGuidedTutorial(machine);
@@ -183,11 +196,17 @@ export function visibleHints(step: TutorialStep, state: ForecastSessionState): r
   return revealCount <= 0 ? [] : step.hints.slice(0, revealCount);
 }
 
+/** True when the guided step list is fully satisfied, so coaching has nothing left to add. */
+export function coachingComplete(machine: TutorialSource, state: ForecastSessionState): boolean {
+  const progress = tutorialProgress(machine, state);
+  return progress.total > 0 && progress.completed >= progress.total;
+}
+
 /**
  * On-demand nudge for missions without step coaching. State-derived and deliberately
  * non-revealing, so it never collapses an independent mission into tutorial mode.
  */
-export function contextualHint(machine: SessionMachine, state: ForecastSessionState): string {
+export function contextualHint(machine: TutorialSource, state: ForecastSessionState): string {
   if (state.phase === "briefing") {
     return "Start the observation, then read at least two stations before deciding anything.";
   }

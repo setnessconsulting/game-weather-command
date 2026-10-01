@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useReducer, useState } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
 
 import type { WeatherScenarioV1 } from "@/scenarios";
 import {
@@ -40,6 +40,13 @@ export function useMissionSession(scenario: WeatherScenarioV1): MissionSession {
   return { machine, state, dispatch, snapshot, evidence };
 }
 
+const reducedMotionQuery = "(prefers-reduced-motion: reduce)";
+
+function systemPrefersReducedMotion(): boolean {
+  if (typeof window === "undefined" || typeof window.matchMedia !== "function") return false;
+  return window.matchMedia(reducedMotionQuery).matches;
+}
+
 export interface MotionPreference {
   readonly reducedMotion: boolean;
   readonly toggleReducedMotion: () => void;
@@ -47,9 +54,27 @@ export interface MotionPreference {
   readonly togglePlaying: () => void;
 }
 
+/**
+ * Seeded from the operating-system setting and kept in sync with it, so a player who asked
+ * their device to reduce motion never has to discover the in-app toggle to get it. The
+ * in-app toggle still exists for a player who wants to change it mid-session.
+ */
 export function useMotionPreference(): MotionPreference {
-  const [reducedMotion, setReducedMotion] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(systemPrefersReducedMotion);
   const [playing, setPlaying] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || typeof window.matchMedia !== "function") return;
+    const list = window.matchMedia(reducedMotionQuery);
+    const sync = (event: MediaQueryList | MediaQueryListEvent) => {
+      setReducedMotion(event.matches);
+      if (event.matches) setPlaying(false);
+    };
+    sync(list);
+    list.addEventListener("change", sync);
+    return () => list.removeEventListener("change", sync);
+  }, []);
+
   const toggleReducedMotion = useCallback(() => {
     setReducedMotion((current) => {
       if (!current) setPlaying(false);

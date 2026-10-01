@@ -295,6 +295,23 @@
 
 /* ------------------------------ workspace ------------------------------- */
 
+.workspaceRegion {
+  display: grid;
+  gap: var(--space-5);
+  min-width: 0;
+  max-width: 100%;
+}
+
+.workspaceRegion:focus {
+  outline: none;
+}
+
+.workspaceRegion:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 4px;
+  border-radius: var(--radius-md);
+}
+
 .workspaceWrapper {
   display: grid;
   gap: var(--space-5);

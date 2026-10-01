@@ -15,6 +15,7 @@ import {
   formatSimulatedTimestamp,
   formatMinuteRange
 } from "./units";
+import { buildGuidedTutorial } from "./tutorial";
 import { verifyForecast, type VerificationReport } from "./verification";
 
 export type SessionPhase = "briefing" | "observing" | "awaiting-outcome" | "verified" | "debrief";
@@ -121,6 +122,9 @@ export function createSessionMachine(scenarioInput: unknown): SessionMachine {
 
   const verificationMinute = Math.min(kernel.timeline.maxMinute, window.endMinute);
 
+  // Hint counters are keyed by authored step ids, so an unknown step id cannot grow the map.
+  const hintStepIds = new Set(buildGuidedTutorial({ scenario }).map((step) => step.id));
+
   const reduce = (state: ForecastSessionState, action: SessionAction): ForecastSessionState => {
     switch (action.type) {
       case "start":
@@ -173,6 +177,9 @@ export function createSessionMachine(scenarioInput: unknown): SessionMachine {
       }
 
       case "openEvidence": {
+        // Unknown identifiers are refused rather than recorded: this collection is a set of
+        // scenario evidence ids, and accepting arbitrary ids would make it grow without bound.
+        if (!scenario.evidence.some((item) => item.id === action.evidenceId)) return state;
         if (state.openedEvidenceIds.includes(action.evidenceId)) return state;
         return { ...state, openedEvidenceIds: [...state.openedEvidenceIds, action.evidenceId] };
       }
@@ -201,11 +208,14 @@ export function createSessionMachine(scenarioInput: unknown): SessionMachine {
       case "setRecommendation":
         return { ...state, forecast: { ...state.forecast, recommendationId: action.recommendationId } };
 
-      case "useHint":
+      case "useHint": {
+        // A hint counter is keyed by a step that exists, so the map cannot grow by key.
+        if (!hintStepIds.has(action.stepId)) return state;
         return {
           ...state,
           hintsUsed: { ...state.hintsUsed, [action.stepId]: (state.hintsUsed[action.stepId] ?? 0) + 1 }
         };
+      }
 
       case "setAssistance":
         return { ...state, assistance: action.assistance };
