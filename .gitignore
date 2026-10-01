@@ -4,5 +4,9 @@ coverage/
 test-results/
 playwright-report/
 playwright-report-host/
+# Qualification output is a build artifact bound to one exact SHA. It is published as a CI
+# artifact, not committed, so the repository does not accumulate machine-generated evidence
+# that cannot have been produced by the commit that contains it.
+qualification/
 *.tsbuildinfo
 .DS_Store

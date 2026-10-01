@@ -73,7 +73,10 @@ v1 deliberately excludes live weather APIs, severe-warning authority, learner ac
 
 ## Development
 
-WC-02 establishes the executable foundation. Production weather simulation and canonical missions remain out of scope until WC-03/WC-04.
+The deterministic kernel, the four canonical Front Passage missions, and the playable
+vertical slice (evidence, forecast, verification, debrief) are implemented. Production
+visual/audio fidelity and the human review gates are tracked separately — see
+`docs/ACCEPTANCE_EVIDENCE_MATRIX.md` for the state of every story.
 
 ```bash
 npm ci
@@ -81,7 +84,15 @@ npm run dev
 npm run verify
 npm run test:e2e
 npm run test:host
+npm run qualify
 ```
+
+`npm run qualify` is the WC-12 evidence path: it runs everything above, measures the bundle
+against the transfer budget, and writes a package bound to one exact clean source SHA. It
+refuses to run on a dirty working tree, because a package that does not describe a commit is
+not evidence. `docs/QUALIFICATION.md` lists which budgets it enforces and which are documented
+only, and which parts of the release gate need human evidence that no automated check may
+stand in for.
 
 The production build uses a relative asset base so the exact artifact can run beneath
 `/game-assets/weather-command/<version>/` inside games-site.

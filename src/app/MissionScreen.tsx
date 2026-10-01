@@ -29,15 +29,16 @@ const phaseLabels = {
 export function MissionScreen({ scenario, mission, onExit }: MissionScreenProps) {
   const { machine, state, dispatch, snapshot, evidence } = useMissionSession(scenario);
   const motion = useMotionPreference();
-  const phaseHeadingRef = useRef<HTMLHeadingElement>(null);
+  const phaseTagRef = useRef<HTMLParagraphElement>(null);
   const previousPhase = useRef(state.phase);
 
-  // Move focus to the new phase heading so keyboard and screen-reader users land on the
-  // content that just changed rather than at the top of the document.
+  // Move focus to the phase tag when the phase changes, so keyboard and screen-reader users
+  // land on what just changed. The tag is a visible element: focusing the visually hidden
+  // heading below would leave the focus indicator off screen, which is worse than useless.
   useEffect(() => {
     if (previousPhase.current === state.phase) return;
     previousPhase.current = state.phase;
-    phaseHeadingRef.current?.focus();
+    phaseTagRef.current?.focus();
   }, [state.phase]);
 
   // Automatic time advance is a convenience only: every control works identically without it.
@@ -67,7 +68,7 @@ export function MissionScreen({ scenario, mission, onExit }: MissionScreenProps)
           <p className={styles.lede}>{scenario.objective}</p>
         </div>
         <div className={styles.missionHeaderSide}>
-          <p className={styles.phaseTag} data-tone="info">
+          <p ref={phaseTagRef} tabIndex={-1} className={styles.phaseTag} data-tone="info">
             {phaseLabels[state.phase]}
           </p>
           <button type="button" onClick={onExit}>
@@ -80,83 +81,89 @@ export function MissionScreen({ scenario, mission, onExit }: MissionScreenProps)
         {state.status?.message ?? `Simulated time ${formatSimulatedTimestamp(state.minute)}.`}
       </p>
 
-      <h2 ref={phaseHeadingRef} tabIndex={-1} className={styles.phaseHeading}>
-        {phaseLabels[state.phase]}
-      </h2>
+      <h2 className={styles.phaseHeading}>{phaseLabels[state.phase]}</h2>
 
-      {state.phase === "briefing" ? (
-        <BriefingPanel
-          machine={machine}
-          mission={mission}
-          status={state.status}
-          onStart={() => dispatch({ type: "start" })}
-          onBackToMissions={onExit}
-        />
-      ) : (
-        <>
-          <CoachingPanel
+      {/*
+        One persistent workspace target, so the skip link resolves on every phase including
+        the briefing. It is focusable so the skip link moves real focus, not just the
+        document scroll position.
+      */}
+      <div id="workspace" tabIndex={-1} className={styles.workspaceRegion}>
+        {state.phase === "briefing" ? (
+          <BriefingPanel
             machine={machine}
-            state={state}
-            onUseHint={(stepId) => dispatch({ type: "useHint", stepId })}
-            onSetAssistance={(assistance) => dispatch({ type: "setAssistance", assistance })}
+            mission={mission}
+            status={state.status}
+            onStart={() => dispatch({ type: "start" })}
+            onBackToMissions={onExit}
           />
+        ) : (
+          <>
+            <CoachingPanel
+              machine={machine}
+              state={state}
+              onUseHint={(stepId) => dispatch({ type: "useHint", stepId })}
+              onSetAssistance={(assistance) => dispatch({ type: "setAssistance", assistance })}
+            />
 
-          {state.phase === "verified" || state.phase === "debrief" ? null : (
-            <div id="workspace" className={styles.workspaceWrapper}>
-              <ObservationPanel
-                machine={machine}
-                scenario={scenario}
-                state={state}
-                evidence={evidence}
-                playing={motion.playing}
-                motionAllowed={!motion.reducedMotion}
-                onSelectStation={(stationId) => dispatch({ type: "selectStation", stationId })}
-                onSetMinute={(minute) => dispatch({ type: "setMinute", minute })}
-                onAdvance={(steps) => dispatch({ type: "advance", steps })}
-                onTogglePlay={motion.togglePlaying}
-                onToggleMotion={motion.toggleReducedMotion}
-                onOpenEvidence={(evidenceId) => dispatch({ type: "openEvidence", evidenceId })}
-                onToggleEvidence={(evidenceId) => dispatch({ type: "toggleEvidence", evidenceId })}
-              />
+            {state.phase === "verified" || state.phase === "debrief" ? null : (
+              <div className={styles.workspaceWrapper}>
+                <ObservationPanel
+                  machine={machine}
+                  scenario={scenario}
+                  state={state}
+                  evidence={evidence}
+                  playing={motion.playing}
+                  motionAllowed={!motion.reducedMotion}
+                  onSelectStation={(stationId) => dispatch({ type: "selectStation", stationId })}
+                  onSetMinute={(minute) => dispatch({ type: "setMinute", minute })}
+                  onAdvance={(steps) => dispatch({ type: "advance", steps })}
+                  onTogglePlay={motion.togglePlaying}
+                  onToggleMotion={motion.toggleReducedMotion}
+                  onOpenEvidence={(evidenceId) => dispatch({ type: "openEvidence", evidenceId })}
+                  onToggleEvidence={(evidenceId) => dispatch({ type: "toggleEvidence", evidenceId })}
+                />
 
-              <ForecastPanel
-                key={editorKey}
-                machine={machine}
-                state={state}
-                evidence={evidence}
-                onSetRange={(field, range) => dispatch({ type: "setRange", field, range })}
-                onSetConfidence={(confidence) => dispatch({ type: "setConfidence", confidence })}
-                onSetRecommendation={(recommendationId) => dispatch({ type: "setRecommendation", recommendationId })}
-                onCommit={() => dispatch({ type: "commit" })}
-              />
+                <ForecastPanel
+                  key={editorKey}
+                  machine={machine}
+                  state={state}
+                  evidence={evidence}
+                  onSetRange={(field, range) => dispatch({ type: "setRange", field, range })}
+                  onSetConfidence={(confidence) => dispatch({ type: "setConfidence", confidence })}
+                  onSetRecommendation={(recommendationId) =>
+                    dispatch({ type: "setRecommendation", recommendationId })
+                  }
+                  onCommit={() => dispatch({ type: "commit" })}
+                />
 
-              {state.phase === "awaiting-outcome" ? (
-                <section className={styles.panel} aria-labelledby="compare-heading">
-                  <h2 id="compare-heading">Compare with the record</h2>
-                  <p className={styles.note}>
-                    The comparison unlocks at{" "}
-                    {formatSimulatedTimestamp(machine.verificationMinute)}, the close of the published forecast
-                    window. Nothing about the outcome is shown until then.
-                  </p>
-                  <div className={styles.actionRow}>
-                    <button
-                      type="button"
-                      className={styles.primaryAction}
-                      onClick={() => dispatch({ type: "verify" })}
-                      disabled={!canCompare}
-                    >
-                      {canCompare
-                        ? "Compare forecast with the record"
-                        : `Advance to ${formatSimulatedTimestamp(machine.verificationMinute)} first`}
-                    </button>
-                    <button type="button" onClick={() => dispatch({ type: "revise" })}>
-                      Revise before comparing
-                    </button>
-                  </div>
-                </section>
-              ) : null}
-            </div>
-          )}
+                {state.phase === "awaiting-outcome" ? (
+                  <section className={styles.panel} aria-labelledby="compare-heading">
+                    <h2 id="compare-heading">Compare with the record</h2>
+                    <p className={styles.note}>
+                      The comparison unlocks at{" "}
+                      {formatSimulatedTimestamp(machine.verificationMinute)}, the close of the published forecast
+                      window. Nothing about the outcome is shown until then.
+                    </p>
+                    <div className={styles.actionRow}>
+                      <button
+                        type="button"
+                        className={styles.primaryAction}
+                        onClick={() => dispatch({ type: "verify" })}
+                        disabled={!canCompare}
+                      >
+                        {canCompare
+                          ? "Compare forecast with the record"
+                          : `Advance to ${formatSimulatedTimestamp(machine.verificationMinute)} first`}
+                      </button>
+                      <button type="button" onClick={() => dispatch({ type: "revise" })}>
+                        Revise before comparing
+                      </button>
+                    </div>
+                  </section>
+                ) : null}
+              </div>
+            )}
 
           {state.phase === "verified" && report ? (
             <VerificationPanel
@@ -167,18 +174,19 @@ export function MissionScreen({ scenario, mission, onExit }: MissionScreenProps)
             />
           ) : null}
 
-          {state.phase === "debrief" && report ? (
-            <DebriefPanel
-              machine={machine}
-              state={state}
-              evidence={evidence}
-              report={report}
-              onRevise={() => dispatch({ type: "revise" })}
-              onBackToMissions={onExit}
-            />
-          ) : null}
-        </>
-      )}
+            {state.phase === "debrief" && report ? (
+              <DebriefPanel
+                machine={machine}
+                state={state}
+                evidence={evidence}
+                report={report}
+                onRevise={() => dispatch({ type: "revise" })}
+                onBackToMissions={onExit}
+              />
+            ) : null}
+          </>
+        )}
+      </div>
     </div>
   );
 }

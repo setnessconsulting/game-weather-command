@@ -76,6 +76,7 @@ export {
 
 export {
   buildGuidedTutorial,
+  coachingComplete,
   contextualHint,
   currentTutorialStep,
   tutorialProgress,

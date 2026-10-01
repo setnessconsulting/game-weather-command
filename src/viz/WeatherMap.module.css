@@ -21,11 +21,12 @@
 .map {
   width: 100%;
   height: clamp(14rem, 42vw, 22rem);
-  transition: opacity var(--transition-calm);
 }
 
-.still {
-  transition: none;
+.motionNote {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
 }
 
 .grid {
@@ -77,7 +78,9 @@
 }
 
 .stationGroup {
-  cursor: pointer;
+  /* Presentation only: the station markers are not controls. Selecting a station is done
+     with the labelled station list under the map. */
+  pointer-events: none;
 }
 
 .stationDot {

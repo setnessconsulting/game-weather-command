@@ -253,3 +253,105 @@ describe("session replay", () => {
     }
   });
 });
+
+describe("bounded runtime", () => {
+it("never accumulates duplicate or unknown identifiers, however many times actions repeat", () => {
+    // Every selector-driven collection in the session is a set in practice. A repeated or
+    // unknown identifier must not grow it, which is the difference between a bounded
+    // session and an unbounded trace.
+    const actions: SessionAction[] = [
+      { type: "start" },
+      ...Array.from({ length: 40 }, (): SessionAction => ({ type: "selectStation", stationId: "west" })),
+      { type: "selectStation", stationId: "not-a-station" },
+      { type: "selectStation", stationId: "central" },
+      { type: "selectStation", stationId: "central" }
+    ];
+    const state = actions.reduce((current, action) => machine.reduce(current, action), machine.initialState);
+
+    expect(state.inspectedStationIds).toEqual(["west", "central"]);
+    expect(state.inspectedStationIds.length).toBeLessThanOrEqual(guided.stations.length);
+  });
+
+  it("bounds opened and selected evidence by the evidence the scenario actually ships", () => {
+    const everyEvidenceId = guided.evidence.flatMap((evidence) => [evidence.id, evidence.id, "not-a-real-evidence-id"]);
+    const actions: SessionAction[] = everyEvidenceId.flatMap((evidenceId): SessionAction[] => [
+      { type: "openEvidence", evidenceId },
+      { type: "toggleEvidence", evidenceId }
+    ]);
+    const state = [{ type: "start" } as SessionAction, ...actions].reduce(
+      (current, action) => machine.reduce(current, action),
+      machine.initialState
+    );
+
+    expect(new Set(state.openedEvidenceIds).size).toBe(state.openedEvidenceIds.length);
+    expect(state.openedEvidenceIds.length).toBeLessThanOrEqual(guided.evidence.length);
+    expect(state.selectedEvidenceIds.length).toBeLessThanOrEqual(guided.evidence.length);
+    for (const id of [...state.openedEvidenceIds, ...state.selectedEvidenceIds]) {
+      expect(guided.evidence.some((evidence) => evidence.id === id), id).toBe(true);
+    }
+  });
+
+  it("bounds hint counters to the steps that exist", () => {
+    const actions: SessionAction[] = [
+      { type: "start" },
+      ...Array.from({ length: 25 }, (): SessionAction => ({ type: "useHint", stepId: "read-station-report" })),
+      { type: "useHint", stepId: "invented-step" }
+    ];
+    const state = actions.reduce((current, action) => machine.reduce(current, action), machine.initialState);
+
+    expect(Object.keys(state.hintsUsed)).toEqual(["read-station-report"]);
+    expect(state.hintsUsed["read-station-report"]).toBe(25);
+  });
+
+  it("keeps the clock inside the scenario timeline however far the player pushes it", () => {
+    let state = machine.reduce(machine.initialState, { type: "start" });
+    for (let i = 0; i < 200; i += 1) {
+      state = machine.reduce(state, { type: "advance", steps: 7 });
+    }
+    expect(state.minute).toBe(guided.timeline.maxMinute);
+
+    for (let i = 0; i < 200; i += 1) {
+      state = machine.reduce(state, { type: "setMinute", minute: -1000 });
+    }
+    expect(state.minute).toBe(0);
+  });
+
+  it("grows the attempt history only by deliberate revisions, and a reset clears it", () => {
+    let state = machine.reduce(machine.initialState, { type: "start" });
+    for (const action of observeEverything()) {
+      state = machine.reduce(state, action);
+    }
+    state = machine.reduce(state, { type: "setRange", field: "temperatureChangeC", range: accepted.temperatureChangeC });
+    state = machine.reduce(
+      state,
+      { type: "setRange", field: "precipitationProbabilityPct", range: accepted.precipitationProbabilityPct }
+    );
+    state = machine.reduce(state, { type: "setRange", field: "windDirectionDeg", range: accepted.windDirectionSectorsDeg[0]! });
+    state = machine.reduce(state, { type: "setRange", field: "transitionWindow", range: accepted.transitionArrivalMinute });
+    state = machine.reduce(state, { type: "setConfidence", confidence: "medium" });
+    state = machine.reduce(state, { type: "setRecommendation", recommendationId: "cool-sharp" });
+
+    const before = state.attempts.length;
+    for (let i = 0; i < 25; i += 1) {
+      state = machine.reduce(state, { type: "commit" });
+    }
+    // Committing repeatedly without revising does not stack attempts.
+    expect(state.attempts).toHaveLength(before + 1);
+
+    for (let i = 0; i < 25; i += 1) {
+      state = machine.reduce(state, { type: "revise" });
+      state = machine.reduce(state, { type: "commit" });
+    }
+    // Revision is the only thing that grows the history, and it is bounded by the player's
+    // own choices rather than by anything the system appends behind them.
+    expect(state.attempts).toHaveLength(before + 26);
+    expect(state.attempts.map((attempt) => attempt.attemptIndex)).toEqual(
+      state.attempts.map((_, index) => index)
+    );
+
+    state = machine.reduce(state, { type: "reset" });
+    expect(state.attempts).toHaveLength(0);
+    expect(state.phase).toBe("briefing");
+    expect(state.minute).toBe(0);
+  });
+});

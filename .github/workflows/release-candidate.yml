@@ -26,7 +26,7 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 35
     steps:
       - name: Require the immutable candidate version format
         shell: bash
@@ -44,10 +44,14 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
+      # Matches playwright.config.ts: the declared matrix includes all three engines.
+      - run: npx playwright install --with-deps chromium firefox webkit
       - run: npm run verify
       - run: npm run test:e2e
       - run: npm run test:host
+      - run: node scripts/bundle-report.mjs
+        env:
+          QUALIFICATION_SHA: ${{ github.sha }}
       - run: npm run release:build
         env:
           GAME_RELEASE_VERSION: ${{ inputs.version }}
@@ -71,6 +75,15 @@ jobs:
         with:
           name: weather-command-${{ inputs.version }}
           path: dist
+          retention-days: 30
+      - name: Upload the qualification evidence for this exact source SHA
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: weather-command-qualification-${{ github.sha }}
+          path: |
+            qualification/${{ github.sha }}
+            playwright-report
           retention-days: 30
 
   publish-r2:

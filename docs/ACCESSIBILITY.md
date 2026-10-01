@@ -56,7 +56,12 @@ Required equivalent structures:
 - trend table/text summaries;
 - explicit front/system status where needed for the mission.
 
-Selecting an item in the semantic station list and selecting its map marker must resolve to the same domain entity.
+Station selection lives in the semantic station list, and the map states the selection in words
+("West Station (selected)"). The map markers are deliberately **not** controls: the map is exposed
+as a single `role="img"` image, so an interactive descendant inside it would be hidden from
+assistive technology and would be a pointer-only control with no keyboard equivalent. The
+requirement is therefore that the map and the station list agree on which station is selected,
+not that both are independently operable.
 
 ## Charts
 
@@ -142,22 +147,43 @@ Simulation time and learner time are separate.
 
 ## Automated evidence
 
-At minimum:
-- axe-core on major states;
-- Playwright keyboard-critical paths;
-- touch/mobile viewport coverage;
-- reduced-motion path;
-- semantic element assertions.
+Implemented in `tests/e2e/smoke.spec.ts`, `tests/viz/*.test.tsx`, `tests/app/*.test.tsx` and
+`tests/game/tutorial.test.ts`:
+
+- axe-core on the mission list, briefing, observing, reduced-motion and motion-toggle states;
+- a keyboard-only path: focus a control, activate with `Enter`/`Space`, assert the focus target and
+  its text, and confirm the skip link resolves to `#workspace` on the briefing screen;
+- a `touch-chromium` Playwright project on a `Pixel 7` device descriptor, so the touch claim is a
+  measurement rather than an assumption;
+- the reduced-motion path reaching application state, asserted through the rendered control state
+  and the equivalent-information text on both the clock panel and the map;
+- 360 px width, 200% reflow and 400% reflow (the WCAG 1.4.10 threshold), each asserted as real
+  layout-viewport width rather than a CSS `zoom` property, which never asks the layout engine to
+  reflow;
+- zero cross-origin network requests, derived from the project config;
+- the autoplay interval updating the record, pausing, and being torn down on mission exit;
+- non-colour encodings and text/table equivalents for the map and both charts;
+- semantic-element assertions for every forecast control, station control and assistance control,
+  including arrow-key operation of the assistance radio group.
 
 ## Manual evidence
 
-Before release:
-- full keyboard mission;
-- screen-reader-oriented review of briefing, evidence, forecast, verification, and debrief;
-- 200% zoom/reflow;
-- phone touch flow;
-- non-color interpretation review;
-- reduced-motion review.
+Still required, and **not** substitutable by the checks above:
+
+- full keyboard mission, end to end, by a human;
+- screen-reader-oriented review of briefing, evidence, forecast, verification, and debrief with a
+  real screen reader (axe-core catches only a subset of real AT behaviour);
+- 200% zoom/reflow on a real browser zoom control;
+- phone touch flow on physical hardware;
+- non-color interpretation review with a human;
+- reduced-motion review on an operating system that requests it.
+
+## Known gap
+
+The map has no encoding for pressure, for forecast state, or for verification result. Pressure is
+present only as a chart series and a station table column; forecast state and verification are
+present only as text. This is recorded rather than hidden, and it is a design decision owed to
+WC-DESIGN (GAME-343) rather than something the renderer should invent.
 
 ## Release blocker
 

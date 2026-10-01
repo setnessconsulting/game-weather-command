@@ -110,3 +110,46 @@ WC-12 records:
 - console/network assertions;
 - representative animation/performance observation;
 - exact source/release SHA.
+
+## Enforcement status
+
+Which of these budgets an automated check actually fails on. A budget with no enforcement is a
+stated intention, and a qualification pass must not be read as if it were measured.
+
+### Enforced by an automated check
+
+| Budget | Enforced by |
+| --- | --- |
+| Compressed transfer <= 350 KiB | `scripts/bundle-report.mjs` (non-zero exit), run by `npm run qualify` and as an explicit step in both CI workflows |
+| Time step <= 16 ms median / <= 50 ms p95 | `tests/domain/timingBudget.test.ts` |
+| Forecast verification <= 16 ms median / <= 50 ms p95 | `tests/domain/timingBudget.test.ts` |
+| No runtime dependency beyond react / react-dom / zod | `scripts/check-privacy-surface.mjs` |
+| No fetch / XHR / WebSocket / web storage / analytics in `src` | `scripts/check-privacy-surface.mjs` |
+| Zero uncaught exceptions, unhandled rejections, console errors | `tests/e2e/smoke.spec.ts` |
+| Zero unexpected third-party network requests | `tests/e2e/smoke.spec.ts`, origin derived from project config |
+| Relative asset base; direct nested-host load; no >= 400 responses | `tests/e2e/nestedAssetBase.spec.ts` (chromium) |
+| No interval continues after mission teardown | `tests/app/accessibility.test.tsx`, plus the E2E autoplay-teardown case |
+| Coverage of the whole production surface | `vitest.config.ts` thresholds inside `npm run verify` |
+
+### Declared, not yet enforced
+
+These are release gates that need a WC-12/WC-14 measurement rather than prose. None of them is
+measured today, and a qualification pass does not certify them.
+
+| Budget | Why it is not enforced | Owner |
+| --- | --- | --- |
+| No single main-thread task > 200 ms on initial load | Needs a real browser performance trace, not jsdom or a headless smoke run | WC-14 |
+| First mission shell interactive without non-current mission assets | Needs network-waterfall capture against a real host | WC-13 / WC-14 |
+| Map selection/state update within one frame (desktop) / 100 ms (low-end) | Needs a rendered measurement; the map does not animate between snapshots today, so there is no frame to measure | WC-07 / WC-14 |
+| 60 fps; no repeated long-task pattern during transitions | Same | WC-14 |
+| Reduced-motion path performs no unnecessary interpolation loop | The app has no interpolation loop to measure; what is asserted is that the reduced path disables autoplay and states the equivalent information | WC-14 |
+| No continuous idle animation | Needs an idle observation over time | WC-14 |
+| No unbounded trace accumulation; replay histories bounded by scenario | The session stores attempts without a bound; needs a property test over many revisions | WC-06 / WC-12 |
+| Animations cancel on view change/unmount | The only interval is cleared on unmount and is now asserted; no other animation exists to check | WC-10 |
+| Audio nodes and listeners disposed | `src/audio` is authored but not yet wired into the app, so there is nothing to dispose | WC-10 |
+| All hashed assets cache as immutable | The nested-host server sends no `Cache-Control`; needs a header assertion against the real host | WC-13 |
+| A missing asset produces bounded error behaviour, not an endless spinner | Needs a fault-injection test | WC-13 |
+| Zero mixed-content / CSP violations | Needs a real host with a CSP to test against | WC-13 |
+| 390 × 844, 768 × 1024, 1440 × 900 viewports | Only 360 px, 640 px and 320 px layout widths are exercised today | WC-12 / WC-14 |
+| Real or representative touch device check | A `touch-chromium` Playwright project on a `Pixel 7` descriptor now covers the representative case; physical hardware remains WC-14 | WC-14 |
+| Clean-clone install/build from the published remote | Documented procedure; no automated step clones the remote and builds it | WC-12 |

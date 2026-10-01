@@ -177,7 +177,14 @@
   background: var(--surface-raised);
   color: var(--text);
   padding: var(--space-2) var(--space-4);
-  transition: background var(--transition-quick), border-color var(--transition-quick);
+  /*
+   * Only the border colour eases. No rule animates a background on hover, and the one
+   * state that does change the background (selected/pressed) also changes the text colour.
+   * Interpolating that pair produces a dark-on-dark frame that fails contrast - a real
+   * player can see it, and any check that samples the instant of the click sees it. The
+   * state change is instant; the border is the eased affordance.
+   */
+  transition: border-color var(--transition-quick);
 }
 
 .actionRow button:hover,
@@ -262,6 +269,10 @@
   color: #10202f;
   border-color: var(--focus);
   font-weight: 700;
+  /* Non-colour cue for the selected state, so it survives greyscale, high-contrast and
+     print. The bold weight alone is too subtle to carry the state on its own. */
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
 }
 
 .coachingStep {
@@ -294,6 +305,23 @@
 }
 
 /* ------------------------------ workspace ------------------------------- */
+
+.workspaceRegion {
+  display: grid;
+  gap: var(--space-5);
+  min-width: 0;
+  max-width: 100%;
+}
+
+.workspaceRegion:focus {
+  outline: none;
+}
+
+.workspaceRegion:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 4px;
+  border-radius: var(--radius-md);
+}
 
 .workspaceWrapper {
   display: grid;

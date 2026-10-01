@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { canonicalFrontPassageScenarios } from "@/scenarios";
 import {
   buildGuidedTutorial,
+  coachingComplete,
   contextualHint,
   createSessionMachine,
   currentTutorialStep,
@@ -26,6 +27,25 @@ const completeForecast = (): SessionAction[] => [
   { type: "setRange", field: "transitionWindow", range: accepted.transitionArrivalMinute },
   { type: "setConfidence", confidence: "medium" },
   { type: "setRecommendation", recommendationId: "cool-sharp" }
+];
+
+/** Every action needed to reach the debrief, with no coaching actions at all. */
+const completeRun = (): SessionAction[] => [
+  { type: "start" },
+  { type: "selectStation", stationId: "west" },
+  { type: "selectStation", stationId: "central" },
+  { type: "selectStation", stationId: "east" },
+  { type: "advance", steps: 2 },
+  { type: "openEvidence", evidenceId: "guided-stations-initial" },
+  { type: "openEvidence", evidenceId: "guided-pressure-trend" },
+  { type: "openEvidence", evidenceId: "guided-front-position" },
+  { type: "advance", steps: 1 },
+  { type: "openEvidence", evidenceId: "guided-precipitation-band" },
+  ...completeForecast(),
+  { type: "commit" },
+  { type: "setMinute", minute: machine.verificationMinute },
+  { type: "verify" },
+  { type: "finish" }
 ];
 
 describe("guided tutorial progression", () => {
@@ -80,16 +100,42 @@ describe("guided tutorial progression", () => {
     expect(tutorialProgress(machine, state).completed).toBe(tutorialProgress(machine, state).total);
   });
 
-  it("disappears when coaching is reduced or disabled, and never runs on independent missions", () => {
+  it("keeps the step list under 'hints on request' but reveals nothing until asked", () => {
     const started = run([{ type: "start" }]);
     expect(currentTutorialStep(machine, started)?.id).toBe("read-station-report");
-    expect(currentTutorialStep(machine, machine.reduce(started, { type: "setAssistance", assistance: "reduced" }))).toBeUndefined();
-    expect(currentTutorialStep(machine, machine.reduce(started, { type: "setAssistance", assistance: "off" }))).toBeUndefined();
+
+    const reduced = machine.reduce(started, { type: "setAssistance", assistance: "reduced" });
+    const step = currentTutorialStep(machine, reduced);
+    expect(step?.id).toBe("read-station-report");
+    // The promise of the label: nothing is revealed until the player asks.
+    expect(visibleHints(step!, reduced)).toEqual([]);
+    const asked = machine.reduce(reduced, { type: "useHint", stepId: step!.id });
+    expect(visibleHints(step!, asked)).toHaveLength(1);
+  });
+
+  it("goes silent when coaching is disabled, and never runs on independent missions", () => {
+    const started = run([{ type: "start" }]);
+    const off = machine.reduce(started, { type: "setAssistance", assistance: "off" });
+    expect(currentTutorialStep(machine, off)).toBeUndefined();
 
     const independent = createSessionMachine(canonicalFrontPassageScenarios[1]!);
     const independentStarted = independent.reduce(independent.initialState, { type: "start" });
     expect(currentTutorialStep(independent, independentStarted)).toBeUndefined();
     expect(buildGuidedTutorial(independent).length).toBeGreaterThan(0);
+  });
+
+  it("stands down once the step list is complete, which is distinct from being disabled", () => {
+    let state = machine.initialState;
+    for (const action of completeRun()) {
+      state = machine.reduce(state, action);
+    }
+    expect(currentTutorialStep(machine, state)).toBeUndefined();
+    expect(coachingComplete(machine, state)).toBe(true);
+
+    // Same undefined step, different reason: coaching is still wanted here.
+    const startedAgain = machine.reduce(machine.initialState, { type: "start" });
+    expect(currentTutorialStep(machine, startedAgain)?.id).toBe("read-station-report");
+    expect(coachingComplete(machine, startedAgain)).toBe(false);
   });
 
   it("reveals one hint at a time and never more than it has", () => {
@@ -100,6 +146,60 @@ describe("guided tutorial progression", () => {
     expect(visibleHints(step, once)).toHaveLength(2);
     const twice = machine.reduce(once, { type: "useHint", stepId: step.id });
     expect(visibleHints(step, twice)).toHaveLength(2);
+  });
+});
+
+describe("no dead ends", () => {
+  it("completes the whole guided path with no hint and no coaching action at all", () => {
+    const state = run(completeRun());
+    expect(state.phase).toBe("debrief");
+    const progress = tutorialProgress(machine, state);
+    expect(progress.completed).toBe(progress.total);
+    expect(state.hintsUsed).toEqual({});
+  });
+
+  it("leaves the cursor on a reachable step after a premature, invalid or unknown action", () => {
+    const started = run([{ type: "start" }]);
+    const wrongActions: readonly SessionAction[] = [
+      // Premature: commit with an empty draft, and compare before the window closes.
+      { type: "commit" },
+      { type: "verify" },
+      // Unknown identifiers: not a station, not evidence, not a hint.
+      { type: "selectStation", stationId: "atlantis" },
+      { type: "openEvidence", evidenceId: "not-a-real-evidence-id" },
+      { type: "useHint", stepId: "not-a-real-step" },
+      // Nonsensical time travel, and past the end of the timeline.
+      { type: "setMinute", minute: -60 },
+      { type: "advance", steps: 999 }
+    ];
+
+    for (const action of wrongActions) {
+      const after = machine.reduce(started, action);
+      // The session survives, and the player is still told what to do next.
+      expect(after.phase, JSON.stringify(action)).toBe("observing");
+      const step = currentTutorialStep(machine, after);
+      expect(step?.id, JSON.stringify(action)).toBe("read-station-report");
+      expect(visibleHints(step!, after).length).toBeGreaterThan(0);
+    }
+  });
+
+  it("every gated step is reachable from the initial state using only its own condition", () => {
+    // The step list is strictly sequential, so a step whose condition can never be met from
+    // the state the player is in would strand them. Walk the mission and assert that each
+    // step becomes the current step before it is completed.
+    const steps = buildGuidedTutorial(machine);
+    let state = machine.initialState;
+    let index = 0;
+    for (const action of completeRun()) {
+      state = machine.reduce(state, action);
+      while (index < steps.length && steps[index]!.isComplete(state)) index += 1;
+      const step = currentTutorialStep(machine, state);
+      // Whenever a step is outstanding it is the next unmet one, never an unreachable one.
+      expect(step?.id ?? "complete", JSON.stringify({ action, index })).toBe(
+        steps[index]?.id ?? "complete"
+      );
+    }
+    expect(index).toBe(steps.length);
   });
 });
 
