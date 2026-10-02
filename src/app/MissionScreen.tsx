@@ -50,7 +50,7 @@ export function MissionScreen({ scenario, mission, onExit }: MissionScreenProps)
 
   const report = snapshot.activeAttempt?.verification ?? snapshot.latestVerification;
   const canCompare = state.minute >= machine.verificationMinute;
-  const editorKey = `${state.attempts.length}-${state.activeAttemptIndex === null ? "open" : "locked"}`;
+  const editorKey = `${state.attemptCount}-${state.activeAttemptIndex === null ? "open" : "locked"}`;
 
   return (
     <div className={styles.mission}>
@@ -168,7 +168,7 @@ export function MissionScreen({ scenario, mission, onExit }: MissionScreenProps)
           {state.phase === "verified" && report ? (
             <VerificationPanel
               report={report}
-              attemptCount={state.attempts.length}
+              attemptCount={state.attemptCount}
               onRevise={() => dispatch({ type: "revise" })}
               onOpenDebrief={() => dispatch({ type: "finish" })}
             />

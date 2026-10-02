@@ -58,6 +58,7 @@ export {
 } from "./verification";
 
 export {
+  MAX_RETAINED_FORECAST_ATTEMPTS,
   createSessionMachine,
   recommendationOptionsFor,
   replaySession,

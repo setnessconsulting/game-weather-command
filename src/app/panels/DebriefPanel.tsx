@@ -136,6 +136,11 @@ export function DebriefPanel({
 
       <section className={styles.dimensionGroup} aria-labelledby="attempts-heading">
         <h3 id="attempts-heading">Attempts</h3>
+        {state.attemptCount > state.attempts.length ? (
+          <p className={styles.note}>
+            Showing the most recent {state.attempts.length} of {state.attemptCount} recorded attempts.
+          </p>
+        ) : null}
         <ul className={styles.bulletList}>
           {state.attempts.map((attempt) => (
             <li key={attempt.attemptIndex}>

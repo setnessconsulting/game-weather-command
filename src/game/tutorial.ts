@@ -138,7 +138,7 @@ export function buildGuidedTutorial(machine: TutorialSource): readonly TutorialS
       "Committing does not end the mission. You can revise as many times as you like.",
       "Commit before the published forecast window closes. After that your entry is recorded as a hindcast."
     ],
-    isComplete: (state) => state.attempts.length > 0
+    isComplete: (state) => state.attemptCount > 0
   });
 
   steps.push({
@@ -150,7 +150,7 @@ export function buildGuidedTutorial(machine: TutorialSource): readonly TutorialS
       "Use the advance controls. Nothing is hidden from you once the window has closed.",
       "Read each dimension separately. A forecast can be right about direction and wrong about timing."
     ],
-    isComplete: (state) => state.attempts.some((attempt) => attempt.verification !== undefined)
+    isComplete: (state) => state.latestVerification !== undefined
   });
 
   steps.push({
@@ -238,7 +238,7 @@ export function contextualHint(machine: TutorialSource, state: ForecastSessionSt
   if (state.forecast.confidence === null || state.forecast.recommendationId === null) {
     return "Choose a confidence level and a recommendation before committing.";
   }
-  if (state.attempts.length === 0) {
+  if (state.attemptCount === 0) {
     return "Commit the forecast, then advance the clock to the close of the published window to compare it with the record.";
   }
   return "Advance the clock to the close of the published forecast window, then compare.";

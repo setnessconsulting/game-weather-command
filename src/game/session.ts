@@ -36,6 +36,9 @@ export interface SessionStatus {
   readonly tone: "info" | "attention" | "success";
 }
 
+/** The session keeps a fixed-size learning history while attemptCount preserves the lifetime total. */
+export const MAX_RETAINED_FORECAST_ATTEMPTS = 64;
+
 export interface ForecastSessionState {
   readonly scenarioId: string;
   readonly contentVersion: string;
@@ -47,7 +50,11 @@ export interface ForecastSessionState {
   readonly selectedEvidenceIds: readonly string[];
   readonly forecast: ForecastDraft;
   readonly attempts: readonly ForecastAttempt[];
+  /** Monotonic number of forecasts committed in this session, including entries no longer retained. */
+  readonly attemptCount: number;
   readonly activeAttemptIndex: number | null;
+  /** Preserved separately so the latest comparison survives when its attempt ages out of the history. */
+  readonly latestVerification: VerificationReport | undefined;
   readonly assistance: AssistanceLevel;
   readonly hintsUsed: Readonly<Record<string, number>>;
   readonly status: SessionStatus | undefined;
@@ -114,7 +121,9 @@ export function createSessionMachine(scenarioInput: unknown): SessionMachine {
     selectedEvidenceIds: [],
     forecast: EMPTY_FORECAST_DRAFT,
     attempts: [],
+    attemptCount: 0,
     activeAttemptIndex: null,
+    latestVerification: undefined,
     assistance: scenario.missionType === "guided-cold-front" ? "guided" : "reduced",
     hintsUsed: {},
     status: undefined
@@ -233,7 +242,7 @@ export function createSessionMachine(scenarioInput: unknown): SessionMachine {
           };
         }
         const attempt: ForecastAttempt = {
-          attemptIndex: state.attempts.length,
+          attemptIndex: state.attemptCount,
           committedAtMinute: state.minute,
           forecast: state.forecast,
           selectedEvidenceIds: [...state.selectedEvidenceIds]
@@ -242,7 +251,8 @@ export function createSessionMachine(scenarioInput: unknown): SessionMachine {
         return {
           ...state,
           phase: "awaiting-outcome",
-          attempts: [...state.attempts, attempt],
+          attempts: [...state.attempts, attempt].slice(-MAX_RETAINED_FORECAST_ATTEMPTS),
+          attemptCount: state.attemptCount + 1,
           activeAttemptIndex: attempt.attemptIndex,
           status: {
             message: hindcast
@@ -260,7 +270,10 @@ export function createSessionMachine(scenarioInput: unknown): SessionMachine {
       }
 
       case "revise": {
-        const previous = state.activeAttemptIndex !== null ? state.attempts[state.activeAttemptIndex] : undefined;
+        const previous =
+          state.activeAttemptIndex !== null
+            ? state.attempts.find((attempt) => attempt.attemptIndex === state.activeAttemptIndex)
+            : undefined;
         return {
           ...state,
           phase: "observing",
@@ -268,7 +281,7 @@ export function createSessionMachine(scenarioInput: unknown): SessionMachine {
           forecast: previous ? previous.forecast : state.forecast,
           status: {
             message: previous
-              ? `Revision ${state.attempts.length + 1} started from your last committed forecast. Changing it is not a penalty; it is the job.`
+              ? `Revision ${state.attemptCount + 1} started from your last committed forecast. Changing it is not a penalty; it is the job.`
               : "Revision started.",
             tone: "info"
           }
@@ -293,7 +306,13 @@ export function createSessionMachine(scenarioInput: unknown): SessionMachine {
             }
           };
         }
-        const attempt = state.attempts[state.activeAttemptIndex]!;
+        const attempt = state.attempts.find((candidate) => candidate.attemptIndex === state.activeAttemptIndex);
+        if (!attempt) {
+          return {
+            ...state,
+            status: { message: "The active forecast is no longer available to compare. Commit it again to continue.", tone: "attention" }
+          };
+        }
         const report = verifyForecast({
           scenario,
           kernel,
@@ -307,9 +326,10 @@ export function createSessionMachine(scenarioInput: unknown): SessionMachine {
         return {
           ...state,
           phase: "verified",
-          attempts: state.attempts.map((candidate, index) =>
-            index === state.activeAttemptIndex ? { ...candidate, verification: report } : candidate
+          attempts: state.attempts.map((candidate) =>
+            candidate.attemptIndex === state.activeAttemptIndex ? { ...candidate, verification: report } : candidate
           ),
+          latestVerification: report,
           status: { message: report.headline, tone: "success" }
         };
       }
@@ -351,8 +371,10 @@ export interface SessionSnapshot {
 
 export function sessionSnapshot(state: ForecastSessionState): SessionSnapshot {
   const activeAttempt =
-    state.activeAttemptIndex !== null ? state.attempts[state.activeAttemptIndex] : undefined;
-  const latestVerification = [...state.attempts].reverse().find((attempt) => attempt.verification)?.verification;
+    state.activeAttemptIndex !== null
+      ? state.attempts.find((attempt) => attempt.attemptIndex === state.activeAttemptIndex)
+      : undefined;
+  const latestVerification = state.latestVerification;
   return { state, activeAttempt, latestVerification };
 }
 

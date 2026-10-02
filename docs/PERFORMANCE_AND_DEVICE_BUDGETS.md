@@ -144,7 +144,7 @@ measured today, and a qualification pass does not certify them.
 | 60 fps; no repeated long-task pattern during transitions | Same | WC-14 |
 | Reduced-motion path performs no unnecessary interpolation loop | The app has no interpolation loop to measure; what is asserted is that the reduced path disables autoplay and states the equivalent information | WC-14 |
 | No continuous idle animation | Needs an idle observation over time | WC-14 |
-| No unbounded trace accumulation; replay histories bounded by scenario | The session stores attempts without a bound; needs a property test over many revisions | WC-06 / WC-12 |
+| No unbounded trace accumulation; replay histories bounded by scenario | Session state retains at most 64 forecast attempts; a 512-revision property check verifies the cap, monotonic attempt numbering, and preservation of the latest comparison | `tests/game/session.test.ts` |
 | Animations cancel on view change/unmount | The only interval is cleared on unmount and is now asserted; no other animation exists to check | WC-10 |
 | Audio nodes and listeners disposed | `src/audio` is authored but not yet wired into the app, so there is nothing to dispose | WC-10 |
 | All hashed assets cache as immutable | The nested-host server sends no `Cache-Control`; needs a header assertion against the real host | WC-13 |

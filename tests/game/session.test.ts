@@ -3,6 +3,8 @@ import { describe, expect, it } from "vitest";
 import { canonicalFrontPassageScenarios, parseWeatherScenario, type WeatherScenarioV1 } from "@/scenarios";
 import {
   createSessionMachine,
+  buildGuidedTutorial,
+  MAX_RETAINED_FORECAST_ATTEMPTS,
   replaySession,
   sessionSnapshot,
   sessionValidation,
@@ -316,7 +318,7 @@ it("never accumulates duplicate or unknown identifiers, however many times actio
     expect(state.minute).toBe(0);
   });
 
-  it("grows the attempt history only by deliberate revisions, and a reset clears it", () => {
+  it("bounds retained attempt history while preserving lifetime counts and the latest comparison", () => {
     let state = machine.reduce(machine.initialState, { type: "start" });
     for (const action of observeEverything()) {
       state = machine.reduce(state, action);
@@ -331,26 +333,39 @@ it("never accumulates duplicate or unknown identifiers, however many times actio
     state = machine.reduce(state, { type: "setConfidence", confidence: "medium" });
     state = machine.reduce(state, { type: "setRecommendation", recommendationId: "cool-sharp" });
 
-    const before = state.attempts.length;
     for (let i = 0; i < 25; i += 1) {
       state = machine.reduce(state, { type: "commit" });
     }
     // Committing repeatedly without revising does not stack attempts.
-    expect(state.attempts).toHaveLength(before + 1);
+    expect(state.attempts).toHaveLength(1);
+    expect(state.attemptCount).toBe(1);
 
-    for (let i = 0; i < 25; i += 1) {
+    state = machine.reduce(state, { type: "setMinute", minute: machine.verificationMinute });
+    state = machine.reduce(state, { type: "verify" });
+    const firstReport = state.latestVerification;
+    expect(firstReport).toBeDefined();
+
+    for (let i = 0; i < 512; i += 1) {
       state = machine.reduce(state, { type: "revise" });
       state = machine.reduce(state, { type: "commit" });
     }
-    // Revision is the only thing that grows the history, and it is bounded by the player's
-    // own choices rather than by anything the system appends behind them.
-    expect(state.attempts).toHaveLength(before + 26);
-    expect(state.attempts.map((attempt) => attempt.attemptIndex)).toEqual(
-      state.attempts.map((_, index) => index)
-    );
+    expect(state.attempts).toHaveLength(MAX_RETAINED_FORECAST_ATTEMPTS);
+    expect(state.attemptCount).toBe(513);
+    expect(state.attempts[0]!.attemptIndex).toBe(state.attemptCount - MAX_RETAINED_FORECAST_ATTEMPTS);
+    expect(state.attempts.at(-1)!.attemptIndex).toBe(state.attemptCount - 1);
+    expect(state.activeAttemptIndex).toBe(state.attemptCount - 1);
+    expect(sessionSnapshot(state).activeAttempt?.attemptIndex).toBe(state.attemptCount - 1);
+    expect(state.attempts.some((attempt) => attempt.verification !== undefined)).toBe(false);
+    expect(state.latestVerification).toBe(firstReport);
+    expect(sessionSnapshot(state).latestVerification).toBe(firstReport);
+    expect(
+      buildGuidedTutorial({ scenario: guided }).find((step) => step.id === "compare-with-record")?.isComplete(state)
+    ).toBe(true);
 
     state = machine.reduce(state, { type: "reset" });
     expect(state.attempts).toHaveLength(0);
+    expect(state.attemptCount).toBe(0);
+    expect(state.latestVerification).toBeUndefined();
     expect(state.phase).toBe("briefing");
     expect(state.minute).toBe(0);
   });
