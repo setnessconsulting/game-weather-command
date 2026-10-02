@@ -32,8 +32,8 @@ command, and CI runs the same commands on the same lockfile.
 | 2 | bundle report | `node scripts/bundle-report.mjs` | compressed HTML+CSS+JS transfer vs the 350 KiB WC-01 budget |
 | 3 | browser E2E | `npm run test:e2e:run` | Chromium, Firefox, WebKit and a touch device; axe-core on every phase reached; console-error and unhandled-rejection assertions; zero cross-origin network assertion; keyboard-only path; 360 px; 200% and 400% reflow; reduced-motion behaviour; autoplay teardown |
 | 4 | nested-host E2E | `npm run test:host:run` | production build under the games-site versioned asset base (chromium) |
-| 5 | release manifest | `npm run release:manifest` | writes the release manifest from the built artifact with the qualification's source SHA |
-| 6 | release check | `npm run release:check` | release manifest identity/provenance validation against the built artifact |
+| 5 | release manifest | `npm run release:manifest` | writes the release manifest from the built artifact with the qualification's source SHA, versioned provenance inventory, and output-file provenance fields |
+| 6 | release check | `npm run release:check` | release manifest identity, source-inventory checksum, file hashes, and provenance mappings against the built artifact |
 | 7 | manifest SHA binding | manifest `commit` must equal the qualification's full source SHA | proves the release identity describes the same source commit |
 
 Steps 3 and 4 require a build first; `npm run test:e2e` and `npm run test:host` include it,

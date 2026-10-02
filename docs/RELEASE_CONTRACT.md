@@ -67,6 +67,9 @@ Minimum fields:
 - artifact-file hashes or equivalent integrity inventory;
 - provenance manifest version.
 
+Each emitted file record also carries its provenance ID, license category, and release-approval
+state. Candidate approval remains pending until the named human reviews are recorded.
+
 ## Immutable artifact rule
 
 Published versioned objects are never overwritten.

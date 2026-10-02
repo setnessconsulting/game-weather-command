@@ -17,12 +17,12 @@ This matrix defines the minimum evidence expected before each downstream story c
 | GAME-345 / WC-07 | production renderer | representative scenarios rendered; reduced motion; non-color encodings; performance evidence | Station pressure/tendency callouts and explicit draft/committed observation-only map states implemented. Frame-rate and long-task budgets remain unmeasured; human design review remains outstanding |
 | GAME-346 / WC-08 | accessible shell | complete pointer/keyboard/touch mission; axe checks; 360 px; 200% zoom; focus behavior | Automated evidence complete across four browser projects. Real screen-reader experience is WC-14 human evidence |
 | GAME-347 / WC-09 | guided mission | tutorial/hint/recovery tests; no dead end; human first-use evidence | Automated evidence complete, including wrong-action recovery and step reachability. Human first-use playtest outstanding |
-| GAME-348 / WC-10 | production fidelity | final assets; provenance; motion/audio tuning; mobile polish; no placeholders | Not started |
+| GAME-348 / WC-10 | production fidelity | final assets; provenance; motion/audio tuning; mobile polish; no placeholders | Machine-readable provenance inventory is bound into the release manifest; independent design/originality review, motion/audio and device polish remain open |
 | GAME-349 / WC-11 | production mission set | independent missions; seeded variants; balance; final science review; target-age evidence | Not started |
-| GAME-350 / WC-12 | qualification suite | exact-candidate unit/E2E/a11y/performance/privacy/build package | One command produces the package for an exact clean SHA. Renderer performance budgets and clean-clone automation remain open |
-| GAME-351 / WC-13 | immutable preview | exact source SHA → immutable R2 release; games-site preview; nested-host verification | Done |
+| GAME-350 / WC-12 | qualification suite | exact-candidate unit/E2E/a11y/performance/privacy/build package | One command produces the package for an exact clean SHA and binds each emitted file to the versioned provenance inventory. Renderer performance budgets and clean-clone automation remain open |
+| GAME-351 / WC-13 | immutable preview | exact source SHA → immutable R2 release; games-site preview; nested-host verification | Jira says Done (updated 2026-09-27); exact versioned artifact and preview-host readback are not in the evidence recorded here; see `docs/RELEASE_RECONCILIATION.md` |
 | GAME-352 / WC-14 | human/comparator gate | frozen rubric; independent review; science review; target-age playtest; a11y/device review; remediation closed | Not started |
-| GAME-353 / WC-PROMOTE | production release | exact approved artifact selected; live smoke; rollback exercise; restored final state | Done |
+| GAME-353 / WC-PROMOTE | production release | exact approved artifact selected; live smoke; rollback exercise; restored final state | Jira says Done (updated 2026-09-21), but the production launcher says “Not playable yet” and the play route says “Coming soon”; promotion remains unverified |
 | GAME-354 / WC-15 | closeout | production truth reconciled; exact SHAs/versions; docs current; no blocking issue remains | Not started |
 
 ## Cross-story rules
