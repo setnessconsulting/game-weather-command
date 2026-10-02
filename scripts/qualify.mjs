@@ -94,6 +94,7 @@ if (dirty.length > 0) {
     label: "release-manifest-source-sha",
     command: "dist/release-manifest.json commit equals qualification source SHA",
     status: releaseManifest?.commit === sourceSha ? "pass" : "fail",
+    durationMs: 0,
     expectedSourceSha: sourceSha,
     actualCommit: releaseManifest?.commit ?? null
   });
