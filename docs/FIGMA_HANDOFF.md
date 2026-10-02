@@ -1,8 +1,22 @@
 # Weather Command — Design Board Handoff
 
-Status: AI-authored responsive design source, version 1. The source is ready to import into a
-Figma design file. No cloud file key or Figma version is claimed until the imported file is
-created and read back.
+Status: AI-authored responsive design source, version 1, with a native Figma draft and named
+version checkpoint saved. This is a design artifact only; independent science, comparator, and
+accessibility review remain open before it can become release authority.
+
+## Native Figma file
+
+- File: [Weather Command — Forecast Desk v1](https://www.figma.com/design/0SuKpGKh2NOjMAHsRarvhL/Weather-Command-Forecast-Desk-v1?version-id=2405904525078777725)
+- File key: `0SuKpGKh2NOjMAHsRarvhL`
+- Named version: `Weather Command v1 — GAME-343 design handoff`
+- Version ID: `2405904525078777725`
+- The native file contains editable desktop mission (1440×900), tablet mission (768×1024), phone
+  mission (390×844), and desktop debrief (1440×900) frames, plus reusable Weather Command color
+  and typography styles.
+- The Figma agent reported that its built-in design quality check found no errors. This is not an
+  independent science, comparator, target-age, or accessibility sign-off.
+- The native file was generated in Figma and saved separately from the repository SVG below; the
+  SVG has not been imported into this file.
 
 ## Design source
 
@@ -34,8 +48,9 @@ created and read back.
 
 ## Before this becomes a release design authority
 
-1. Import the SVG into Figma under Andrew's selected account and save the editable file.
-2. Record its exact file URL/key, version, and the imported page/frame names here and in GAME-343.
+1. Review the native Figma frames against the repository SVG and reconcile any differences before
+   declaring either source authoritative.
+2. Record the exact file URL/key, version, and page/frame names here and in GAME-343.
 3. Review the pressure and forecast-state choices with the independent science and comparator
    reviewers. Record changes rather than treating this AI-authored concept as sign-off.
 4. Reconcile the approved design with the production components, accessibility equivalents,
