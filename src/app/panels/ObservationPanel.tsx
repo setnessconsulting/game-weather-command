@@ -91,7 +91,7 @@ export function ObservationPanel({
   const lastReading = readings?.[readings.length - 1]?.observation;
   const committedAttempt =
     state.phase === "awaiting-outcome" && state.activeAttemptIndex !== null
-      ? state.attempts[state.activeAttemptIndex]
+      ? state.attempts.find((attempt) => attempt.attemptIndex === state.activeAttemptIndex)
       : undefined;
 
   const temperatureLines = trendSeries.map(({ station, series }, index) => ({
