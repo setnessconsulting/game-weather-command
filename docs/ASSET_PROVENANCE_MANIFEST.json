@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "1.0.0",
+  "version": "wc-assets-v1",
+  "game": "weather-command",
+  "entries": [
+    {
+      "provenanceId": "wc-static-shell",
+      "category": "static-html-shell",
+      "sourcePaths": ["index.html"],
+      "creator": "Weather Command project team",
+      "creationMethod": "Original static HTML authored for this project",
+      "sourceReference": "Original project source at index.html; no external source asset",
+      "modifications": "No third-party assets are embedded in the static shell",
+      "rightsBasis": "Project-original work; independent design review is pending",
+      "licenseCategory": "project-original",
+      "releaseApproval": "pending-human-review",
+      "reviewer": null,
+      "reviewDate": null
+    },
+    {
+      "provenanceId": "wc-interface-styles",
+      "category": "interface-styles-and-patterns",
+      "sourcePaths": ["src/**/*.css"],
+      "creator": "Weather Command project team",
+      "creationMethod": "Original CSS layout, typography tokens, and non-color visual patterns",
+      "sourceReference": "Original project CSS under src; no external source asset",
+      "modifications": "No third-party style, font, image, or pattern assets are bundled",
+      "rightsBasis": "Project-original work; independent design review is pending",
+      "licenseCategory": "project-original",
+      "releaseApproval": "pending-human-review",
+      "reviewer": null,
+      "reviewDate": null
+    },
+    {
+      "provenanceId": "wc-game-runtime",
+      "category": "game-interface-and-inline-vector-graphics",
+      "sourcePaths": ["src/**/*.ts", "src/**/*.tsx"],
+      "creator": "Weather Command project team",
+      "creationMethod": "Original React and TypeScript interface with project-authored inline SVG maps and charts",
+      "sourceReference": "Original project source under src; no external source asset",
+      "modifications": "Inline vector graphics are authored in the application source; no borrowed comparator artwork is used",
+      "rightsBasis": "Project-original work; independent originality and design review is pending",
+      "licenseCategory": "project-original",
+      "releaseApproval": "pending-human-review",
+      "reviewer": null,
+      "reviewDate": null
+    }
+  ],
+  "distributionNotes": {
+    "standaloneImages": "None are emitted by the current production build.",
+    "fonts": "No font files are bundled; the interface uses the system font stack.",
+    "audio": "No audio files are emitted by the current production build.",
+    "mapTiles": "No third-party map tiles or external map datasets are used.",
+    "designReference": "design/figma/weather-command-v1.svg is an AI-authored design reference and is not part of the runtime build."
+  }
+}

@@ -120,6 +120,13 @@ Minimum shipping fields:
 - license category;
 - release approval.
 
+The current inventory is [`ASSET_PROVENANCE_MANIFEST.json`](ASSET_PROVENANCE_MANIFEST.json).
+The release-manifest builder copies its version and entries into
+`dist/release-manifest.json`, binds the source inventory by SHA-256, and tags each emitted
+HTML/CSS/JavaScript file with its provenance ID, license category, and release-approval state.
+An emitted file without a provenance mapping fails manifest generation. The current entries are
+still `pending-human-review`; this inventory does not grant production approval.
+
 ## Release blocker
 
 Unknown or incompatible provenance for a shipping asset is release-blocking until the asset is:

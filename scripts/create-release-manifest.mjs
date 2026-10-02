@@ -14,6 +14,7 @@ const checkOnly = flags.includes("--check");
 const manifestPath = path.join(distDir, "release-manifest.json");
 const GAME_SLUG = "weather-command";
 const ENTRY_FILE = "index.html";
+const PROVENANCE_MANIFEST_PATH = path.resolve("docs/ASSET_PROVENANCE_MANIFEST.json");
 
 const contentTypes = new Map([
   [".css", "text/css"],
@@ -62,11 +63,71 @@ async function lockfileIdentity() {
   }
 }
 
+async function readProvenanceManifest() {
+  const raw = await fs.readFile(PROVENANCE_MANIFEST_PATH, "utf8");
+  const manifest = JSON.parse(raw);
+  if (
+    manifest.schemaVersion !== "1.0.0" ||
+    typeof manifest.version !== "string" ||
+    manifest.game !== GAME_SLUG ||
+    !Array.isArray(manifest.entries) ||
+    manifest.entries.length === 0
+  ) {
+    throw new Error("Asset provenance manifest must identify this game and contain versioned entries");
+  }
+
+  const ids = new Set();
+  for (const entry of manifest.entries) {
+    if (
+      typeof entry.provenanceId !== "string" ||
+      ids.has(entry.provenanceId) ||
+      typeof entry.category !== "string" ||
+      !Array.isArray(entry.sourcePaths) ||
+      entry.sourcePaths.length === 0 ||
+      typeof entry.creator !== "string" ||
+      typeof entry.creationMethod !== "string" ||
+      typeof entry.sourceReference !== "string" ||
+      typeof entry.modifications !== "string" ||
+      typeof entry.rightsBasis !== "string" ||
+      typeof entry.licenseCategory !== "string" ||
+      typeof entry.releaseApproval !== "string"
+    ) {
+      throw new Error("Asset provenance manifest contains an incomplete or duplicate entry");
+    }
+    ids.add(entry.provenanceId);
+  }
+
+  return { manifest, identity: { path: "docs/ASSET_PROVENANCE_MANIFEST.json", ...(await sha256(PROVENANCE_MANIFEST_PATH)) } };
+}
+
+function provenanceForOutput(relative, provenanceEntries) {
+  const extension = path.extname(relative).toLowerCase();
+  const provenanceId =
+    relative === ENTRY_FILE
+      ? "wc-static-shell"
+      : relative.startsWith("assets/") && extension === ".css"
+        ? "wc-interface-styles"
+        : relative.startsWith("assets/") && extension === ".js"
+          ? "wc-game-runtime"
+          : undefined;
+  const entry = provenanceEntries.find((candidate) => candidate.provenanceId === provenanceId);
+  if (!entry) throw new Error(`No asset provenance entry is mapped to release file: ${relative}`);
+  return entry;
+}
+
 async function buildManifest() {
   const version = process.env.GAME_RELEASE_VERSION ?? process.env.npm_package_version ?? "0.1.0";
+  const provenance = await readProvenanceManifest();
   const files = {};
   for (const file of await filesUnder(distDir)) {
-    files[file.relative] = { ...(await sha256(file.absolute)), contentType: contentTypeFor(file.relative) };
+    const entry = provenanceForOutput(file.relative, provenance.manifest.entries);
+    files[file.relative] = {
+      ...(await sha256(file.absolute)),
+      contentType: contentTypeFor(file.relative),
+      provenanceId: entry.provenanceId,
+      licenseCategory: entry.licenseCategory,
+      releaseApproval: entry.releaseApproval
+    };
   }
 
   return {
@@ -78,6 +139,12 @@ async function buildManifest() {
     manifestFile: "release-manifest.json",
     r2Prefix: `${GAME_SLUG}/${version}/`,
     lockfile: await lockfileIdentity(),
+    provenanceManifestVersion: provenance.manifest.version,
+    provenanceManifest: {
+      ...provenance.identity,
+      schemaVersion: provenance.manifest.schemaVersion,
+      entries: provenance.manifest.entries
+    },
     validationStatus: "candidate-not-approved",
     validationEvidence: {
       status: "candidate-not-approved",
