@@ -39,10 +39,11 @@ const mapSvg = (): SVGSVGElement => {
 };
 
 describe("weather map semantics", () => {
-  it("is a single accessible image whose label points at the text equivalent", () => {
+  it("is a single accessible image whose label includes pressure readings and points at their text equivalent", () => {
     renderMap();
     const label = mapSvg().getAttribute("aria-label") ?? "";
-    expect(label).toMatch(/repeated as text directly below the map/i);
+    expect(label).toMatch(/Station pressure and pressure tendency are shown beside each station/i);
+    expect(label).toContain("West Station: 1007 hPa, steady");
     expect(label).toMatch(/stations are selected from the station list/i);
   });
 
@@ -109,6 +110,28 @@ describe("weather map semantics", () => {
     // The unselected stations are labelled plainly, with no ring and no colour dependency.
     expect(screen.getByText(/^West Station$/)).toBeTruthy();
     expect(screen.getByText(/^Central Station$/)).toBeTruthy();
+  });
+
+  it("shows current pressure and tendency beside each mapped station", () => {
+    renderMap(guided, 0);
+    expect(screen.getAllByText("1007 hPa").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("1006 hPa").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("1005 hPa").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("steady").length).toBeGreaterThanOrEqual(3);
+    expect(screen.getByText(/pressure and pressure tendency are written beside each station/i)).toBeTruthy();
+  });
+
+  it("updates station pressure callouts from the same deterministic snapshot", () => {
+    const pressureLabelsAt = (minute: number): string => {
+      const { container, unmount } = renderMap(guided, minute);
+      const text = Array.from(container.querySelectorAll("svg text"), (item) => item.textContent ?? "")
+        .filter((label) => label.endsWith("hPa"))
+        .join("|");
+      unmount();
+      return text;
+    };
+
+    expect(pressureLabelsAt(120)).not.toBe(pressureLabelsAt(0));
   });
 });
 

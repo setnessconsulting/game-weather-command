@@ -110,6 +110,22 @@
   stroke-width: 0.9;
 }
 
+.stationPressure,
+.stationTendency {
+  fill: var(--text-secondary);
+  font-size: 2.45px;
+  font-weight: 600;
+  paint-order: stroke;
+  stroke: rgb(8 19 31 / 92%);
+  stroke-width: 0.75;
+}
+
+.stationTendency {
+  fill: var(--text-muted);
+  font-size: 2.15px;
+  font-weight: 500;
+}
+
 .legend {
   margin: 0;
   padding: 0;

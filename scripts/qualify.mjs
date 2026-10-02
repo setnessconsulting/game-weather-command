@@ -1,5 +1,5 @@
 import { execSync } from "node:child_process";
-import { cpSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -77,13 +77,28 @@ const steps =
         run("bundle-report", "node", ["scripts/bundle-report.mjs"], { QUALIFICATION_SHA: shortSha }),
         run("test:e2e", npm, ["run", "test:e2e:run"], {}),
         run("test:host", npm, ["run", "test:host:run"], {}),
-        run("release:manifest", npm, ["run", "release:manifest"], {}),
-        run("release:check", npm, ["run", "release:check"], {})
+        run("release:manifest", npm, ["run", "release:manifest"], { GAME_COMMIT_SHA: sourceSha }),
+        run("release:check", npm, ["run", "release:check"], { GAME_COMMIT_SHA: sourceSha })
       ];
 
 if (dirty.length > 0) {
   console.log(`\nQualification for ${shortSha}: FAIL (clean-tree)`);
 } else {
+  let releaseManifest = null;
+  try {
+    releaseManifest = JSON.parse(readFileSync(join(root, "dist", "release-manifest.json"), "utf8"));
+  } catch {
+    // The identity step below records a missing or invalid manifest as a qualification failure.
+  }
+  steps.push({
+    label: "release-manifest-source-sha",
+    command: "dist/release-manifest.json commit equals qualification source SHA",
+    status: releaseManifest?.commit === sourceSha ? "pass" : "fail",
+    durationMs: 0,
+    expectedSourceSha: sourceSha,
+    actualCommit: releaseManifest?.commit ?? null
+  });
+
   // Copy the browser reports into the package so the directory really contains what the
   // documentation says it contains, instead of only the step summary.
   for (const report of ["playwright-report", "playwright-report-host"]) {
@@ -91,6 +106,9 @@ if (dirty.length > 0) {
     if (existsSync(from)) {
       cpSync(from, join(outDir, report), { recursive: true });
     }
+  }
+  if (releaseManifest) {
+    cpSync(join(root, "dist", "release-manifest.json"), join(outDir, "release-manifest.json"));
   }
 
   const failed = steps.filter((step) => step.status === "fail");

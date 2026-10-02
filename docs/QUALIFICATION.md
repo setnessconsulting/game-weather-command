@@ -11,6 +11,8 @@ writes `qualification/<short-sha>/` containing:
 
 * `qualification.json` — machine-readable step results, durations, and overall pass/fail;
 * `bundle-report.json` — compressed transfer sizes vs the WC-01 budget;
+* `release-manifest.json` — artifact manifest whose `commit` field is checked against the
+  qualification's exact source SHA;
 * the Playwright HTML reports copied in from `playwright-report/` and `playwright-report-host/`.
 
 **The pipeline refuses to run on a dirty working tree.** A package is a claim about one exact
@@ -30,8 +32,9 @@ command, and CI runs the same commands on the same lockfile.
 | 2 | bundle report | `node scripts/bundle-report.mjs` | compressed HTML+CSS+JS transfer vs the 350 KiB WC-01 budget |
 | 3 | browser E2E | `npm run test:e2e:run` | Chromium, Firefox, WebKit and a touch device; axe-core on every phase reached; console-error and unhandled-rejection assertions; zero cross-origin network assertion; keyboard-only path; 360 px; 200% and 400% reflow; reduced-motion behaviour; autoplay teardown |
 | 4 | nested-host E2E | `npm run test:host:run` | production build under the games-site versioned asset base (chromium) |
-| 5 | release manifest | `npm run release:manifest` | writes the release manifest from the built artifact |
+| 5 | release manifest | `npm run release:manifest` | writes the release manifest from the built artifact with the qualification's source SHA |
 | 6 | release check | `npm run release:check` | release manifest identity/provenance validation against the built artifact |
+| 7 | manifest SHA binding | manifest `commit` must equal the qualification's full source SHA | proves the release identity describes the same source commit |
 
 Steps 3 and 4 require a build first; `npm run test:e2e` and `npm run test:host` include it,
 `test:e2e:run` and `test:host:run` do not.
@@ -96,7 +99,7 @@ These are **not** covered by `npm run qualify` and must not be inferred from a p
 | Comparator / originality rubric | Human review of feel, clarity and age-appropriateness | GAME-352 |
 | Screen-reader experience with a real screen reader | Human evidence; axe-core catches only a subset | GAME-352 |
 | Renderer frame-rate and long-task budgets | jsdom and headless runs cannot measure them; only bundle transfer, kernel time step and verification latency are measured | `docs/PERFORMANCE_AND_DEVICE_BUDGETS.md` |
-| Pressure, forecast-state and verification encodings on the map itself | Not implemented; the map draws fronts, air masses, precipitation and stations. Pressure appears as a chart series and table column only | `docs/ACCESSIBILITY.md`, GAME-345 |
+| Verification result as a map overlay | Verified and debrief phases use the dimension-by-dimension comparison panel; the map stays on observations and is not rendered as a separate forecast/outcome layer | GAME-345, `docs/ACCESSIBILITY.md` |
 | Clean-clone install from the published remote | Documented procedure, not an automated step | below |
 
 ## Clean-clone check

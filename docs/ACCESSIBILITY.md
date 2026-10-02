@@ -178,12 +178,18 @@ Still required, and **not** substitutable by the checks above:
 - non-color interpretation review with a human;
 - reduced-motion review on an operating system that requests it.
 
-## Known gap
+## Map pressure and forecast state
 
-The map has no encoding for pressure, for forecast state, or for verification result. Pressure is
-present only as a chart series and a station table column; forecast state and verification are
-present only as text. This is recorded rather than hidden, and it is a design decision owed to
-WC-DESIGN (GAME-343) rather than something the renderer should invent.
+Each mapped station shows its observed pressure and short measured tendency beside the marker; the
+accessible map name and station report table provide the complete values. The map states that it
+shows observed conditions only. Before commitment it identifies the forecast as a draft; after
+commitment it keeps the submitted forecast separate and says when comparison unlocks. The map does
+not draw interpolated pressure contours because the scenario model defines station readings, not a
+pressure field.
+
+After comparison, the verification and debrief panels show dimension-by-dimension results. The map
+is intentionally absent in those phases, so a result cannot be mistaken for a newly observed map
+layer.
 
 ## Release blocker
 

@@ -157,6 +157,30 @@ describe("motion preference", () => {
     ).toBeTruthy();
     expect(screen.getByText(/Motion is reduced: the map shows each state directly/)).toBeTruthy();
   });
+
+  it("labels the map as observations-only for draft and committed forecasts", () => {
+    renderMission();
+    expect(screen.getByText(/Map layer: observed conditions only/)).toBeTruthy();
+    expect(screen.getByText(/Your draft stays in the forecast panel/)).toBeTruthy();
+
+    const type = (id: string, value: string): void => {
+      fireEvent.change(document.getElementById(id) as HTMLInputElement, { target: { value } });
+    };
+    type("forecast-temperature-low", "-6");
+    type("forecast-temperature-high", "-6");
+    type("forecast-precipitation-low", "70");
+    type("forecast-precipitation-high", "70");
+    type("forecast-wind-low", "265");
+    type("forecast-wind-high", "265");
+    type("forecast-timing-low", "105");
+    type("forecast-timing-high", "105");
+    fireEvent.click(screen.getByRole("radio", { name: "Medium confidence" }));
+    fireEvent.click(screen.getByRole("radio", { name: /sudden cooler, windier, wetter change/i }));
+    fireEvent.click(screen.getByRole("button", { name: "Commit forecast" }));
+
+    expect(screen.getByText(/Map layer: observed conditions only/)).toBeTruthy();
+    expect(screen.getByText(/Your forecast was committed at .*Its result stays hidden until/)).toBeTruthy();
+  });
 });
 
 describe("no timers survive the mission", () => {

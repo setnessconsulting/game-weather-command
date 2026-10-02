@@ -125,6 +125,20 @@
   margin: 0;
 }
 
+.mapForecastState {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-left: 4px solid var(--info);
+  border-radius: var(--radius-sm);
+  background: var(--surface-sunken);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.mapForecastState strong {
+  color: var(--text);
+}
+
 .bulletList {
   margin: 0;
   padding-left: 1.1rem;
