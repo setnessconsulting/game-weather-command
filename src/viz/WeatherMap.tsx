@@ -2,7 +2,14 @@ import { useId, useMemo } from "react";
 
 import type { KernelScenarioDefinition, ScenarioState } from "@/domain";
 import type { WeatherScenarioV1 } from "@/scenarios";
-import { buildRegionalSummary, formatPrecipitationRate, formatSimulatedTimestamp, roundTo } from "@/game";
+import {
+  buildRegionalSummary,
+  formatPrecipitationRate,
+  formatPressure,
+  formatPressureTendency,
+  formatSimulatedTimestamp,
+  roundTo
+} from "@/game";
 
 import styles from "./WeatherMap.module.css";
 
@@ -68,8 +75,16 @@ export function WeatherMap({
   const stationGeometries = scenario.stations.map((station) => ({
     station,
     x: toX(station.position.x),
-    y: toY(station.position.y)
+    y: toY(station.position.y),
+    observation: state.stations[station.id]!,
+    pressureTrend: roundTo(state.stations[station.id]!.pressureTendencyHpaPer3h, 1)
   }));
+  const stationPressureSummary = stationGeometries
+    .map(
+      ({ station, observation }) =>
+        `${station.name}: ${formatPressure(observation.pressureHpa)}, ${formatPressureTendency(observation.pressureTendencyHpaPer3h)}`
+    )
+    .join("; ");
 
   return (
     <figure className={styles.figure}>
@@ -87,7 +102,7 @@ export function WeatherMap({
         <svg
           viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
           role="img"
-          aria-label={`Regional forecast map at ${summary.timestamp}. Every fact shown here is repeated as text directly below the map, and stations are selected from the station list below it.`}
+          aria-label={`Regional forecast map at ${summary.timestamp}. Station pressure and pressure tendency are shown beside each station: ${stationPressureSummary}. The complete readings are repeated in the station report table directly below the map. Stations are selected from the station list below it.`}
           className={styles.map}
           preserveAspectRatio="xMidYMid meet"
         >
@@ -186,16 +201,26 @@ export function WeatherMap({
             </g>
           ))}
 
-          {stationGeometries.map(({ station, x, y }) => {
+          {stationGeometries.map(({ station, x, y, observation, pressureTrend }) => {
             const selected = station.id === selectedStationId;
+            const labelBelow = y < HEIGHT - 12;
+            const labelY = labelBelow ? y + 1.1 : y - 5;
+            const pressureY = labelBelow ? y + 5.1 : y - 1.2;
+            const tendencyY = labelBelow ? y + 8.6 : y - 9.2;
             return (
               <g key={station.id} className={styles.stationGroup}>
                 {selected ? <circle cx={x} cy={y} r="4.6" className={styles.stationSelectedRing} /> : null}
                 <circle cx={x} cy={y} r="2" className={styles.stationDot} />
                 <line x1={x - 3.4} y1={y} x2={x + 3.4} y2={y} className={styles.stationTick} />
-                <text x={x + 5} y={y + 1.1} className={styles.stationName}>
+                <text x={x + 5} y={labelY} className={styles.stationName}>
                   {station.name}
                   {selected ? " (selected)" : ""}
+                </text>
+                <text x={x + 5} y={pressureY} className={styles.stationPressure}>
+                  {formatPressure(observation.pressureHpa)}
+                </text>
+                <text x={x + 5} y={tendencyY} className={styles.stationTendency}>
+                  {pressureTrend === 0 ? "steady" : pressureTrend > 0 ? "rising" : "falling"}
                 </text>
               </g>
             );
@@ -225,7 +250,7 @@ export function WeatherMap({
         <li>
           <span className={styles.legendText}>
             Station (crossed dot, always labelled; the selected station has an outer ring and the word
-            &ldquo;selected&rdquo; beside its name)
+            &ldquo;selected&rdquo; beside its name; pressure and pressure tendency are written beside each station)
           </span>
         </li>
         <li>

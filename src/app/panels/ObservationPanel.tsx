@@ -89,6 +89,10 @@ export function ObservationPanel({
   const readings = selectedSeries.points.length > 1 ? selectedSeries.points : null;
   const firstReading = readings?.[0]?.observation;
   const lastReading = readings?.[readings.length - 1]?.observation;
+  const committedAttempt =
+    state.phase === "awaiting-outcome" && state.activeAttemptIndex !== null
+      ? state.attempts[state.activeAttemptIndex]
+      : undefined;
 
   const temperatureLines = trendSeries.map(({ station, series }, index) => ({
     id: station.id,
@@ -115,6 +119,12 @@ export function ObservationPanel({
             selectedStationId={state.selectedStationId}
             motionAllowed={motionAllowed}
           />
+          <p className={styles.mapForecastState} aria-live="polite">
+            <strong>Map layer: observed conditions only.</strong>{" "}
+            {committedAttempt
+              ? `Your forecast was committed at ${formatSimulatedTimestamp(committedAttempt.committedAtMinute)}. Its result stays hidden until ${formatSimulatedTimestamp(machine.verificationMinute)}.`
+              : "Your draft stays in the forecast panel; it is not drawn as if it were observed weather."}
+          </p>
 
           <div className={styles.boundaryBlock}>
             <h3>Front position and motion</h3>

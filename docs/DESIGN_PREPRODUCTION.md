@@ -1,10 +1,12 @@
 # Weather Command — As-Built Design Preproduction (WC-DESIGN companion)
 
-**Status: implementation-derived design record. No Figma authority is claimed.** WC-DESIGN's DoD
-requires a real Figma fileKey/version linked from Jira; that artifact is an owner gate (see the
-GAME-343 comment). This document records the design system *as shipped in WC-07/WC-08* so that
-WC-09/WC-10 and the WC-14 comparator review have an authoritative, implementation-annotated design
-reference without inventing decisions the codebase does not already make.
+**Status: implementation-derived record plus AI-authored design source. No Figma authority is
+claimed yet.** WC-DESIGN's DoD requires a real Figma fileKey/version linked from Jira. The editable
+vector source is [`design/figma/weather-command-v1.svg`](../design/figma/weather-command-v1.svg),
+with a decision and provenance handoff in [`FIGMA_HANDOFF.md`](FIGMA_HANDOFF.md). The actual Figma
+file URL/key and version must be recorded after import and readback. The sections below describe the
+system as shipped in WC-07/WC-08; the new design decisions are proposals until reviewed and
+implemented.
 
 ## 1. Design tokens (`src/styles/tokens.css`)
 
@@ -125,3 +127,14 @@ audio-only.
 - Touch targets ≥ 44px (`--tap-target`); no drag-only essential interaction.
 - Reduced motion: token-level transition collapse + component-level override.
 - axe-core E2E gate: the smoke spec asserts zero accessibility violations on boot.
+
+## 11. V1 pressure and forecast-state design
+
+The AI-authored responsive board is in [`design/figma/weather-command-v1.svg`](../design/figma/weather-command-v1.svg).
+The map adds each station's observed pressure and a short measured tendency label beside its
+marker; the station table and the map's accessible name retain the complete value. No isobars or
+interpolated pressure field are drawn because the deterministic scenario model does not define
+either. During observation and after commitment, the map explicitly says it shows observed
+conditions only. A committed result remains hidden until the published comparison time; the
+forecast stays in its own panel. Human science/comparator review and the real Figma file/version
+are still required before this proposal becomes design authority.

@@ -1,0 +1,224 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3000" height="2220" viewBox="0 0 3000 2220" role="img" aria-labelledby="title desc">
+  <title id="title">Weather Command — mission desk and responsive design, version 1</title>
+  <desc id="desc">Original interface concept showing desktop, tablet, phone, and post-forecast debrief layouts. Map pressure is shown only as station readings and tendency, never as invented isobars.</desc>
+  <defs>
+    <pattern id="rainHatch" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(35)">
+      <rect width="12" height="12" fill="#153d42" fill-opacity=".82" />
+      <path d="M0 0V12" stroke="#6fd6c4" stroke-width="3" />
+    </pattern>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#35536c" stroke-opacity=".34" stroke-width="1" />
+    </pattern>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#93a9bc" />
+    </marker>
+    <style>
+      .bg{fill:#08131f}.surface{fill:#102235}.raised{fill:#173149}.sunken{fill:#0b1926}.line{stroke:#35536c}.line-soft{stroke:#22384c}.text{fill:#f5f8fb}.secondary{fill:#c8d4df}.muted{fill:#93a9bc}.blue{fill:#7fc4ff}.coral{fill:#ff9f7a}.mint{fill:#6fd6c4}.yellow{fill:#ffd166}.green{fill:#8fe3a4}.purple{fill:#b6a6ff}.mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}.label{font:700 11px Inter,Segoe UI,Arial,sans-serif;letter-spacing:1.15px}.small{font:12px Inter,Segoe UI,Arial,sans-serif}.body{font:14px Inter,Segoe UI,Arial,sans-serif}.medium{font:600 16px Inter,Segoe UI,Arial,sans-serif}.heading{font:700 25px Inter,Segoe UI,Arial,sans-serif}.title{font:700 34px Inter,Segoe UI,Arial,sans-serif}.button{fill:#ffd166}.button-text{fill:#08131f;font:700 14px Inter,Segoe UI,Arial,sans-serif}.card{fill:#102235;stroke:#35536c;stroke-width:1}.chip{fill:#173149;stroke:#35536c;stroke-width:1}.caption{font:12px Inter,Segoe UI,Arial,sans-serif;fill:#93a9bc}.front{fill:none;stroke:#7fc4ff;stroke-width:4;stroke-dasharray:14 8;stroke-linecap:round}.tabtext{font:700 12px Inter,Segoe UI,Arial,sans-serif;fill:#c8d4df}
+    </style>
+  </defs>
+  <rect width="3000" height="2220" fill="#07111c" />
+  <text x="48" y="42" class="label yellow">WEATHER COMMAND  /  ORIGINAL DESIGN BOARD  /  V1</text>
+  <text x="48" y="82" class="heading text">Forecast desk — evidence first, uncertainty visible</text>
+  <text x="48" y="108" class="small muted">Figma import source · desktop, tablet, phone, and debrief · built from the real mission flow and current science model</text>
+
+  <!-- Desktop mission desk — 1440 × 900 -->
+  <g transform="translate(48 138)">
+    <rect width="1440" height="900" rx="18" class="bg" stroke="#35536c" stroke-width="2" />
+    <rect x="0" y="0" width="1440" height="66" rx="18" class="surface" />
+    <rect x="0" y="48" width="1440" height="18" class="surface" />
+    <circle cx="34" cy="33" r="14" fill="#173149" stroke="#ffd166" />
+    <path d="M28 37L34 23L40 37M30 33H38" fill="none" stroke="#ffd166" stroke-width="2" />
+    <text x="60" y="31" class="medium text">WEATHER COMMAND</text>
+    <text x="60" y="48" class="label muted">FIELD DESK  /  FRONT PASSAGE</text>
+    <rect x="1112" y="17" width="134" height="32" rx="16" class="chip" />
+    <circle cx="1131" cy="33" r="4" class="green" />
+    <text x="1143" y="37" class="label text">OBSERVING</text>
+    <text x="1264" y="38" class="small muted">Mission list</text>
+    <path d="M1385 27H1405M1398 20L1405 27L1398 34" stroke="#c8d4df" stroke-width="1.7" fill="none" />
+
+    <text x="36" y="112" class="label yellow">COACHED MISSION  ·  01 / 04</text>
+    <text x="36" y="151" class="title text">Cold Front Shift</text>
+    <text x="36" y="177" class="body secondary">Forecast when the main change will reach Central Station. Use the evidence; explain your range.</text>
+    <rect x="1204" y="100" width="194" height="42" rx="10" fill="#0b1926" stroke="#35536c" />
+    <text x="1222" y="117" class="label muted">MISSION TIME</text>
+    <text x="1222" y="134" class="medium text mono">T+00  /  240 MIN</text>
+
+    <!-- Workspace left -->
+    <rect x="36" y="202" width="862" height="458" rx="14" class="card" />
+    <text x="60" y="236" class="medium text">Regional map</text>
+    <text x="60" y="257" class="small muted">Schematic region · every map mark has a text equivalent below</text>
+    <rect x="60" y="274" width="814" height="244" rx="10" fill="#0b1926" />
+    <rect x="60" y="274" width="814" height="244" rx="10" fill="url(#grid)" />
+    <text x="82" y="298" class="small blue">Cooler, drier air</text>
+    <text x="649" y="298" class="small coral">Warmer, moister air</text>
+    <circle cx="122" cy="395" r="43" fill="url(#rainHatch)" stroke="#6fd6c4" stroke-opacity=".8" />
+    <text x="122" y="399" text-anchor="middle" class="label text">RAIN BAND</text>
+    <path d="M152 282V505" class="front" />
+    <text x="162" y="325" class="small blue">Cold front · dashed</text>
+    <path d="M174 347L244 347" fill="none" stroke="#93a9bc" stroke-width="1.5" marker-end="url(#arrow)" />
+    <g><circle cx="239" cy="414" r="12" fill="#08131f" stroke="#ffd166" stroke-width="2" /><path d="M230 414H248M239 405V423" stroke="#ffd166" stroke-width="1.4"/><text x="239" y="443" text-anchor="middle" class="small text">West</text><rect x="204" y="455" width="70" height="24" rx="12" fill="#173149"/><text x="239" y="471" text-anchor="middle" class="small text mono">1007 hPa</text></g>
+    <g><circle cx="465" cy="399" r="16" fill="none" stroke="#f5f8fb" stroke-width="2.5"/><circle cx="465" cy="399" r="10" fill="#08131f" stroke="#ffd166" stroke-width="2"/><path d="M457 399H473M465 391V407" stroke="#ffd166" stroke-width="1.3"/><text x="465" y="431" text-anchor="middle" class="small text">Central · selected</text><rect x="430" y="443" width="70" height="24" rx="12" fill="#173149"/><text x="465" y="459" text-anchor="middle" class="small text mono">1006 hPa</text></g>
+    <g><circle cx="724" cy="383" r="12" fill="#08131f" stroke="#ffd166" stroke-width="2"/><path d="M715 383H733M724 374V392" stroke="#ffd166" stroke-width="1.4"/><text x="724" y="412" text-anchor="middle" class="small text">East</text><rect x="689" y="424" width="70" height="24" rx="12" fill="#173149"/><text x="724" y="440" text-anchor="middle" class="small text mono">1005 hPa</text></g>
+    <rect x="60" y="534" width="256" height="90" rx="10" class="sunken" stroke="#22384c" />
+    <text x="78" y="556" class="label muted">PRESSURE · OBSERVED AT STATIONS</text>
+    <text x="78" y="582" class="medium text">1007 → 1006 → 1005 hPa</text>
+    <text x="78" y="605" class="small secondary">No interpolated pressure contours</text>
+    <rect x="328" y="534" width="256" height="90" rx="10" class="sunken" stroke="#22384c" />
+    <text x="346" y="556" class="label muted">FRONT MOVEMENT</text>
+    <text x="346" y="582" class="medium text">Eastward · modeled</text>
+    <text x="346" y="605" class="small secondary">Position + direction are separate facts</text>
+    <rect x="596" y="534" width="278" height="90" rx="10" class="sunken" stroke="#22384c" />
+    <text x="614" y="556" class="label muted">MAP KEY</text>
+    <path d="M614 578H653" class="front" stroke-width="3" />
+    <text x="664" y="582" class="small secondary">Cold front</text>
+    <rect x="774" y="568" width="20" height="18" fill="url(#rainHatch)" stroke="#6fd6c4" />
+    <text x="801" y="582" class="small secondary">Rain band</text>
+    <text x="614" y="609" class="small muted">Station pressure is labeled in hPa</text>
+
+    <!-- Evidence and trend area -->
+    <rect x="36" y="678" width="862" height="182" rx="14" class="card" />
+    <text x="60" y="711" class="medium text">Station evidence</text>
+    <text x="60" y="732" class="small muted">Select a row to inspect the complete reading and the same station’s trend</text>
+    <rect x="60" y="746" width="814" height="38" rx="8" class="sunken" />
+    <text x="76" y="770" class="label muted">STATION</text><text x="230" y="770" class="label muted">TEMP</text><text x="340" y="770" class="label muted">PRESSURE</text><text x="482" y="770" class="label muted">TREND</text><text x="636" y="770" class="label muted">WIND</text><text x="764" y="770" class="label muted">RAIN</text>
+    <rect x="60" y="789" width="814" height="30" rx="6" fill="#173149" stroke="#ffd166" />
+    <text x="76" y="809" class="small text">Central · selected</text><text x="230" y="809" class="small text">23 °C</text><text x="340" y="809" class="small text">1006 hPa</text><text x="482" y="809" class="small yellow">— Start reading</text><text x="636" y="809" class="small text">190° · 4 m/s</text><text x="764" y="809" class="small text">0 mm/h</text>
+    <text x="60" y="843" class="small muted">Advance time to reveal pressure and temperature trends. Values shown are the published scenario start state.</text>
+
+    <!-- Right rail -->
+    <rect x="922" y="202" width="482" height="172" rx="14" class="card" />
+    <text x="946" y="236" class="medium text">Simulated clock</text>
+    <text x="946" y="261" class="small muted">Step through evidence at your own pace</text>
+    <rect x="946" y="280" width="90" height="44" rx="9" class="chip"/><text x="991" y="307" text-anchor="middle" class="medium text">−30 min</text>
+    <rect x="1048" y="280" width="90" height="44" rx="9" class="button"/><text x="1093" y="307" text-anchor="middle" class="button-text">+30 min</text>
+    <rect x="1150" y="280" width="90" height="44" rx="9" class="chip"/><text x="1195" y="307" text-anchor="middle" class="medium text">+60 min</text>
+    <rect x="1252" y="280" width="128" height="44" rx="9" class="chip"/><text x="1316" y="307" text-anchor="middle" class="small text">Play steps</text>
+    <text x="946" y="350" class="small secondary">At least two readings are needed for a trend.</text>
+
+    <rect x="922" y="380" width="482" height="512" rx="14" class="card" />
+    <text x="946" y="405" class="label yellow">FORECAST WINDOW  ·  30–180 MIN</text>
+    <text x="946" y="435" class="heading text">Your forecast</text>
+    <text x="946" y="456" class="small muted">For Central Station · ranges keep uncertainty visible</text>
+    <text x="946" y="483" class="label muted">TEMPERATURE CHANGE</text>
+    <rect x="946" y="491" width="210" height="34" rx="7" class="sunken" stroke="#35536c"/><text x="959" y="513" class="small text">Smallest  —  °C</text>
+    <rect x="1166" y="491" width="214" height="34" rx="7" class="sunken" stroke="#35536c"/><text x="1179" y="513" class="small text">Largest  —  °C</text>
+    <text x="946" y="540" class="label muted">PRECIPITATION PROBABILITY</text>
+    <rect x="946" y="548" width="210" height="34" rx="7" class="sunken" stroke="#35536c"/><text x="959" y="570" class="small text">Lowest chance  —  %</text>
+    <rect x="1166" y="548" width="214" height="34" rx="7" class="sunken" stroke="#35536c"/><text x="1179" y="570" class="small text">Highest chance  —  %</text>
+    <text x="946" y="597" class="label muted">WIND DIRECTION SECTOR</text>
+    <rect x="946" y="605" width="210" height="34" rx="7" class="sunken" stroke="#35536c"/><text x="959" y="627" class="small text">Sector start  —  °</text>
+    <rect x="1166" y="605" width="214" height="34" rx="7" class="sunken" stroke="#35536c"/><text x="1179" y="627" class="small text">Sector end  —  °</text>
+    <text x="946" y="654" class="label muted">TIMING WINDOW · MINUTES FROM START</text>
+    <rect x="946" y="662" width="210" height="34" rx="7" class="sunken" stroke="#35536c"/><text x="959" y="684" class="small text">Earliest arrival  —  min</text>
+    <rect x="1166" y="662" width="214" height="34" rx="7" class="sunken" stroke="#35536c"/><text x="1179" y="684" class="small text">Latest arrival  —  min</text>
+    <text x="946" y="710" class="label muted">CONFIDENCE</text>
+    <rect x="946" y="719" width="132" height="32" rx="16" class="chip"/><text x="1012" y="740" text-anchor="middle" class="small secondary">Low</text>
+    <rect x="1087" y="719" width="132" height="32" rx="16" fill="#173149" stroke="#ffd166" stroke-width="2"/><text x="1153" y="740" text-anchor="middle" class="small text">Medium · selected</text>
+    <rect x="1228" y="719" width="152" height="32" rx="16" class="chip"/><text x="1304" y="740" text-anchor="middle" class="small secondary">High</text>
+    <text x="946" y="766" class="label muted">OPERATIONAL RECOMMENDATION</text>
+    <rect x="946" y="774" width="434" height="34" rx="8" class="sunken" stroke="#35536c"/><text x="961" y="796" class="small secondary">Choose the plan your forecast supports  ▾</text>
+    <text x="946" y="827" class="small muted">Evidence attached: 1 of 3 reports</text>
+    <rect x="946" y="838" width="434" height="38" rx="8" class="button" />
+    <text x="1163" y="863" text-anchor="middle" class="button-text">Commit forecast</text>
+  </g>
+  <text x="48" y="1060" class="label muted">01  DESKTOP  ·  1440 × 900  ·  TWO-COLUMN EVIDENCE DESK</text>
+
+  <!-- Tablet mission desk — 768 × 1024 -->
+  <g transform="translate(1540 138)">
+    <rect width="768" height="1024" rx="18" class="bg" stroke="#35536c" stroke-width="2" />
+    <rect width="768" height="64" rx="18" class="surface"/><rect y="48" width="768" height="16" class="surface" />
+    <circle cx="28" cy="31" r="12" fill="#173149" stroke="#ffd166"/><path d="M23 35L28 23L33 35M25 31H31" fill="none" stroke="#ffd166" stroke-width="1.8"/>
+    <text x="50" y="35" class="medium text">WEATHER COMMAND</text><text x="620" y="35" class="small muted">Mission list</text>
+    <text x="28" y="104" class="label yellow">COACHED MISSION · OBSERVING</text><text x="28" y="139" class="heading text">Cold Front Shift</text>
+    <text x="28" y="164" class="small secondary">Forecast the change at Central Station.</text>
+    <rect x="28" y="188" width="712" height="364" rx="14" class="card" />
+    <text x="50" y="220" class="medium text">Regional map</text><text x="50" y="241" class="small muted">T+00 · published scenario start state</text>
+    <rect x="50" y="257" width="668" height="203" rx="10" fill="#0b1926"/><rect x="50" y="257" width="668" height="203" rx="10" fill="url(#grid)"/>
+    <text x="67" y="280" class="small blue">Cooler, drier</text><text x="561" y="280" class="small coral">Warmer, moister</text>
+    <circle cx="111" cy="359" r="32" fill="url(#rainHatch)" stroke="#6fd6c4"/><path d="M134 264V450" class="front" stroke-width="3"/>
+    <text x="144" y="305" class="small blue">Cold front · dashed</text><path d="M154 322H213" fill="none" stroke="#93a9bc" stroke-width="1.4" marker-end="url(#arrow)"/>
+    <g><circle cx="236" cy="367" r="9" fill="#08131f" stroke="#ffd166" stroke-width="2"/><path d="M229 367H243M236 360V374" stroke="#ffd166"/><text x="236" y="391" text-anchor="middle" class="small text">West</text></g>
+    <g><circle cx="389" cy="354" r="14" fill="none" stroke="#f5f8fb" stroke-width="2"/><circle cx="389" cy="354" r="8" fill="#08131f" stroke="#ffd166" stroke-width="2"/><path d="M382 354H396M389 347V361" stroke="#ffd166"/><text x="389" y="384" text-anchor="middle" class="small text">Central · selected</text></g>
+    <g><circle cx="584" cy="345" r="9" fill="#08131f" stroke="#ffd166" stroke-width="2"/><path d="M577 345H591M584 338V352" stroke="#ffd166"/><text x="584" y="369" text-anchor="middle" class="small text">East</text></g>
+    <rect x="50" y="473" width="668" height="56" rx="8" class="sunken"/><text x="68" y="496" class="label muted">PRESSURE · STATION REPORTS</text><text x="68" y="517" class="body text mono">West 1007  →  Central 1006  →  East 1005 hPa</text>
+    <rect x="28" y="570" width="712" height="132" rx="14" class="card"/><text x="50" y="603" class="medium text">Station reports</text>
+    <rect x="50" y="618" width="206" height="64" rx="9" fill="#173149" stroke="#ffd166"/><text x="66" y="641" class="label yellow">CENTRAL · SELECTED</text><text x="66" y="666" class="body text">23 °C · 1006 hPa</text>
+    <rect x="269" y="618" width="206" height="64" rx="9" class="sunken" stroke="#35536c"/><text x="285" y="641" class="label muted">WEST</text><text x="285" y="666" class="body text">22 °C · 1007 hPa</text>
+    <rect x="488" y="618" width="230" height="64" rx="9" class="sunken" stroke="#35536c"/><text x="504" y="641" class="label muted">EAST</text><text x="504" y="666" class="body text">24 °C · 1005 hPa</text>
+    <rect x="28" y="720" width="712" height="238" rx="14" class="card"/><text x="50" y="753" class="medium text">Your forecast · Central Station</text><text x="50" y="775" class="small muted">Forecast window 30–180 min · ranges keep uncertainty visible</text>
+    <text x="50" y="810" class="label muted">TEMPERATURE CHANGE</text><rect x="50" y="821" width="322" height="48" rx="8" class="sunken" stroke="#35536c"/><text x="68" y="851" class="body text">Smallest  —  °C</text><rect x="384" y="821" width="334" height="48" rx="8" class="sunken" stroke="#35536c"/><text x="402" y="851" class="body text">Largest  —  °C</text>
+    <text x="50" y="901" class="label muted">CONFIDENCE</text><rect x="160" y="881" width="116" height="42" rx="21" class="chip"/><text x="218" y="907" text-anchor="middle" class="small secondary">Low</text><rect x="289" y="881" width="152" height="42" rx="21" fill="#173149" stroke="#ffd166" stroke-width="2"/><text x="365" y="907" text-anchor="middle" class="small text">Medium · selected</text><rect x="454" y="881" width="116" height="42" rx="21" class="chip"/><text x="512" y="907" text-anchor="middle" class="small secondary">High</text>
+    <rect x="50" y="934" width="668" height="44" rx="10" class="button"/><text x="384" y="962" text-anchor="middle" class="button-text">Commit forecast</text>
+    <text x="50" y="1004" class="small muted">More ranges continue below · compare unlocks only after the window closes.</text>
+  </g>
+  <text x="1540" y="1184" class="label muted">02  TABLET  ·  768 × 1024  ·  STACK MAP, READINGS, AND FORECAST</text>
+
+  <!-- Phone mission desk — 390 × 844 -->
+  <g transform="translate(2400 138)">
+    <rect width="390" height="844" rx="24" class="bg" stroke="#35536c" stroke-width="2" />
+    <rect width="390" height="58" rx="24" class="surface"/><rect y="42" width="390" height="16" class="surface"/>
+    <circle cx="24" cy="29" r="10" fill="#173149" stroke="#ffd166"/><path d="M20 33L24 21L28 33M22 29H26" fill="none" stroke="#ffd166" stroke-width="1.5"/>
+    <text x="43" y="33" class="small text" font-weight="700">WEATHER COMMAND</text><text x="326" y="33" class="small muted">Exit</text>
+    <text x="18" y="88" class="label yellow">COACHED · OBSERVING</text><text x="18" y="118" class="heading text" font-size="24">Cold Front Shift</text><text x="18" y="141" class="small secondary">Forecast for Central Station</text>
+    <rect x="18" y="159" width="354" height="260" rx="12" class="card"/><text x="34" y="187" class="medium text">Regional map</text><text x="34" y="207" class="small muted">T+00 · scenario start</text>
+    <rect x="34" y="220" width="322" height="130" rx="8" fill="#0b1926"/><rect x="34" y="220" width="322" height="130" rx="8" fill="url(#grid)"/>
+    <text x="46" y="239" class="small blue" font-size="10">Cooler, drier</text><text x="257" y="239" class="small coral" font-size="10">Warmer, moister</text>
+    <circle cx="67" cy="285" r="23" fill="url(#rainHatch)" stroke="#6fd6c4"/><path d="M83 224V346" class="front" stroke-width="2.4"/><text x="91" y="256" class="small blue" font-size="10">Cold front</text>
+    <circle cx="123" cy="291" r="6" fill="#08131f" stroke="#ffd166" stroke-width="1.6"/><path d="M117 291H129M123 285V297" stroke="#ffd166"/><text x="123" y="311" text-anchor="middle" class="small text" font-size="10">West</text>
+    <circle cx="196" cy="285" r="11" fill="none" stroke="#f5f8fb" stroke-width="1.7"/><circle cx="196" cy="285" r="6" fill="#08131f" stroke="#ffd166" stroke-width="1.4"/><path d="M190 285H202M196 279V291" stroke="#ffd166"/><text x="196" y="310" text-anchor="middle" class="small text" font-size="10">Central</text>
+    <circle cx="286" cy="279" r="6" fill="#08131f" stroke="#ffd166" stroke-width="1.6"/><path d="M280 279H292M286 273V285" stroke="#ffd166"/><text x="286" y="299" text-anchor="middle" class="small text" font-size="10">East</text>
+    <text x="34" y="376" class="label muted">PRESSURE · OBSERVED</text><text x="34" y="400" class="body text mono">1007 → 1006 → 1005 hPa</text>
+    <rect x="18" y="435" width="354" height="112" rx="12" class="card"/><text x="34" y="465" class="medium text">Central Station</text><text x="34" y="488" class="small muted">Selected report · current conditions</text>
+    <rect x="34" y="501" width="150" height="32" rx="8" class="sunken"/><text x="48" y="522" class="small text">23 °C</text><rect x="192" y="501" width="164" height="32" rx="8" class="sunken"/><text x="206" y="522" class="small text">1006 hPa</text>
+    <rect x="18" y="563" width="354" height="170" rx="12" class="card"/><text x="34" y="593" class="medium text">Your forecast</text><text x="34" y="614" class="small muted">Temperature change · credible range</text>
+    <rect x="34" y="628" width="150" height="40" rx="8" class="sunken" stroke="#35536c"/><text x="48" y="653" class="small text">Low  —  °C</text><rect x="192" y="628" width="164" height="40" rx="8" class="sunken" stroke="#35536c"/><text x="206" y="653" class="small text">High  —  °C</text>
+    <text x="34" y="696" class="small secondary">Confidence: <tspan class="yellow">Medium</tspan>  ·  Evidence: 1 attached</text><text x="34" y="718" class="small muted">More fields and commit below ↓</text>
+    <rect x="0" y="742" width="390" height="102" class="surface"/>
+    <text x="18" y="765" class="small muted">Time · 0 of 240 min</text><rect x="18" y="778" width="116" height="46" rx="10" class="chip"/><text x="76" y="807" text-anchor="middle" class="small text">−30 min</text>
+    <rect x="143" y="778" width="229" height="46" rx="10" class="button"/><text x="257" y="807" text-anchor="middle" class="button-text">Advance 30 min</text>
+  </g>
+  <text x="2400" y="1006" class="label muted">03  PHONE  ·  390 × 844  ·  PROGRESSIVE PANELS + FIXED TIME ACTION</text>
+
+  <!-- Post-comparison debrief — 1440 × 900 -->
+  <g transform="translate(48 1214)">
+    <rect width="1440" height="900" rx="18" class="bg" stroke="#35536c" stroke-width="2" />
+    <rect width="1440" height="66" rx="18" class="surface"/><rect y="48" width="1440" height="18" class="surface"/>
+    <circle cx="34" cy="33" r="14" fill="#173149" stroke="#ffd166"/><path d="M28 37L34 23L40 37M30 33H38" fill="none" stroke="#ffd166" stroke-width="2"/>
+    <text x="60" y="31" class="medium text">WEATHER COMMAND</text><text x="60" y="48" class="label muted">MISSION DEBRIEF  /  ATTEMPT 1</text>
+    <rect x="1180" y="17" width="218" height="32" rx="16" fill="#15342d" stroke="#3e8260"/><circle cx="1199" cy="33" r="4" class="green"/><text x="1211" y="37" class="label green">COMPARED WITH RECORD</text>
+    <text x="36" y="116" class="label yellow">COLD FRONT SHIFT  ·  CENTRAL STATION</text><text x="36" y="155" class="title text">What did your evidence support?</text><text x="36" y="181" class="body secondary">Read the forecast beside the record. The explanation matters as much as the range.</text>
+    <rect x="36" y="210" width="884" height="424" rx="14" class="card"/>
+    <text x="60" y="248" class="medium text">Forecast compared with the record</text>
+    <rect x="60" y="270" width="268" height="48" rx="8" class="sunken"/><text x="78" y="290" class="label muted">YOUR FORECAST</text><text x="78" y="308" class="small text">Committed before the window closed</text>
+    <rect x="342" y="270" width="268" height="48" rx="8" class="sunken"/><text x="360" y="290" class="label muted">OBSERVED RECORD</text><text x="360" y="308" class="small text">Revealed after comparison unlocked</text>
+    <rect x="624" y="270" width="272" height="48" rx="8" class="sunken"/><text x="642" y="290" class="label muted">READOUT</text><text x="642" y="308" class="small text">Ranges can be defensible without exact matches</text>
+    <text x="78" y="354" class="label muted">DIMENSION</text><text x="282" y="354" class="label muted">PREDICTED RANGE</text><text x="500" y="354" class="label muted">OBSERVED</text><text x="694" y="354" class="label muted">INTERPRETATION</text>
+    <path d="M60 367H896M60 429H896M60 491H896M60 553H896" stroke="#22384c"/>
+    <text x="78" y="404" class="body text">Arrival timing</text><text x="282" y="404" class="body secondary">90–150 min</text><text x="500" y="404" class="body secondary">120–180 min</text><text x="694" y="404" class="body green">Partially supported</text>
+    <text x="78" y="466" class="body text">Temperature</text><text x="282" y="466" class="body secondary">−4 to −1 °C</text><text x="500" y="466" class="body secondary">−3 °C</text><text x="694" y="466" class="body green">Range includes record</text>
+    <text x="78" y="528" class="body text">Precipitation chance</text><text x="282" y="528" class="body secondary">20–45 %</text><text x="500" y="528" class="body secondary">Within authored band</text><text x="694" y="528" class="body yellow">Review evidence</text>
+    <text x="78" y="590" class="body text">Wind sector</text><text x="282" y="590" class="body secondary">220°–270°</text><text x="500" y="590" class="body secondary">245°</text><text x="694" y="590" class="body green">Range includes record</text>
+    <text x="60" y="616" class="small muted">Values here illustrate layout and will be bound to a qualified mission record before release.</text>
+
+    <rect x="944" y="210" width="460" height="204" rx="14" class="card"/>
+    <text x="968" y="246" class="medium text">Evidence trail</text><text x="968" y="271" class="small muted">Reasoning attached to this forecast</text>
+    <circle cx="978" cy="305" r="5" class="mint"/><text x="994" y="310" class="body text">Central Station report · attached</text>
+    <circle cx="978" cy="339" r="5" class="mint"/><text x="994" y="344" class="body text">Pressure trend · opened before commit</text>
+    <circle cx="978" cy="373" r="5" fill="none" stroke="#93a9bc" stroke-width="1.5"/><text x="994" y="378" class="body muted">East Station report · not attached</text>
+    <rect x="944" y="432" width="460" height="202" rx="14" class="card"/>
+    <text x="968" y="468" class="medium text">Confidence calibration</text>
+    <rect x="968" y="487" width="118" height="36" rx="18" fill="#173149" stroke="#ffd166"/><text x="1027" y="510" text-anchor="middle" class="small text">Medium · chosen</text>
+    <text x="968" y="551" class="heading green">Well calibrated</text><text x="968" y="577" class="body secondary">Your confidence fits the width of your range</text>
+    <text x="968" y="604" class="small muted">This is feedback about the forecast, not a grade on you.</text>
+
+    <rect x="36" y="656" width="1368" height="154" rx="14" class="card"/>
+    <text x="60" y="692" class="medium text">Guided debrief · why the forecast changed</text>
+    <rect x="60" y="709" width="423" height="76" rx="9" class="sunken"/><text x="78" y="733" class="label blue">01  OBSERVE</text><text x="78" y="760" class="body text">Pressure fell as the boundary approached.</text>
+    <rect x="500" y="709" width="423" height="76" rx="9" class="sunken"/><text x="518" y="733" class="label coral">02  CONNECT</text><text x="518" y="760" class="body text">West changed first; Central was next in sequence.</text>
+    <rect x="940" y="709" width="440" height="76" rx="9" class="sunken"/><text x="958" y="733" class="label mint">03  REVISE</text><text x="958" y="760" class="body text">Widen timing, cite the station sequence, compare again.</text>
+    <rect x="1048" y="830" width="170" height="44" rx="10" class="chip"/><text x="1133" y="858" text-anchor="middle" class="medium text">Mission list</text>
+    <rect x="1230" y="830" width="174" height="44" rx="10" class="button"/><text x="1317" y="858" text-anchor="middle" class="button-text">Revise forecast</text>
+  </g>
+  <text x="48" y="2138" class="label muted">04  DEBRIEF  ·  1440 × 900  ·  SIDE-BY-SIDE RECORD, DIMENSIONAL FEEDBACK, RECOVERY ALWAYS AVAILABLE</text>
+  <text x="48" y="2172" class="small secondary">Design rules: 44 px minimum controls · focus ring #FFD166 · text labels + patterns, never color alone · reduced motion removes interpolation · no live-weather implication.</text>
+</svg>
