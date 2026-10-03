@@ -1,12 +1,13 @@
 # Weather Command — As-Built Design Preproduction (WC-DESIGN companion)
 
 **Status: implementation-derived record plus AI-authored design source. No Figma authority is
-claimed yet.** WC-DESIGN's DoD requires a real Figma fileKey/version linked from Jira. The editable
-vector source is [`design/figma/weather-command-v1.svg`](../design/figma/weather-command-v1.svg),
-with a decision and provenance handoff in [`FIGMA_HANDOFF.md`](FIGMA_HANDOFF.md). The actual Figma
-file URL/key and version must be recorded after import and readback. The sections below describe the
-system as shipped in WC-07/WC-08; the new design decisions are proposals until reviewed and
-implemented.
+claimed yet.** A native Figma file key/version now exists and is recorded in
+[`FIGMA_HANDOFF.md`](FIGMA_HANDOFF.md) and on GAME-343; that records the artifact only and does not
+establish design authority. WC-DESIGN's DoD additionally requires independent review and
+reconciliation of that native file against the editable vector source
+[`design/figma/weather-command-v1.svg`](../design/figma/weather-command-v1.svg) and against this
+as-built record. The sections below describe the system as shipped in WC-07/WC-08; the new design
+decisions are proposals until reviewed and implemented.
 
 ## 1. Design tokens (`src/styles/tokens.css`)
 
@@ -136,5 +137,6 @@ marker; the station table and the map's accessible name retain the complete valu
 interpolated pressure field are drawn because the deterministic scenario model does not define
 either. During observation and after commitment, the map explicitly says it shows observed
 conditions only. A committed result remains hidden until the published comparison time; the
-forecast stays in its own panel. Human science/comparator review and the real Figma file/version
-are still required before this proposal becomes design authority.
+forecast stays in its own panel. Independent reconciliation of the native Figma file against this
+record, and human science/comparator review, are still required before this proposal becomes design
+authority.
