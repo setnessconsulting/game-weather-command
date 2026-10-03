@@ -87,6 +87,7 @@ jobs:
           retention-days: 30
 
   publish-r2:
+    timeout-minutes: 20
     if: ${{ inputs.publish_to_r2 }}
     needs: validate
     runs-on: ubuntu-latest
