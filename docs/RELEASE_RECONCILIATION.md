@@ -37,7 +37,7 @@ Keep Weather Command unavailable in production. Reconcile the immutable object a
 ## Remaining evidence owners
 
 - GAME-341: independent human science sign-off for the four canonical scenarios.
-- GAME-343: create and read back the Figma file key/version; review it against the source SVG and record the approved frames.
+- GAME-343: reconcile the recorded native Figma file/version against the source SVG and the as-built record, then record the approved frame names; independent review remains open.
 - GAME-342 and GAME-347: target-age usability and first-use guided-mission evidence.
 - GAME-345 and GAME-350: renderer frame-rate and long-task measurements on representative physical devices; headless browser checks do not satisfy this gate.
 - GAME-348: final visual polish, asset provenance, and motion/audio/mobile review.

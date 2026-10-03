@@ -50,7 +50,8 @@ accessibility review remain open before it can become release authority.
 
 1. Review the native Figma frames against the repository SVG and reconcile any differences before
    declaring either source authoritative.
-2. Record the exact file URL/key, version, and page/frame names here and in GAME-343.
+2. Record the verbatim page and frame names from the native file here and in GAME-343. The file URL,
+   key, and version ID are already recorded above.
 3. Review the pressure and forecast-state choices with the independent science and comparator
    reviewers. Record changes rather than treating this AI-authored concept as sign-off.
 4. Reconcile the approved design with the production components, accessibility equivalents,
